@@ -10,19 +10,17 @@ import random
 import threading
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=5)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
 parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
-parser.add_argument('-render', type=str2bool,  help='#Render?',  default=False)
 parser.add_argument('-savetag', help='Saved tag',  default='')
-parser.add_argument('-gamma', type=float,  help='#Gamma',  default=0.99)
+parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=True)
 parser.add_argument('-seed', type=float,  help='#Seed',  default=7)
 
 ROLLOUT_SIZE = vars(parser.parse_args())['rollsize']
 SEED = vars(parser.parse_args())['seed']
 POP_SIZE = vars(parser.parse_args())['popsize']
 SAVE_TAG = vars(parser.parse_args())['savetag']
-GAMMA = vars(parser.parse_args())['gamma']
-RENDER = vars(parser.parse_args())['render']
+USE_PG = vars(parser.parse_args())['pg']
 CUDA = True
 
 
@@ -38,10 +36,9 @@ class Parameters:
 
 
         #Rover domain
-        self.dim_x = self.dim_y = 15; self.obs_radius = 100; self.act_dist = 2; self.angle_res = 20
-        self.num_poi = 5; self.num_agents = 8; self.ep_len = 30
-        self.poi_rand = True; self.coupling = 4; self.rover_speed = 1
-        self.render = RENDER
+        self.dim_x = self.dim_y = 15; self.obs_radius = 100; self.act_dist = 2; self.angle_res = 10
+        self.num_poi = 5; self.num_agents = 4; self.ep_len = 30
+        self.poi_rand = False; self.coupling = 2; self.rover_speed = 1
         self.sensor_model = 'closest'  #Closest VS Density
 
         #TD3 params
@@ -51,7 +48,7 @@ class Parameters:
         self.tau = 5e-3
         self.init_w = True
         self.gradperstep = 1.0
-        self.gamma = GAMMA
+        self.gamma = 0.99
         self.batch_size = 128
         self.buffer_size = 500000
         self.updates_per_step = 1
@@ -167,26 +164,24 @@ class MERL:
 
 
         ########## START POLICY GRADIENT ROLLOUT ##########
-        #Synch pg_actors to its corresponding rollout_bucket
-        for agent in self.agents: agent.update_rollout_actor()
+        if USE_PG:
+            #Synch pg_actors to its corresponding rollout_bucket
+            for agent in self.agents: agent.update_rollout_actor()
 
-        #Start rollouts using the rollout actors
-        for id, pipe in enumerate(self.pg_task_pipes):
-            pipe[0].send([id for _ in range(self.args.num_agents)]) #Index 0 for the Rollout bucket
+            #Start rollouts using the rollout actors
+            for id, pipe in enumerate(self.pg_task_pipes):
+                pipe[0].send([id for _ in range(self.args.num_agents)]) #Index 0 for the Rollout bucket
 
 
+            ############ POLICY GRADIENT UPDATES #########
+            # Spin up threads for each agent
+            threads = [threading.Thread(target=agent.update_parameters, args=()) for agent in self.agents]
 
+            # Start threads
+            for thread in threads: thread.start()
 
-        ############ POLICY GRADIENT UPDATES #########
-
-        # Spin up threads for each agent
-        threads = [threading.Thread(target=agent.update_parameters, args=()) for agent in self.agents]
-
-        # Start threads
-        for thread in threads: thread.start()
-
-        # Join threads
-        for thread in threads: thread.join()
+            # Join threads
+            for thread in threads: thread.join()
 
 
         all_fits = []
@@ -229,14 +224,17 @@ if __name__ == "__main__":
 
     ###### TRAINING LOOP ########
     for gen in range(1, 1000000000): #RUN VIRTUALLY FOREVER
-        gen_time = time.time()
 
         #ONE EPOCH OF TRAINING
         best_score = ai.train()
 
         #PRINT PROGRESS
-        print('Ep:', gen, 'Gen_best:', pprint(best_score),
-              'Time:',pprint(time.time()-gen_time))
+        print('Ep:', gen, 'Gen_best/Avg:', pprint(best_score),
+              'FPS:',pprint(ai.agents[0].buffer.total_frames/(time.time()-time_start)),
+              'Use_Pg:', USE_PG,
+              'Evo/ROllout size:', POP_SIZE, '/', ROLLOUT_SIZE,
+              '#Samples seen:', ai.agents[0].buffer.total_frames
+              )
 
         gen_tracker.update([best_score], gen)
 

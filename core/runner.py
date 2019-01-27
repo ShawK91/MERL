@@ -1,6 +1,6 @@
 from core.env_wrapper import EnvironmentWrapper
 from core import mod_utils as utils
-import numpy as np, torch
+import numpy as np, random
 
 
 #Rollout evaluate an agent in a complete game
@@ -23,13 +23,10 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
     """
 
     env = EnvironmentWrapper(args)
-    np.random.seed(id)
+    np.random.seed(id); random.seed(id)
 
     while True:
         teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
-
-        if type == 'pg':
-            a = 0
 
 
         # Get the current team actors
@@ -62,7 +59,8 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
             #DONE FLAG IS Received
             if done:
-                #if RENDER: env.render()
+                RENDER = random.random() < 0.01
+                if RENDER: env.render()
 
                 #Push experiences to main
                 for agent_id, buffer in enumerate(data_bucket):
