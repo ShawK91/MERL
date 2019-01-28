@@ -13,9 +13,9 @@ import threading
 if True:
     parser = argparse.ArgumentParser()
     parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
-    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
     parser.add_argument('-savetag', help='Saved tag',  default='')
-    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
+    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
     parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
     parser.add_argument('-agents', type=int,  help='#agents',  default=8)
@@ -262,8 +262,8 @@ if __name__ == "__main__":
         print('Ep:', gen, 'Gen_best/Avg:', pprint(best_score), pprint(gen_tracker.all_tracker[0][1]) ,
               'FPS:',pprint(ai.agents[0].buffer.total_frames/(time.time()-time_start)),
               '#Samples seen:', ai.agents[0].buffer.total_frames,
-              'SAVETAG', SAVE_TAG
               )
+        if gen % 7 ==0: print(SAVE_TAG)
 
         gen_tracker.update([best_score], gen)
 
