@@ -1,5 +1,4 @@
 from core.agent import Agent
-from core import models
 from core.mod_utils import list_mean, pprint, str2bool
 import numpy as np, os, time, random, torch
 from core import mod_utils as utils
@@ -9,22 +8,52 @@ import argparse
 import random
 import threading
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
-parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
-parser.add_argument('-savetag', help='Saved tag',  default='')
-parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=True)
-parser.add_argument('-seed', type=float,  help='#Seed',  default=7)
 
-ROLLOUT_SIZE = vars(parser.parse_args())['rollsize']
-SEED = vars(parser.parse_args())['seed']
-POP_SIZE = vars(parser.parse_args())['popsize']
-SAVE_TAG = vars(parser.parse_args())['savetag']
-USE_PG = vars(parser.parse_args())['pg']
-CUDA = True
+#ARGPARSE
+if True:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
+    parser.add_argument('-savetag', help='Saved tag',  default='')
+    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
+    parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
+    parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=8)
+    parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=4)
+    parser.add_argument('-eplen', type=int,  help='eplen',  default=25)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=10)
+    parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
+    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
 
+    ROLLOUT_SIZE = vars(parser.parse_args())['rollsize']
+    SEED = vars(parser.parse_args())['seed']
+    POP_SIZE = vars(parser.parse_args())['popsize']
+    SAVE_TAG = vars(parser.parse_args())['savetag']
+    USE_PG = vars(parser.parse_args())['pg']
+    WORLD_DIM = vars(parser.parse_args())['dim']
+    NUM_POIS = vars(parser.parse_args())['pois']
+    COUPLING = vars(parser.parse_args())['coupling']
+    EPLEN = vars(parser.parse_args())['eplen']
+    ANGLE_RES = vars(parser.parse_args())['angle_res']
+    RAND_POI = vars(parser.parse_args())['randpoi']
+    SENSOR_MODEL = vars(parser.parse_args())['sensor_model']
+    NUM_AGENTS = vars(parser.parse_args())['agents']
 
-SAVE_TAG = SAVE_TAG + '_' + str(POP_SIZE) + '_' + str(ROLLOUT_SIZE)
+    CUDA = True
+    SAVE_TAG = SAVE_TAG + \
+               '_pop' + str(POP_SIZE)+ \
+               '_roll' + str(ROLLOUT_SIZE) + \
+               '_dim' + str(WORLD_DIM) + \
+               '_anglr' + str(ANGLE_RES) + \
+               '_couple' + str(COUPLING) + \
+               '_eplen' + str(EPLEN) + \
+               '#pois' + str(NUM_POIS) + \
+               '_#agents' + str(NUM_AGENTS) + \
+               '_sensor' + str(SENSOR_MODEL) + \
+               '_poi_rand' + str(RAND_POI) + \
+               '_use_pg' + str(USE_PG) + \
+               '_seed' + str(SEED)
 
 class Parameters:
     def __init__(self):
@@ -36,10 +65,10 @@ class Parameters:
 
 
         #Rover domain
-        self.dim_x = self.dim_y = 15; self.obs_radius = 100; self.act_dist = 2; self.angle_res = 10
-        self.num_poi = 5; self.num_agents = 4; self.ep_len = 30
-        self.poi_rand = False; self.coupling = 2; self.rover_speed = 1
-        self.sensor_model = 'closest'  #Closest VS Density
+        self.dim_x = self.dim_y = WORLD_DIM; self.obs_radius = WORLD_DIM * 2; self.act_dist = 2; self.angle_res = ANGLE_RES
+        self.num_poi = NUM_POIS; self.num_agents = NUM_AGENTS; self.ep_len = EPLEN
+        self.poi_rand = RAND_POI; self.coupling = COUPLING; self.rover_speed = 1
+        self.sensor_model = SENSOR_MODEL  #Closest VS Density
 
         #TD3 params
         self.algo_name = 'TD3'
@@ -195,8 +224,9 @@ class MERL:
 
 
         ####### JOIN PG ROLLOUTS ########
-        for pipe in self.pg_result_pipes:
-            _ = pipe[1].recv()
+        if USE_PG:
+            for pipe in self.pg_result_pipes:
+                _ = pipe[1].recv()
 
 
         # #Save models periodically
@@ -229,11 +259,10 @@ if __name__ == "__main__":
         best_score = ai.train()
 
         #PRINT PROGRESS
-        print('Ep:', gen, 'Gen_best/Avg:', pprint(best_score),
+        print('Ep:', gen, 'Gen_best/Avg:', pprint(best_score), pprint(gen_tracker.all_tracker[0][1]) ,
               'FPS:',pprint(ai.agents[0].buffer.total_frames/(time.time()-time_start)),
-              'Use_Pg:', USE_PG,
-              'Evo/ROllout size:', POP_SIZE, '/', ROLLOUT_SIZE,
-              '#Samples seen:', ai.agents[0].buffer.total_frames
+              '#Samples seen:', ai.agents[0].buffer.total_frames,
+              'SAVETAG', SAVE_TAG
               )
 
         gen_tracker.update([best_score], gen)
