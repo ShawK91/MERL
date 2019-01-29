@@ -4,7 +4,7 @@ import numpy as np, random
 
 
 #Rollout evaluate an agent in a complete game
-def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_bucket):
+def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_bucket, store_transitions):
     """Rollout Worker runs a simulation in the environment to generate experiences and fitness values
 
         Parameters:
@@ -50,10 +50,11 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
             fitness += sum(reward)/args.coupling
 
             #Push experiences to memory
-            for i in range(args.num_agents):
-                rollout_trajectory[i].append([np.expand_dims(utils.to_numpy(joint_state)[i,:], 0), np.expand_dims(utils.to_numpy(next_state)[i, :], 0),
-                                              np.expand_dims(np.array(joint_action)[i,:], 0), np.expand_dims(np.array([reward[i]], dtype="float32"), 0),
-                                              np.expand_dims(np.array([done], dtype="float32"), 0)])
+            if store_transitions:
+                for i in range(args.num_agents):
+                    rollout_trajectory[i].append([np.expand_dims(utils.to_numpy(joint_state)[i,:], 0), np.expand_dims(utils.to_numpy(next_state)[i, :], 0),
+                                                  np.expand_dims(np.array(joint_action)[i,:], 0), np.expand_dims(np.array([reward[i]], dtype="float32"), 0),
+                                                  np.expand_dims(np.array([done], dtype="float32"), 0)])
 
             joint_state = next_state
 

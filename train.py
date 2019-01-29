@@ -13,7 +13,7 @@ import threading
 if True:
     parser = argparse.ArgumentParser()
     parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
-    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
     parser.add_argument('-savetag', help='Saved tag',  default='')
     parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
@@ -148,7 +148,7 @@ class MERL:
         self.evo_task_pipes = [Pipe() for _ in range(args.popn_size)]
         self.evo_result_pipes = [Pipe() for _ in range(args.popn_size)]
         self.evo_workers = [Process(target=rollout_worker, args=(self.args, i, 'evo', self.evo_task_pipes[i][1], self.evo_result_pipes[i][0],
-                                                                   self.buffer_bucket, self.popn_bucket)) for i in range(args.popn_size)]
+                                                                   self.buffer_bucket, self.popn_bucket, USE_PG)) for i in range(args.popn_size)]
         for worker in self.evo_workers: worker.start()
 
 
@@ -156,7 +156,7 @@ class MERL:
         self.pg_task_pipes = [Pipe() for _ in range(args.rollout_size)]
         self.pg_result_pipes = [Pipe() for _ in range(args.rollout_size)]
         self.pg_workers = [Process(target=rollout_worker, args=(self.args, i, 'pg', self.pg_task_pipes[i][1], self.pg_result_pipes[i][0],
-                                                                   self.buffer_bucket, self.rollout_bucket)) for i in range(args.rollout_size)]
+                                                                   self.buffer_bucket, self.rollout_bucket, USE_PG)) for i in range(args.rollout_size)]
         for worker in self.pg_workers: worker.start()
 
 
@@ -263,7 +263,10 @@ if __name__ == "__main__":
               'FPS:',pprint(ai.agents[0].buffer.total_frames/(time.time()-time_start)),
               '#Samples seen:', ai.agents[0].buffer.total_frames,
               )
-        if gen % 7 ==0: print(SAVE_TAG)
+        print()
+        if gen % 7 ==0: print('SAVETAG:  ',SAVE_TAG)
+        print()
+
 
         gen_tracker.update([best_score], gen)
 
