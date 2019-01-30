@@ -67,8 +67,8 @@ class Task_Rovers:
                     x = center + i/4 #randint(center + rad + 1, end)
                     y = start + i/4#randint(start, end)
                 elif i % 3 == 2:
-                    x = center+i/4#randint(center - rad, center + rad)
-                    y = start + i/4#randint(start, center - rad - 1)
+                    x = start+i/4#randint(center - rad, center + rad)
+                    y = center + i/4#randint(start, center - rad - 1)
                 else:
                     x = center+i/4#randint(center - rad, center + rad)
                     y = center+i/4#randint(center + rad + 1, end)
@@ -266,7 +266,7 @@ class Task_Rovers:
         for loc, status in zip(self.poi_pos, self.poi_status):
             x = int(loc[0]);
             y = int(loc[1])
-            marker = 'I' if status else 'A'
+            marker = '$' if status else '#'
             grid[x][y] = marker
 
         for row in grid:

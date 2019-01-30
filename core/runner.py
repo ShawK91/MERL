@@ -40,10 +40,10 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
             joint_action = [team[i].forward(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
             if type == 'pg':
-                for action in joint_action: action += np.random.normal(0, 0.2, size=args.action_dim).clip(-1, 1)
+                for action in joint_action: action += np.random.normal(0, 0.3, size=args.action_dim).clip(-1, 1)
 
 
-            next_state, reward, done, info = env.step(joint_action)  # Simulate one step in environment
+            next_state, reward, done, info = env.step(np.array(joint_action, dtype = 'double'))  # Simulate one step in environment
 
 
             next_state = utils.to_tensor(np.array(next_state))
@@ -60,8 +60,8 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
             #DONE FLAG IS Received
             if done:
-                RENDER = random.random() < 0.01
-                if RENDER: env.render()
+                if random.random() < 0.0:
+                    env.render()
 
                 #Push experiences to main
                 for agent_id, buffer in enumerate(data_bucket):

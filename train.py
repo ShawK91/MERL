@@ -12,19 +12,20 @@ import threading
 #ARGPARSE
 if True:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
+    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=5)
     parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
-    parser.add_argument('-savetag', help='Saved tag',  default='')
     parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
+
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
     parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
-    parser.add_argument('-agents', type=int,  help='#agents',  default=8)
-    parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=2)
+    parser.add_argument('-pois', type=int,  help='#POIs',  default=1)
     parser.add_argument('-coupling', type=int,  help='Coupling',  default=4)
     parser.add_argument('-eplen', type=int,  help='eplen',  default=25)
-    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=10)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=90)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
+    parser.add_argument('-savetag', help='Saved tag',  default='')
 
     ROLLOUT_SIZE = vars(parser.parse_args())['rollsize']
     SEED = vars(parser.parse_args())['seed']
@@ -96,7 +97,7 @@ class Parameters:
         self.mut_distribution = 1  # 1-Gaussian, 2-Laplace, 3-Uniform
 
         #Dependents
-        self.state_dim = int(720 / self.angle_res + 4)
+        self.state_dim = 8#int(720 / self.angle_res + 4)
         self.action_dim = 2
 
         #Save Filenames
@@ -263,9 +264,11 @@ if __name__ == "__main__":
               'FPS:',pprint(ai.agents[0].buffer.total_frames/(time.time()-time_start)),
               '#Samples seen:', ai.agents[0].buffer.total_frames,
               )
-        print()
-        if gen % 7 ==0: print('SAVETAG:  ',SAVE_TAG)
-        print()
+
+        if gen % 7 ==0:
+            print()
+            print('SAVETAG:  ',SAVE_TAG)
+            print()
 
 
         gen_tracker.update([best_score], gen)
