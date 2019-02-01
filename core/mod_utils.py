@@ -20,7 +20,7 @@ class Tracker(): #Tracker
         self.foldername = save_folder
         self.all_tracker = [[[],0.0,[]] for _ in vars_string] #[Id of var tracked][fitnesses, avg_fitness, csv_fitnesses]
         self.counter = 0
-        self.conv_size = 10
+        self.conv_size = 25
         if not os.path.exists(self.foldername):
             os.makedirs(self.foldername)
 

@@ -14,6 +14,8 @@ class RoverDomainCython:
 		A base template for all environment wrappers.
 		"""
 		#Initialize world with requiste params
+		self.args = args
+
 		from envs.rover_domain_cython import rover_domain_w_setup as r
 		self.env = r.RoverDomain()
 		self.env.n_rovers = args.num_agents
@@ -65,14 +67,43 @@ class RoverDomainCython:
 		next_state = next_state.base; reward = reward.base
 		next_state = next_state.reshape(next_state.shape[0], -1)
 
-		#print(self.env.rover_positions.base, self.env.poi_positions.base, self.env.rover_orientations.base, action)
+		#print(self.env.rover_positions.base, self.env.poi_positions.base, action, reward)
+		# import numpy as np
+		# if np.sum(reward) != 0:
+		# 	k = 0
+
 		#print(self.env.rover_positions.base, self.env.poi_positions.base, reward)
 		##None
 
 		return next_state, reward, done, info
 
 	def render(self):
-		self.env.render()
+
+		# Visualize
+		grid = [['-' for _ in range(self.args.dim_x)] for _ in range(self.args.dim_y)]
+
+
+		# Draw in rover path
+		for time_step, joint_pos in enumerate(self.env.rover_position_histories.base):
+			for rover_id, rover_pos in enumerate(joint_pos):
+				x = int(rover_pos[0]);
+				y = int(rover_pos[1])
+				# print x,y
+				try: grid[x][y] = str(rover_id)
+				except: None
+
+		# Draw in food
+		for poi_pos, poi_status in zip(self.env.poi_positions.base, self.env.poi_status.base):
+			x = int(poi_pos[0]);
+			y = int(poi_pos[1])
+			marker = '#' if poi_status else '$'
+			grid[x][y] = marker
+
+		for row in grid:
+			print(row)
+		print()
+
+		print('------------------------------------------------------------------------')
 
 
 

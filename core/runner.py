@@ -48,6 +48,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
             next_state = utils.to_tensor(np.array(next_state))
             fitness += sum(reward)/args.coupling
+            #print(reward)
 
             #Push experiences to memory
             if store_transitions:
@@ -68,6 +69,15 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
                     for entry in rollout_trajectory[agent_id]: buffer.append(entry)
 
                 break
+
+        #Normalize fitness to be (0,1)
+        max_score = 0.0
+        for i in range(args.num_poi): max_score += (i+1)
+        fitness = fitness/float(max_score)
+
+        if random.random() < 0.05:
+            env.render()
+            print ('Fit of rendered', fitness)
 
         #Send back id, fitness, total length and shaped fitness using the result pipe
         result_pipe.send([teams_blueprint, [fitness]])

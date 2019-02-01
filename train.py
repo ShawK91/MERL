@@ -12,17 +12,17 @@ import threading
 #ARGPARSE
 if True:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
-    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
-    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
+    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
+    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
-    parser.add_argument('-dim', type=int,  help='World dimension',  default=10)
-    parser.add_argument('-agents', type=int,  help='#agents',  default=1)
-    parser.add_argument('-pois', type=int,  help='#POIs',  default=2)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
-    parser.add_argument('-eplen', type=int,  help='eplen',  default=25)
-    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=10)
+    parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=2)
+    parser.add_argument('-pois', type=int,  help='#POIs',  default=1)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=2)
+    parser.add_argument('-eplen', type=int,  help='eplen',  default=20)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=45)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
     parser.add_argument('-savetag', help='Saved tag',  default='')
@@ -258,6 +258,7 @@ if __name__ == "__main__":
 
         #ONE EPOCH OF TRAINING
         best_score = ai.train()
+
 
         #PRINT PROGRESS
         print('Ep:', gen, 'Gen_best/Avg:', pprint(best_score), pprint(gen_tracker.all_tracker[0][1]) ,
