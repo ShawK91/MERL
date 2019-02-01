@@ -1,4 +1,4 @@
-from core.env_wrapper import EnvironmentWrapper
+from core.env_wrapper import RoverDomainCython, RoverDomainPython
 from core import mod_utils as utils
 import numpy as np, random
 
@@ -22,7 +22,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
             None
     """
 
-    env = EnvironmentWrapper(args)
+    env = RoverDomainCython(args)
     np.random.seed(id); random.seed(id)
 
     while True:
