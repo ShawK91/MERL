@@ -19,7 +19,7 @@ if True:
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
     parser.add_argument('-dim', type=int,  help='World dimension',  default=10)
     parser.add_argument('-agents', type=int,  help='#agents',  default=1)
-    parser.add_argument('-pois', type=int,  help='#POIs',  default=1)
+    parser.add_argument('-pois', type=int,  help='#POIs',  default=2)
     parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
     parser.add_argument('-eplen', type=int,  help='eplen',  default=25)
     parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=10)
