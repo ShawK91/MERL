@@ -50,6 +50,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
             fitness += sum(reward)/args.coupling
             #print(reward)
 
+
             #Push experiences to memory
             if store_transitions:
                 for i in range(args.num_agents):

@@ -181,6 +181,8 @@ cdef class RoverDomain:
         # Store first rover positions in histories
         # todo avoiding slicing for speed?
         self.rover_position_histories[0,...] = self.init_rover_positions
+
+        self.update_observations()
             
     cpdef void stop_prematurely(self):
         self.n_steps = self.step_id

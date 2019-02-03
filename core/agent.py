@@ -51,7 +51,7 @@ class Agent:
 		self.fitnesses = [None for _ in range(args.popn_size)]
 
 		###Best Policy HOF####
-		self.champ_ind = None
+		self.champ_ind = 0
 
 
 
