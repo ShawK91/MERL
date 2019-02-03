@@ -237,10 +237,11 @@ class MERL:
         ####### JOIN EVO ROLLOUTS ########
         for pipe in self.evo_result_pipes:
             entry = pipe[1].recv()
-            team = entry[0]; fitness = entry[1][0]
+            team = entry[0]; fitness = entry[1][0]; frames = entry[2]
 
             for agent_id, popn_id in enumerate(team): self.agents[agent_id].fitnesses[popn_id] = fitness ##Assign
             all_fits.append(fitness)
+            self.total_frames+=frames
 
 
         ####### JOIN PG ROLLOUTS ########
@@ -249,6 +250,7 @@ class MERL:
             for pipe in self.pg_result_pipes:
                 entry = pipe[1].recv()
                 pg_fits.append(entry[1][0])
+                self.total_frames += entry[2]
 
 
         ####### JOIN TEST ROLLOUTS ########
@@ -296,8 +298,8 @@ if __name__ == "__main__":
 
         #PRINT PROGRESS
         print('Ep:', gen, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:', mod.list_stat(pg_fits),
-              'Average:',pprint(test_tracker.all_tracker[0][1]), 'FPS:',pprint(ai.agents[0].buffer.total_frames/(time.time()-time_start)),
-              '#Samples seen:', ai.agents[0].buffer.total_frames,
+              'Average:',pprint(test_tracker.all_tracker[0][1]), 'FPS:',pprint(ai.total_frames/(time.time()-time_start)),
+              '#Samples seen:', ai.total_frames,
               )
 
         if gen % 5 ==0:

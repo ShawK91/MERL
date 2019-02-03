@@ -33,7 +33,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         team = [models_bucket[agent_id][popn_id] for agent_id, popn_id in enumerate(teams_blueprint)]
 
 
-        fitness = 0.0
+        fitness = 0.0; frame=0
         joint_state = env.reset(); rollout_trajectory = [[] for _ in range(args.num_agents)]
         joint_state = utils.to_tensor(np.array(joint_state))
         while True: #unless done
@@ -59,6 +59,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
                                                   np.expand_dims(np.array([done], dtype="float32"), 0)])
 
             joint_state = next_state
+            frame+=1
 
             #DONE FLAG IS Received
             if done:
@@ -82,7 +83,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
             print (type, id, 'Fit of rendered', fitness)
 
         #Send back id, fitness, total length and shaped fitness using the result pipe
-        result_pipe.send([teams_blueprint, [fitness]])
+        result_pipe.send([teams_blueprint, [fitness], frame])
 
 
 
