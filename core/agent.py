@@ -72,7 +72,8 @@ class Agent:
 	def evolve(self):
 
 		## One gen of evolution ###
-		self.champ_ind = self.evolver.evolve(self.popn, self.fitnesses, self.rollout_actor)
+		if self.args.popn_size > 1:
+			self.champ_ind = self.evolver.evolve(self.popn, self.fitnesses, [self.rollout_actor[0]])
 
 		#Reset fitness metrics
 		self.fitnesses = [None for _ in range(self.args.popn_size)]

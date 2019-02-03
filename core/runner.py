@@ -77,9 +77,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         for i in range(args.num_poi): max_score += (i+1)
         fitness = fitness/float(max_score)
 
-        if random.random() < 0.05:
+        if random.random() < 0.01:
             env.render()
-            print ('Fit of rendered', fitness)
+            print (type, id, 'Fit of rendered', fitness)
 
         #Send back id, fitness, total length and shaped fitness using the result pipe
         result_pipe.send([teams_blueprint, [fitness]])
