@@ -56,6 +56,7 @@ cdef class RoverDomain:
     cdef public bool poi_turnoff
     cdef public double[:] poi_status
     cdef public double[:] rover_local_rewards
+    cdef public bool poi_disappear
     
     
     def __cinit__(self):
@@ -93,6 +94,7 @@ cdef class RoverDomain:
         self.reward_structure = 'soft_distance'
         self.poi_turnoff = True
         self.poi_status = np.ones(self.n_pois)
+        self.poi_disappear = True
 
 
                         
@@ -555,6 +557,8 @@ cdef class RoverDomain:
 
             # Update POI type observations
             for poi_id in range(self.n_pois):
+
+                if self.poi_disappear and self.poi_status[poi_id] == False: continue
             
                 self.add_to_sensor(rover_id, 1,
                     self.poi_positions[poi_id, 0], 

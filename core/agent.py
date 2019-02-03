@@ -51,7 +51,7 @@ class Agent:
 		self.fitnesses = [None for _ in range(args.popn_size)]
 
 		###Best Policy HOF####
-		self.best_policy = Actor(args.state_dim, args.action_dim)
+		self.champ_ind = None
 
 
 
@@ -72,7 +72,7 @@ class Agent:
 	def evolve(self):
 
 		## One gen of evolution ###
-		self.evolver.evolve(self.popn, self.fitnesses, self.rollout_actor)
+		self.champ_ind = self.evolver.evolve(self.popn, self.fitnesses, self.rollout_actor)
 
 		#Reset fitness metrics
 		self.fitnesses = [None for _ in range(self.args.popn_size)]
@@ -83,5 +83,37 @@ class Agent:
 			mod.hard_update(actor, self.algo.actor)
 			self.algo.actor.cuda()
 
+
+
+class TestAgent:
+	"""Learner object encapsulating a local learner
+
+		Parameters:
+		algo_name (str): Algorithm Identifier
+		state_dim (int): State size
+		action_dim (int): Action size
+		actor_lr (float): Actor learning rate
+		critic_lr (float): Critic learning rate
+		gamma (float): DIscount rate
+		tau (float): Target network sync generate
+		init_w (bool): Use kaimling normal to initialize?
+		**td3args (**kwargs): arguments for TD3 algo
+
+
+	"""
+	def __init__(self, args, id):
+		self.args = args
+		self.id = id
+
+		#### Rollout Actor is a template used for MP #####
+		self.manager = Manager()
+		self.rollout_actor = self.manager.list()
+		for _ in range(args.num_agents):
+			self.rollout_actor.append(Actor(args.state_dim, args.action_dim))
+
+
+	def make_champ_team(self, agents):
+		for agent_id, agent in enumerate(agents):
+			mod.hard_update(self.rollout_actor[agent_id], agent.popn[agent.champ_ind])
 
 

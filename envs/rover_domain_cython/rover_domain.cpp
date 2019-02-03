@@ -1046,6 +1046,7 @@ struct __pyx_obj_12rover_domain_RoverDomain {
   PyBoolObject *poi_turnoff;
   __Pyx_memviewslice poi_status;
   __Pyx_memviewslice rover_local_rewards;
+  PyBoolObject *poi_disappear;
 };
 
 
@@ -2480,6 +2481,9 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_10poi_status___get__(stru
 static int __pyx_pf_12rover_domain_11RoverDomain_10poi_status_2__set__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
 static PyObject *__pyx_pf_12rover_domain_11RoverDomain_19rover_local_rewards___get__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self); /* proto */
 static int __pyx_pf_12rover_domain_11RoverDomain_19rover_local_rewards_2__set__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static PyObject *__pyx_pf_12rover_domain_11RoverDomain_13poi_disappear___get__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self); /* proto */
+static int __pyx_pf_12rover_domain_11RoverDomain_13poi_disappear_2__set__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self, PyObject *__pyx_v_value); /* proto */
+static int __pyx_pf_12rover_domain_11RoverDomain_13poi_disappear_4__del__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_12rover_domain_11RoverDomain_34__reduce_cython__(CYTHON_UNUSED struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self); /* proto */
 static PyObject *__pyx_pf_12rover_domain_11RoverDomain_36__setstate_cython__(CYTHON_UNUSED struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self, CYTHON_UNUSED PyObject *__pyx_v___pyx_state); /* proto */
 static int __pyx_array___pyx_pf_15View_dot_MemoryView_5array___cinit__(struct __pyx_array_obj *__pyx_v_self, PyObject *__pyx_v_shape, Py_ssize_t __pyx_v_itemsize, PyObject *__pyx_v_format, PyObject *__pyx_v_mode, int __pyx_v_allocate_buffer); /* proto */
@@ -2568,7 +2572,7 @@ static PyObject *__pyx_tuple__30;
 static PyObject *__pyx_codeobj__31;
 /* Late includes */
 
-/* "rover_domain.pyx":61
+/* "rover_domain.pyx":62
  * 
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -2604,7 +2608,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   PyObject *__pyx_t_7 = NULL;
   __Pyx_RefNannySetupContext("__cinit__", 0);
 
-  /* "rover_domain.pyx":62
+  /* "rover_domain.pyx":63
  * 
  *     def __cinit__(self):
  *         self.n_rovers = 1             # <<<<<<<<<<<<<<
@@ -2613,7 +2617,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->n_rovers = 1;
 
-  /* "rover_domain.pyx":63
+  /* "rover_domain.pyx":64
  *     def __cinit__(self):
  *         self.n_rovers = 1
  *         self.n_pois = 2             # <<<<<<<<<<<<<<
@@ -2622,7 +2626,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->n_pois = 2;
 
-  /* "rover_domain.pyx":64
+  /* "rover_domain.pyx":65
  *         self.n_rovers = 1
  *         self.n_pois = 2
  *         self.n_steps = 15             # <<<<<<<<<<<<<<
@@ -2631,7 +2635,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->n_steps = 15;
 
-  /* "rover_domain.pyx":66
+  /* "rover_domain.pyx":67
  *         self.n_steps = 15
  * 
  *         self.n_req = 1             # <<<<<<<<<<<<<<
@@ -2640,7 +2644,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->n_req = 1;
 
-  /* "rover_domain.pyx":67
+  /* "rover_domain.pyx":68
  * 
  *         self.n_req = 1
  *         self.min_dist = 1.             # <<<<<<<<<<<<<<
@@ -2649,7 +2653,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->min_dist = 1.;
 
-  /* "rover_domain.pyx":68
+  /* "rover_domain.pyx":69
  *         self.n_req = 1
  *         self.min_dist = 1.
  *         self.step_id = 0             # <<<<<<<<<<<<<<
@@ -2658,7 +2662,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->step_id = 0;
 
-  /* "rover_domain.pyx":72
+  /* "rover_domain.pyx":73
  *         # Done is set to true to prevent stepping the sim forward
  *         # before a call to reset (i.e. the domain is not yet ready/initialized).
  *         self.done = True             # <<<<<<<<<<<<<<
@@ -2671,7 +2675,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   __Pyx_DECREF(((PyObject *)__pyx_v_self->done));
   __pyx_v_self->done = ((PyBoolObject *)Py_True);
 
-  /* "rover_domain.pyx":74
+  /* "rover_domain.pyx":75
  *         self.done = True
  * 
  *         self.setup_size = 10.             # <<<<<<<<<<<<<<
@@ -2680,7 +2684,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->setup_size = 10.;
 
-  /* "rover_domain.pyx":75
+  /* "rover_domain.pyx":76
  * 
  *         self.setup_size = 10.
  *         self.interaction_dist = 2.             # <<<<<<<<<<<<<<
@@ -2689,7 +2693,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->interaction_dist = 2.;
 
-  /* "rover_domain.pyx":76
+  /* "rover_domain.pyx":77
  *         self.setup_size = 10.
  *         self.interaction_dist = 2.
  *         self.n_obs_sections = 36             # <<<<<<<<<<<<<<
@@ -2698,7 +2702,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
  */
   __pyx_v_self->n_obs_sections = 36;
 
-  /* "rover_domain.pyx":77
+  /* "rover_domain.pyx":78
  *         self.interaction_dist = 2.
  *         self.n_obs_sections = 36
  *         self.reorients = False             # <<<<<<<<<<<<<<
@@ -2711,7 +2715,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   __Pyx_DECREF(((PyObject *)__pyx_v_self->reorients));
   __pyx_v_self->reorients = ((PyBoolObject *)Py_False);
 
-  /* "rover_domain.pyx":78
+  /* "rover_domain.pyx":79
  *         self.n_obs_sections = 36
  *         self.reorients = False
  *         self.discounts_eval = False             # <<<<<<<<<<<<<<
@@ -2724,136 +2728,136 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   __Pyx_DECREF(((PyObject *)__pyx_v_self->discounts_eval));
   __pyx_v_self->discounts_eval = ((PyBoolObject *)Py_False);
 
-  /* "rover_domain.pyx":81
+  /* "rover_domain.pyx":82
  * 
  *         # Set positions to zero lets rover domain generate self for you
  *         self.init_rover_positions = None             # <<<<<<<<<<<<<<
  *         self.init_rover_orientations =  None
  *         self.rover_positions =  None
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 81, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 82, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->init_rover_positions, 0);
   __pyx_v_self->init_rover_positions = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "rover_domain.pyx":82
+  /* "rover_domain.pyx":83
  *         # Set positions to zero lets rover domain generate self for you
  *         self.init_rover_positions = None
  *         self.init_rover_orientations =  None             # <<<<<<<<<<<<<<
  *         self.rover_positions =  None
  *         self.rover_position_histories =  None
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 82, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 83, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->init_rover_orientations, 0);
   __pyx_v_self->init_rover_orientations = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "rover_domain.pyx":83
+  /* "rover_domain.pyx":84
  *         self.init_rover_positions = None
  *         self.init_rover_orientations =  None
  *         self.rover_positions =  None             # <<<<<<<<<<<<<<
  *         self.rover_position_histories =  None
  *         self.rover_orientations = None
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 83, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 84, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_positions, 0);
   __pyx_v_self->rover_positions = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "rover_domain.pyx":84
+  /* "rover_domain.pyx":85
  *         self.init_rover_orientations =  None
  *         self.rover_positions =  None
  *         self.rover_position_histories =  None             # <<<<<<<<<<<<<<
  *         self.rover_orientations = None
  * 
  */
-  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 84, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 85, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_position_histories, 0);
   __pyx_v_self->rover_position_histories = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
 
-  /* "rover_domain.pyx":85
+  /* "rover_domain.pyx":86
  *         self.rover_positions =  None
  *         self.rover_position_histories =  None
  *         self.rover_orientations = None             # <<<<<<<<<<<<<<
  * 
  *         self.poi_values =  None
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 85, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 86, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_orientations, 0);
   __pyx_v_self->rover_orientations = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "rover_domain.pyx":87
+  /* "rover_domain.pyx":88
  *         self.rover_orientations = None
  * 
  *         self.poi_values =  None             # <<<<<<<<<<<<<<
  *         self.poi_positions =  None
  *         self.rover_observations = None
  */
-  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 87, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 88, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->poi_values, 0);
   __pyx_v_self->poi_values = __pyx_t_3;
   __pyx_t_3.memview = NULL;
   __pyx_t_3.data = NULL;
 
-  /* "rover_domain.pyx":88
+  /* "rover_domain.pyx":89
  * 
  *         self.poi_values =  None
  *         self.poi_positions =  None             # <<<<<<<<<<<<<<
  *         self.rover_observations = None
  *         self.rover_rewards = None
  */
-  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 88, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_1.memview)) __PYX_ERR(0, 89, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->poi_positions, 0);
   __pyx_v_self->poi_positions = __pyx_t_1;
   __pyx_t_1.memview = NULL;
   __pyx_t_1.data = NULL;
 
-  /* "rover_domain.pyx":89
+  /* "rover_domain.pyx":90
  *         self.poi_values =  None
  *         self.poi_positions =  None
  *         self.rover_observations = None             # <<<<<<<<<<<<<<
  *         self.rover_rewards = None
  *         self.rover_local_rewards = np.zeros(self.n_rovers)
  */
-  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 89, __pyx_L1_error)
+  __pyx_t_2 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_2.memview)) __PYX_ERR(0, 90, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_observations, 0);
   __pyx_v_self->rover_observations = __pyx_t_2;
   __pyx_t_2.memview = NULL;
   __pyx_t_2.data = NULL;
 
-  /* "rover_domain.pyx":90
+  /* "rover_domain.pyx":91
  *         self.poi_positions =  None
  *         self.rover_observations = None
  *         self.rover_rewards = None             # <<<<<<<<<<<<<<
  *         self.rover_local_rewards = np.zeros(self.n_rovers)
  * 
  */
-  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 90, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(Py_None, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 91, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_rewards, 0);
   __pyx_v_self->rover_rewards = __pyx_t_3;
   __pyx_t_3.memview = NULL;
   __pyx_t_3.data = NULL;
 
-  /* "rover_domain.pyx":91
+  /* "rover_domain.pyx":92
  *         self.rover_observations = None
  *         self.rover_rewards = None
  *         self.rover_local_rewards = np.zeros(self.n_rovers)             # <<<<<<<<<<<<<<
  * 
  *         self.reward_structure = 'soft_distance'
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_5, __pyx_n_s_np); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
-  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_zeros); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_GetAttrStr(__pyx_t_5, __pyx_n_s_zeros); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_5 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_5 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __pyx_t_7 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_6))) {
@@ -2868,17 +2872,17 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   __pyx_t_4 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_6, __pyx_t_7, __pyx_t_5) : __Pyx_PyObject_CallOneArg(__pyx_t_6, __pyx_t_5);
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 91, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 91, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 92, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_local_rewards, 0);
   __pyx_v_self->rover_local_rewards = __pyx_t_3;
   __pyx_t_3.memview = NULL;
   __pyx_t_3.data = NULL;
 
-  /* "rover_domain.pyx":93
+  /* "rover_domain.pyx":94
  *         self.rover_local_rewards = np.zeros(self.n_rovers)
  * 
  *         self.reward_structure = 'soft_distance'             # <<<<<<<<<<<<<<
@@ -2891,12 +2895,12 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   __Pyx_DECREF(__pyx_v_self->reward_structure);
   __pyx_v_self->reward_structure = __pyx_n_u_soft_distance;
 
-  /* "rover_domain.pyx":94
+  /* "rover_domain.pyx":95
  * 
  *         self.reward_structure = 'soft_distance'
  *         self.poi_turnoff = True             # <<<<<<<<<<<<<<
  *         self.poi_status = np.ones(self.n_pois)
- * 
+ *         self.poi_disappear = True
  */
   __Pyx_INCREF(Py_True);
   __Pyx_GIVEREF(Py_True);
@@ -2904,19 +2908,19 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   __Pyx_DECREF(((PyObject *)__pyx_v_self->poi_turnoff));
   __pyx_v_self->poi_turnoff = ((PyBoolObject *)Py_True);
 
-  /* "rover_domain.pyx":95
+  /* "rover_domain.pyx":96
  *         self.reward_structure = 'soft_distance'
  *         self.poi_turnoff = True
  *         self.poi_status = np.ones(self.n_pois)             # <<<<<<<<<<<<<<
- * 
+ *         self.poi_disappear = True
  * 
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_6, __pyx_n_s_np); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
-  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_ones); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_GetAttrStr(__pyx_t_6, __pyx_n_s_ones); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_5);
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  __pyx_t_6 = PyInt_FromSsize_t(__pyx_v_self->n_pois); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_6 = PyInt_FromSsize_t(__pyx_v_self->n_pois); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_6);
   __pyx_t_7 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_5))) {
@@ -2931,17 +2935,30 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   __pyx_t_4 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_5, __pyx_t_7, __pyx_t_6) : __Pyx_PyObject_CallOneArg(__pyx_t_5, __pyx_t_6);
   __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
   __Pyx_DECREF(__pyx_t_6); __pyx_t_6 = 0;
-  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 95, __pyx_L1_error)
+  if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_4);
   __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
-  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 95, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_3.memview)) __PYX_ERR(0, 96, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->poi_status, 0);
   __pyx_v_self->poi_status = __pyx_t_3;
   __pyx_t_3.memview = NULL;
   __pyx_t_3.data = NULL;
 
-  /* "rover_domain.pyx":61
+  /* "rover_domain.pyx":97
+ *         self.poi_turnoff = True
+ *         self.poi_status = np.ones(self.n_pois)
+ *         self.poi_disappear = True             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+  __Pyx_INCREF(Py_True);
+  __Pyx_GIVEREF(Py_True);
+  __Pyx_GOTREF(__pyx_v_self->poi_disappear);
+  __Pyx_DECREF(((PyObject *)__pyx_v_self->poi_disappear));
+  __pyx_v_self->poi_disappear = ((PyBoolObject *)Py_True);
+
+  /* "rover_domain.pyx":62
  * 
  * 
  *     def __cinit__(self):             # <<<<<<<<<<<<<<
@@ -2967,7 +2984,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain___cinit__(struct __pyx_obj_12ro
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":99
+/* "rover_domain.pyx":101
  * 
  * 
  *     cpdef void reset(self):             # <<<<<<<<<<<<<<
@@ -3004,7 +3021,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_reset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_reset); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_3reset)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -3020,7 +3037,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 99, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 101, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -3040,19 +3057,19 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     #endif
   }
 
-  /* "rover_domain.pyx":103
+  /* "rover_domain.pyx":105
  *         # permanent (but managed) memory
  * 
  *         self.poi_status = np.ones(self.n_pois)             # <<<<<<<<<<<<<<
  * 
  *         self.step_id = 0
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_pois); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_pois); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -3067,17 +3084,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 103, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 103, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 105, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->poi_status, 0);
   __pyx_v_self->poi_status = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "rover_domain.pyx":105
+  /* "rover_domain.pyx":107
  *         self.poi_status = np.ones(self.n_pois)
  * 
  *         self.step_id = 0             # <<<<<<<<<<<<<<
@@ -3086,7 +3103,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   __pyx_v_self->step_id = 0;
 
-  /* "rover_domain.pyx":106
+  /* "rover_domain.pyx":108
  * 
  *         self.step_id = 0
  *         self.done = False             # <<<<<<<<<<<<<<
@@ -3099,42 +3116,42 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
   __Pyx_DECREF(((PyObject *)__pyx_v_self->done));
   __pyx_v_self->done = ((PyBoolObject *)Py_False);
 
-  /* "rover_domain.pyx":110
+  /* "rover_domain.pyx":112
  *         # If user has not specified initial data, the domain provides
  *         # automatic initialization
  *         if self.init_rover_positions is None:             # <<<<<<<<<<<<<<
  *             self.init_rover_positions = 0.5 * self.setup_size * np.ones(
  *                 (self.n_rovers, 2))
  */
-  if (unlikely(!__pyx_v_self->init_rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 110, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->init_rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 112, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->init_rover_positions.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":111
+    /* "rover_domain.pyx":113
  *         # automatic initialization
  *         if self.init_rover_positions is None:
  *             self.init_rover_positions = 0.5 * self.setup_size * np.ones(             # <<<<<<<<<<<<<<
  *                 (self.n_rovers, 2))
  *         if self.init_rover_orientations is None:
  */
-    __pyx_t_1 = PyFloat_FromDouble((0.5 * __pyx_v_self->setup_size)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 111, __pyx_L1_error)
+    __pyx_t_1 = PyFloat_FromDouble((0.5 * __pyx_v_self->setup_size)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 111, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 111, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_ones); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "rover_domain.pyx":112
+    /* "rover_domain.pyx":114
  *         if self.init_rover_positions is None:
  *             self.init_rover_positions = 0.5 * self.setup_size * np.ones(
  *                 (self.n_rovers, 2))             # <<<<<<<<<<<<<<
  *         if self.init_rover_orientations is None:
  *             rand_angles = np.random.uniform(-np.pi, np.pi, self.n_rovers)
  */
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 112, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 112, __pyx_L1_error)
+    __pyx_t_7 = PyTuple_New(2); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 114, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_7, 0, __pyx_t_2);
@@ -3155,29 +3172,29 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_2, __pyx_t_7) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_7);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 111, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "rover_domain.pyx":111
+    /* "rover_domain.pyx":113
  *         # automatic initialization
  *         if self.init_rover_positions is None:
  *             self.init_rover_positions = 0.5 * self.setup_size * np.ones(             # <<<<<<<<<<<<<<
  *                 (self.n_rovers, 2))
  *         if self.init_rover_orientations is None:
  */
-    __pyx_t_4 = PyNumber_Multiply(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 111, __pyx_L1_error)
+    __pyx_t_4 = PyNumber_Multiply(__pyx_t_1, __pyx_t_3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 111, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_4, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 113, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->init_rover_positions, 0);
     __pyx_v_self->init_rover_positions = __pyx_t_8;
     __pyx_t_8.memview = NULL;
     __pyx_t_8.data = NULL;
 
-    /* "rover_domain.pyx":110
+    /* "rover_domain.pyx":112
  *         # If user has not specified initial data, the domain provides
  *         # automatic initialization
  *         if self.init_rover_positions is None:             # <<<<<<<<<<<<<<
@@ -3186,46 +3203,46 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":113
+  /* "rover_domain.pyx":115
  *             self.init_rover_positions = 0.5 * self.setup_size * np.ones(
  *                 (self.n_rovers, 2))
  *         if self.init_rover_orientations is None:             # <<<<<<<<<<<<<<
  *             rand_angles = np.random.uniform(-np.pi, np.pi, self.n_rovers)
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),
  */
-  if (unlikely(!__pyx_v_self->init_rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 113, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->init_rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 115, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->init_rover_orientations.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":114
+    /* "rover_domain.pyx":116
  *                 (self.n_rovers, 2))
  *         if self.init_rover_orientations is None:
  *             rand_angles = np.random.uniform(-np.pi, np.pi, self.n_rovers)             # <<<<<<<<<<<<<<
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),
  *                 np.sin(rand_angles))).T
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_random); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_random); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_uniform); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_uniform); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_pi); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_7 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_pi); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyNumber_Negative(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_1 = PyNumber_Negative(__pyx_t_7); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_pi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_pi); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
-    __pyx_t_7 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 114, __pyx_L1_error)
+    __pyx_t_7 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
     __pyx_t_9 = NULL;
     __pyx_t_10 = 0;
@@ -3242,7 +3259,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[4] = {__pyx_t_9, __pyx_t_1, __pyx_t_2, __pyx_t_7};
-      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 116, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3253,7 +3270,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_3)) {
       PyObject *__pyx_temp[4] = {__pyx_t_9, __pyx_t_1, __pyx_t_2, __pyx_t_7};
-      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyCFunction_FastCall(__pyx_t_3, __pyx_temp+1-__pyx_t_10, 3+__pyx_t_10); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 116, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -3262,7 +3279,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     } else
     #endif
     {
-      __pyx_t_11 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 114, __pyx_L1_error)
+      __pyx_t_11 = PyTuple_New(3+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 116, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_11);
       if (__pyx_t_9) {
         __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -3276,7 +3293,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
       __pyx_t_1 = 0;
       __pyx_t_2 = 0;
       __pyx_t_7 = 0;
-      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 114, __pyx_L1_error)
+      __pyx_t_4 = __Pyx_PyObject_Call(__pyx_t_3, __pyx_t_11, NULL); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 116, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
     }
@@ -3284,21 +3301,21 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_v_rand_angles = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "rover_domain.pyx":115
+    /* "rover_domain.pyx":117
  *         if self.init_rover_orientations is None:
  *             rand_angles = np.random.uniform(-np.pi, np.pi, self.n_rovers)
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),             # <<<<<<<<<<<<<<
  *                 np.sin(rand_angles))).T
  *         if self.poi_values is None:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_3, __pyx_n_s_np); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_vstack); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_3, __pyx_n_s_vstack); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_cos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_cos); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_7 = NULL;
@@ -3313,20 +3330,20 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     }
     __pyx_t_3 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_7, __pyx_v_rand_angles) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_v_rand_angles);
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 115, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
 
-    /* "rover_domain.pyx":116
+    /* "rover_domain.pyx":118
  *             rand_angles = np.random.uniform(-np.pi, np.pi, self.n_rovers)
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),
  *                 np.sin(rand_angles))).T             # <<<<<<<<<<<<<<
  *         if self.poi_values is None:
  *             self.poi_values = np.arange(self.n_pois) + 1.
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_7, __pyx_n_s_np); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_7);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_sin); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_7, __pyx_n_s_sin); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_7); __pyx_t_7 = 0;
     __pyx_t_7 = NULL;
@@ -3341,18 +3358,18 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     }
     __pyx_t_2 = (__pyx_t_7) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_7, __pyx_v_rand_angles) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_v_rand_angles);
     __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
-    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 116, __pyx_L1_error)
+    if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "rover_domain.pyx":115
+    /* "rover_domain.pyx":117
  *         if self.init_rover_orientations is None:
  *             rand_angles = np.random.uniform(-np.pi, np.pi, self.n_rovers)
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),             # <<<<<<<<<<<<<<
  *                 np.sin(rand_angles))).T
  *         if self.poi_values is None:
  */
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 115, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_3);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_3);
@@ -3373,24 +3390,24 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_4 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 115, __pyx_L1_error)
+    if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 117, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "rover_domain.pyx":116
+    /* "rover_domain.pyx":118
  *             rand_angles = np.random.uniform(-np.pi, np.pi, self.n_rovers)
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),
  *                 np.sin(rand_angles))).T             # <<<<<<<<<<<<<<
  *         if self.poi_values is None:
  *             self.poi_values = np.arange(self.n_pois) + 1.
  */
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_T); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_T); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_11, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 116, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_11, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 118, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "rover_domain.pyx":115
+    /* "rover_domain.pyx":117
  *         if self.init_rover_orientations is None:
  *             rand_angles = np.random.uniform(-np.pi, np.pi, self.n_rovers)
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),             # <<<<<<<<<<<<<<
@@ -3402,7 +3419,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_8.memview = NULL;
     __pyx_t_8.data = NULL;
 
-    /* "rover_domain.pyx":113
+    /* "rover_domain.pyx":115
  *             self.init_rover_positions = 0.5 * self.setup_size * np.ones(
  *                 (self.n_rovers, 2))
  *         if self.init_rover_orientations is None:             # <<<<<<<<<<<<<<
@@ -3411,30 +3428,30 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":117
+  /* "rover_domain.pyx":119
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),
  *                 np.sin(rand_angles))).T
  *         if self.poi_values is None:             # <<<<<<<<<<<<<<
  *             self.poi_values = np.arange(self.n_pois) + 1.
  *         if self.poi_positions is None:
  */
-  if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 117, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 119, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->poi_values.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":118
+    /* "rover_domain.pyx":120
  *                 np.sin(rand_angles))).T
  *         if self.poi_values is None:
  *             self.poi_values = np.arange(self.n_pois) + 1.             # <<<<<<<<<<<<<<
  *         if self.poi_positions is None:
  *             self.poi_positions = (np.random.rand(self.n_pois, 2) *
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 120, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_arange); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_arange); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_self->n_pois); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_self->n_pois); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 120, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_2 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -3449,20 +3466,20 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_11 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 118, __pyx_L1_error)
+    if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 120, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = __Pyx_PyFloat_AddObjC(__pyx_t_11, __pyx_float_1_, 1., 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyFloat_AddObjC(__pyx_t_11, __pyx_float_1_, 1., 0); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 118, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 120, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->poi_values, 0);
     __pyx_v_self->poi_values = __pyx_t_5;
     __pyx_t_5.memview = NULL;
     __pyx_t_5.data = NULL;
 
-    /* "rover_domain.pyx":117
+    /* "rover_domain.pyx":119
  *             self.init_rover_orientations = np.vstack((np.cos(rand_angles),
  *                 np.sin(rand_angles))).T
  *         if self.poi_values is None:             # <<<<<<<<<<<<<<
@@ -3471,33 +3488,33 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":119
+  /* "rover_domain.pyx":121
  *         if self.poi_values is None:
  *             self.poi_values = np.arange(self.n_pois) + 1.
  *         if self.poi_positions is None:             # <<<<<<<<<<<<<<
  *             self.poi_positions = (np.random.rand(self.n_pois, 2) *
  *                 self.setup_size)
  */
-  if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 119, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 121, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->poi_positions.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":120
+    /* "rover_domain.pyx":122
  *             self.poi_values = np.arange(self.n_pois) + 1.
  *         if self.poi_positions is None:
  *             self.poi_positions = (np.random.rand(self.n_pois, 2) *             # <<<<<<<<<<<<<<
  *                 self.setup_size)
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 120, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_random); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 120, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_random); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_rand); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 120, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_rand); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_self->n_pois); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 120, __pyx_L1_error)
+    __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_self->n_pois); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __pyx_t_2 = NULL;
     __pyx_t_10 = 0;
@@ -3514,7 +3531,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     #if CYTHON_FAST_PYCALL
     if (PyFunction_Check(__pyx_t_11)) {
       PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_t_4, __pyx_int_2};
-      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
@@ -3523,14 +3540,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     #if CYTHON_FAST_PYCCALL
     if (__Pyx_PyFastCFunction_Check(__pyx_t_11)) {
       PyObject *__pyx_temp[3] = {__pyx_t_2, __pyx_t_4, __pyx_int_2};
-      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyCFunction_FastCall(__pyx_t_11, __pyx_temp+1-__pyx_t_10, 2+__pyx_t_10); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
     } else
     #endif
     {
-      __pyx_t_3 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __pyx_t_3 = PyTuple_New(2+__pyx_t_10); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_3);
       if (__pyx_t_2) {
         __Pyx_GIVEREF(__pyx_t_2); PyTuple_SET_ITEM(__pyx_t_3, 0, __pyx_t_2); __pyx_t_2 = NULL;
@@ -3541,41 +3558,41 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
       __Pyx_GIVEREF(__pyx_int_2);
       PyTuple_SET_ITEM(__pyx_t_3, 1+__pyx_t_10, __pyx_int_2);
       __pyx_t_4 = 0;
-      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 120, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_Call(__pyx_t_11, __pyx_t_3, NULL); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 122, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     }
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
 
-    /* "rover_domain.pyx":121
+    /* "rover_domain.pyx":123
  *         if self.poi_positions is None:
  *             self.poi_positions = (np.random.rand(self.n_pois, 2) *
  *                 self.setup_size)             # <<<<<<<<<<<<<<
  * 
  *         # If initial data is invalid (e.g. number of initial rovers does not
  */
-    __pyx_t_11 = PyFloat_FromDouble(__pyx_v_self->setup_size); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 121, __pyx_L1_error)
+    __pyx_t_11 = PyFloat_FromDouble(__pyx_v_self->setup_size); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 123, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
 
-    /* "rover_domain.pyx":120
+    /* "rover_domain.pyx":122
  *             self.poi_values = np.arange(self.n_pois) + 1.
  *         if self.poi_positions is None:
  *             self.poi_positions = (np.random.rand(self.n_pois, 2) *             # <<<<<<<<<<<<<<
  *                 self.setup_size)
  * 
  */
-    __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 120, __pyx_L1_error)
+    __pyx_t_3 = PyNumber_Multiply(__pyx_t_1, __pyx_t_11); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 120, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 122, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->poi_positions, 0);
     __pyx_v_self->poi_positions = __pyx_t_8;
     __pyx_t_8.memview = NULL;
     __pyx_t_8.data = NULL;
 
-    /* "rover_domain.pyx":119
+    /* "rover_domain.pyx":121
  *         if self.poi_values is None:
  *             self.poi_values = np.arange(self.n_pois) + 1.
  *         if self.poi_positions is None:             # <<<<<<<<<<<<<<
@@ -3584,31 +3601,31 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":125
+  /* "rover_domain.pyx":127
  *         # If initial data is invalid (e.g. number of initial rovers does not
  *         # match init_rover_positions.shape[0]), we need to raise an error
  *         if self.init_rover_positions.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
  *             raise ValueError(
  *                 'Number of rovers does not match number of initial '
  */
-  if (unlikely(!__pyx_v_self->init_rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 125, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->init_rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 127, __pyx_L1_error)}
   __pyx_t_6 = (((__pyx_v_self->init_rover_positions.shape[0]) != __pyx_v_self->n_rovers) != 0);
   if (unlikely(__pyx_t_6)) {
 
-    /* "rover_domain.pyx":126
+    /* "rover_domain.pyx":128
  *         # match init_rover_positions.shape[0]), we need to raise an error
  *         if self.init_rover_positions.shape[0] != self.n_rovers:
  *             raise ValueError(             # <<<<<<<<<<<<<<
  *                 'Number of rovers does not match number of initial '
  *                 + 'rover positions')
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 126, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple_, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 128, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 126, __pyx_L1_error)
+    __PYX_ERR(0, 128, __pyx_L1_error)
 
-    /* "rover_domain.pyx":125
+    /* "rover_domain.pyx":127
  *         # If initial data is invalid (e.g. number of initial rovers does not
  *         # match init_rover_positions.shape[0]), we need to raise an error
  *         if self.init_rover_positions.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
@@ -3617,31 +3634,31 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":129
+  /* "rover_domain.pyx":131
  *                 'Number of rovers does not match number of initial '
  *                 + 'rover positions')
  *         if self.init_rover_orientations.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
  *             raise ValueError(
  *                 'Number of rovers does not match number of initial '
  */
-  if (unlikely(!__pyx_v_self->init_rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 129, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->init_rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 131, __pyx_L1_error)}
   __pyx_t_6 = (((__pyx_v_self->init_rover_orientations.shape[0]) != __pyx_v_self->n_rovers) != 0);
   if (unlikely(__pyx_t_6)) {
 
-    /* "rover_domain.pyx":130
+    /* "rover_domain.pyx":132
  *                 + 'rover positions')
  *         if self.init_rover_orientations.shape[0] != self.n_rovers:
  *             raise ValueError(             # <<<<<<<<<<<<<<
  *                 'Number of rovers does not match number of initial '
  *                 + 'rover orientations')
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 130, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__2, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 132, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 130, __pyx_L1_error)
+    __PYX_ERR(0, 132, __pyx_L1_error)
 
-    /* "rover_domain.pyx":129
+    /* "rover_domain.pyx":131
  *                 'Number of rovers does not match number of initial '
  *                 + 'rover positions')
  *         if self.init_rover_orientations.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
@@ -3650,31 +3667,31 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":133
+  /* "rover_domain.pyx":135
  *                 'Number of rovers does not match number of initial '
  *                 + 'rover orientations')
  *         if self.poi_values.shape[0] != self.n_pois:             # <<<<<<<<<<<<<<
  *             raise ValueError(
  *                 'Number of POIs does not match number of POI values')
  */
-  if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 133, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 135, __pyx_L1_error)}
   __pyx_t_6 = (((__pyx_v_self->poi_values.shape[0]) != __pyx_v_self->n_pois) != 0);
   if (unlikely(__pyx_t_6)) {
 
-    /* "rover_domain.pyx":134
+    /* "rover_domain.pyx":136
  *                 + 'rover orientations')
  *         if self.poi_values.shape[0] != self.n_pois:
  *             raise ValueError(             # <<<<<<<<<<<<<<
  *                 'Number of POIs does not match number of POI values')
  *         if self.poi_positions.shape[0] != self.n_pois:
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 134, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__3, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 136, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 134, __pyx_L1_error)
+    __PYX_ERR(0, 136, __pyx_L1_error)
 
-    /* "rover_domain.pyx":133
+    /* "rover_domain.pyx":135
  *                 'Number of rovers does not match number of initial '
  *                 + 'rover orientations')
  *         if self.poi_values.shape[0] != self.n_pois:             # <<<<<<<<<<<<<<
@@ -3683,31 +3700,31 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":136
+  /* "rover_domain.pyx":138
  *             raise ValueError(
  *                 'Number of POIs does not match number of POI values')
  *         if self.poi_positions.shape[0] != self.n_pois:             # <<<<<<<<<<<<<<
  *             raise ValueError(
  *                 'Number of POIs does not match number of POI positions')
  */
-  if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 136, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 138, __pyx_L1_error)}
   __pyx_t_6 = (((__pyx_v_self->poi_positions.shape[0]) != __pyx_v_self->n_pois) != 0);
   if (unlikely(__pyx_t_6)) {
 
-    /* "rover_domain.pyx":137
+    /* "rover_domain.pyx":139
  *                 'Number of POIs does not match number of POI values')
  *         if self.poi_positions.shape[0] != self.n_pois:
  *             raise ValueError(             # <<<<<<<<<<<<<<
  *                 'Number of POIs does not match number of POI positions')
  * 
  */
-    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 137, __pyx_L1_error)
+    __pyx_t_3 = __Pyx_PyObject_Call(__pyx_builtin_ValueError, __pyx_tuple__4, NULL); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 139, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_Raise(__pyx_t_3, 0, 0, 0);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-    __PYX_ERR(0, 137, __pyx_L1_error)
+    __PYX_ERR(0, 139, __pyx_L1_error)
 
-    /* "rover_domain.pyx":136
+    /* "rover_domain.pyx":138
  *             raise ValueError(
  *                 'Number of POIs does not match number of POI values')
  *         if self.poi_positions.shape[0] != self.n_pois:             # <<<<<<<<<<<<<<
@@ -3716,32 +3733,32 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":141
+  /* "rover_domain.pyx":143
  * 
  *         # Create all unspecified working data
  *         if self.rover_positions is  None:             # <<<<<<<<<<<<<<
  *             self.rover_positions = np.zeros((self.n_rovers, 2))
  *         if self.rover_orientations is  None:
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 141, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 143, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->rover_positions.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":142
+    /* "rover_domain.pyx":144
  *         # Create all unspecified working data
  *         if self.rover_positions is  None:
  *             self.rover_positions = np.zeros((self.n_rovers, 2))             # <<<<<<<<<<<<<<
  *         if self.rover_orientations is  None:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 144, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __pyx_t_11 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 144, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_11);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_11);
@@ -3762,17 +3779,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_11) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_11, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_11); __pyx_t_11 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 142, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 142, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 144, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_positions, 0);
     __pyx_v_self->rover_positions = __pyx_t_8;
     __pyx_t_8.memview = NULL;
     __pyx_t_8.data = NULL;
 
-    /* "rover_domain.pyx":141
+    /* "rover_domain.pyx":143
  * 
  *         # Create all unspecified working data
  *         if self.rover_positions is  None:             # <<<<<<<<<<<<<<
@@ -3781,32 +3798,32 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":143
+  /* "rover_domain.pyx":145
  *         if self.rover_positions is  None:
  *             self.rover_positions = np.zeros((self.n_rovers, 2))
  *         if self.rover_orientations is  None:             # <<<<<<<<<<<<<<
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if self.rover_position_histories is None:
  */
-  if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 143, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 145, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->rover_orientations.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":144
+    /* "rover_domain.pyx":146
  *             self.rover_positions = np.zeros((self.n_rovers, 2))
  *         if self.rover_orientations is  None:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))             # <<<<<<<<<<<<<<
  *         if self.rover_position_histories is None:
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 146, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_11 = PyTuple_New(2); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_1);
@@ -3827,17 +3844,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_t_11) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_11);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 144, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 146, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 144, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 146, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_orientations, 0);
     __pyx_v_self->rover_orientations = __pyx_t_8;
     __pyx_t_8.memview = NULL;
     __pyx_t_8.data = NULL;
 
-    /* "rover_domain.pyx":143
+    /* "rover_domain.pyx":145
  *         if self.rover_positions is  None:
  *             self.rover_positions = np.zeros((self.n_rovers, 2))
  *         if self.rover_orientations is  None:             # <<<<<<<<<<<<<<
@@ -3846,50 +3863,50 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":145
+  /* "rover_domain.pyx":147
  *         if self.rover_orientations is  None:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if self.rover_position_histories is None:             # <<<<<<<<<<<<<<
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,
  *                 self.n_rovers, 2))
  */
-  if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 145, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 147, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->rover_position_histories.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":146
+    /* "rover_domain.pyx":148
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if self.rover_position_histories is None:
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,             # <<<<<<<<<<<<<<
  *                 self.n_rovers, 2))
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyInt_FromSsize_t((__pyx_v_self->n_steps + 1)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __pyx_t_4 = PyInt_FromSsize_t((__pyx_v_self->n_steps + 1)); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
 
-    /* "rover_domain.pyx":147
+    /* "rover_domain.pyx":149
  *         if self.rover_position_histories is None:
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,
  *                 self.n_rovers, 2))             # <<<<<<<<<<<<<<
  * 
  *         # Create all unspecified return data
  */
-    __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 147, __pyx_L1_error)
+    __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 149, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "rover_domain.pyx":146
+    /* "rover_domain.pyx":148
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if self.rover_position_histories is None:
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,             # <<<<<<<<<<<<<<
  *                 self.n_rovers, 2))
  * 
  */
-    __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __pyx_t_2 = PyTuple_New(3); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_4);
@@ -3913,17 +3930,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 146, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 146, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 148, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_position_histories, 0);
     __pyx_v_self->rover_position_histories = __pyx_t_12;
     __pyx_t_12.memview = NULL;
     __pyx_t_12.data = NULL;
 
-    /* "rover_domain.pyx":145
+    /* "rover_domain.pyx":147
  *         if self.rover_orientations is  None:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if self.rover_position_histories is None:             # <<<<<<<<<<<<<<
@@ -3932,50 +3949,50 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":150
+  /* "rover_domain.pyx":152
  * 
  *         # Create all unspecified return data
  *         if self.rover_observations is None:             # <<<<<<<<<<<<<<
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  *                 self.n_obs_sections))
  */
-  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 150, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 152, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->rover_observations.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":151
+    /* "rover_domain.pyx":153
  *         # Create all unspecified return data
  *         if self.rover_observations is None:
  *             self.rover_observations = np.zeros((self.n_rovers, 2,             # <<<<<<<<<<<<<<
  *                 self.n_obs_sections))
  *         if self.rover_rewards is None:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 151, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 151, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 151, __pyx_L1_error)
+    __pyx_t_11 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
 
-    /* "rover_domain.pyx":152
+    /* "rover_domain.pyx":154
  *         if self.rover_observations is None:
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  *                 self.n_obs_sections))             # <<<<<<<<<<<<<<
  *         if self.rover_rewards is None:
  *             self.rover_rewards = np.zeros(self.n_rovers)
  */
-    __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_self->n_obs_sections); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 152, __pyx_L1_error)
+    __pyx_t_1 = PyInt_FromSsize_t(__pyx_v_self->n_obs_sections); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 154, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "rover_domain.pyx":151
+    /* "rover_domain.pyx":153
  *         # Create all unspecified return data
  *         if self.rover_observations is None:
  *             self.rover_observations = np.zeros((self.n_rovers, 2,             # <<<<<<<<<<<<<<
  *                 self.n_obs_sections))
  *         if self.rover_rewards is None:
  */
-    __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 151, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(3); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_11);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_11);
@@ -3999,17 +4016,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_1, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 151, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 151, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 153, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_observations, 0);
     __pyx_v_self->rover_observations = __pyx_t_12;
     __pyx_t_12.memview = NULL;
     __pyx_t_12.data = NULL;
 
-    /* "rover_domain.pyx":150
+    /* "rover_domain.pyx":152
  * 
  *         # Create all unspecified return data
  *         if self.rover_observations is None:             # <<<<<<<<<<<<<<
@@ -4018,30 +4035,30 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":153
+  /* "rover_domain.pyx":155
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  *                 self.n_obs_sections))
  *         if self.rover_rewards is None:             # <<<<<<<<<<<<<<
  *             self.rover_rewards = np.zeros(self.n_rovers)
  * 
  */
-  if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 153, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 155, __pyx_L1_error)}
   __pyx_t_6 = ((((PyObject *) __pyx_v_self->rover_rewards.memview) == Py_None) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":154
+    /* "rover_domain.pyx":156
  *                 self.n_obs_sections))
  *         if self.rover_rewards is None:
  *             self.rover_rewards = np.zeros(self.n_rovers)             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __pyx_t_1 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_4))) {
@@ -4056,17 +4073,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_1) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_1, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_2);
     __Pyx_XDECREF(__pyx_t_1); __pyx_t_1 = 0;
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 154, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 154, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 156, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_rewards, 0);
     __pyx_v_self->rover_rewards = __pyx_t_5;
     __pyx_t_5.memview = NULL;
     __pyx_t_5.data = NULL;
 
-    /* "rover_domain.pyx":153
+    /* "rover_domain.pyx":155
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  *                 self.n_obs_sections))
  *         if self.rover_rewards is None:             # <<<<<<<<<<<<<<
@@ -4075,32 +4092,32 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":158
+  /* "rover_domain.pyx":160
  * 
  *         # Recreate all invalid working data
  *         if self.rover_positions.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
  *             self.rover_positions = np.zeros((self.n_rovers, 2))
  *         if self.rover_orientations.shape[0] != self.n_rovers:
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 158, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 160, __pyx_L1_error)}
   __pyx_t_6 = (((__pyx_v_self->rover_positions.shape[0]) != __pyx_v_self->n_rovers) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":159
+    /* "rover_domain.pyx":161
  *         # Recreate all invalid working data
  *         if self.rover_positions.shape[0] != self.n_rovers:
  *             self.rover_positions = np.zeros((self.n_rovers, 2))             # <<<<<<<<<<<<<<
  *         if self.rover_orientations.shape[0] != self.n_rovers:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_2 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(2); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
@@ -4121,17 +4138,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_2, __pyx_t_4, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_2, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 159, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 159, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 161, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_positions, 0);
     __pyx_v_self->rover_positions = __pyx_t_8;
     __pyx_t_8.memview = NULL;
     __pyx_t_8.data = NULL;
 
-    /* "rover_domain.pyx":158
+    /* "rover_domain.pyx":160
  * 
  *         # Recreate all invalid working data
  *         if self.rover_positions.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
@@ -4140,32 +4157,32 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":160
+  /* "rover_domain.pyx":162
  *         if self.rover_positions.shape[0] != self.n_rovers:
  *             self.rover_positions = np.zeros((self.n_rovers, 2))
  *         if self.rover_orientations.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if (self.rover_position_histories.shape[0] != self.n_steps + 1
  */
-  if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 160, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 162, __pyx_L1_error)}
   __pyx_t_6 = (((__pyx_v_self->rover_orientations.shape[0]) != __pyx_v_self->n_rovers) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":161
+    /* "rover_domain.pyx":163
  *             self.rover_positions = np.zeros((self.n_rovers, 2))
  *         if self.rover_orientations.shape[0] != self.n_rovers:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))             # <<<<<<<<<<<<<<
  *         if (self.rover_position_histories.shape[0] != self.n_steps + 1
  *                 or self.rover_position_histories.shape[1] != self.n_rovers):
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 163, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 163, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 163, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
-    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_4 = PyTuple_New(2); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 163, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_GIVEREF(__pyx_t_2);
     PyTuple_SET_ITEM(__pyx_t_4, 0, __pyx_t_2);
@@ -4186,17 +4203,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_t_4) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_4);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 161, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 163, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 161, __pyx_L1_error)
+    __pyx_t_8 = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_8.memview)) __PYX_ERR(0, 163, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_orientations, 0);
     __pyx_v_self->rover_orientations = __pyx_t_8;
     __pyx_t_8.memview = NULL;
     __pyx_t_8.data = NULL;
 
-    /* "rover_domain.pyx":160
+    /* "rover_domain.pyx":162
  *         if self.rover_positions.shape[0] != self.n_rovers:
  *             self.rover_positions = np.zeros((self.n_rovers, 2))
  *         if self.rover_orientations.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
@@ -4205,14 +4222,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":162
+  /* "rover_domain.pyx":164
  *         if self.rover_orientations.shape[0] != self.n_rovers:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if (self.rover_position_histories.shape[0] != self.n_steps + 1             # <<<<<<<<<<<<<<
  *                 or self.rover_position_histories.shape[1] != self.n_rovers):
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,
  */
-  if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 162, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 164, __pyx_L1_error)}
   __pyx_t_13 = (((__pyx_v_self->rover_position_histories.shape[0]) != (__pyx_v_self->n_steps + 1)) != 0);
   if (!__pyx_t_13) {
   } else {
@@ -4220,19 +4237,19 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     goto __pyx_L19_bool_binop_done;
   }
 
-  /* "rover_domain.pyx":163
+  /* "rover_domain.pyx":165
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if (self.rover_position_histories.shape[0] != self.n_steps + 1
  *                 or self.rover_position_histories.shape[1] != self.n_rovers):             # <<<<<<<<<<<<<<
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,
  *                 self.n_rovers, 2))
  */
-  if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 163, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 165, __pyx_L1_error)}
   __pyx_t_13 = (((__pyx_v_self->rover_position_histories.shape[1]) != __pyx_v_self->n_rovers) != 0);
   __pyx_t_6 = __pyx_t_13;
   __pyx_L19_bool_binop_done:;
 
-  /* "rover_domain.pyx":162
+  /* "rover_domain.pyx":164
  *         if self.rover_orientations.shape[0] != self.n_rovers:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if (self.rover_position_histories.shape[0] != self.n_steps + 1             # <<<<<<<<<<<<<<
@@ -4241,39 +4258,39 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":164
+    /* "rover_domain.pyx":166
  *         if (self.rover_position_histories.shape[0] != self.n_steps + 1
  *                 or self.rover_position_histories.shape[1] != self.n_rovers):
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,             # <<<<<<<<<<<<<<
  *                 self.n_rovers, 2))
  * 
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_1, __pyx_n_s_np); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
-    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_4 = __Pyx_PyObject_GetAttrStr(__pyx_t_1, __pyx_n_s_zeros); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_1 = PyInt_FromSsize_t((__pyx_v_self->n_steps + 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_1 = PyInt_FromSsize_t((__pyx_v_self->n_steps + 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
 
-    /* "rover_domain.pyx":165
+    /* "rover_domain.pyx":167
  *                 or self.rover_position_histories.shape[1] != self.n_rovers):
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,
  *                 self.n_rovers, 2))             # <<<<<<<<<<<<<<
  * 
  *         # Recreate all invalid return data
  */
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 165, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 167, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
 
-    /* "rover_domain.pyx":164
+    /* "rover_domain.pyx":166
  *         if (self.rover_position_histories.shape[0] != self.n_steps + 1
  *                 or self.rover_position_histories.shape[1] != self.n_rovers):
  *             self.rover_position_histories = np.zeros((self.n_steps + 1,             # <<<<<<<<<<<<<<
  *                 self.n_rovers, 2))
  * 
  */
-    __pyx_t_11 = PyTuple_New(3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_11 = PyTuple_New(3); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_GIVEREF(__pyx_t_1);
     PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_1);
@@ -4297,17 +4314,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_2, __pyx_t_11) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_11);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 164, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 166, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 164, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 166, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_position_histories, 0);
     __pyx_v_self->rover_position_histories = __pyx_t_12;
     __pyx_t_12.memview = NULL;
     __pyx_t_12.data = NULL;
 
-    /* "rover_domain.pyx":162
+    /* "rover_domain.pyx":164
  *         if self.rover_orientations.shape[0] != self.n_rovers:
  *             self.rover_orientations = np.zeros((self.n_rovers, 2))
  *         if (self.rover_position_histories.shape[0] != self.n_steps + 1             # <<<<<<<<<<<<<<
@@ -4316,14 +4333,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":168
+  /* "rover_domain.pyx":170
  * 
  *         # Recreate all invalid return data
  *         if (self.rover_observations.shape[0] != self.n_rovers or             # <<<<<<<<<<<<<<
  *                 self.rover_observations.shape[3] != self.n_obs_sections):
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  */
-  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 168, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 170, __pyx_L1_error)}
   __pyx_t_13 = (((__pyx_v_self->rover_observations.shape[0]) != __pyx_v_self->n_rovers) != 0);
   if (!__pyx_t_13) {
   } else {
@@ -4331,19 +4348,19 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     goto __pyx_L22_bool_binop_done;
   }
 
-  /* "rover_domain.pyx":169
+  /* "rover_domain.pyx":171
  *         # Recreate all invalid return data
  *         if (self.rover_observations.shape[0] != self.n_rovers or
  *                 self.rover_observations.shape[3] != self.n_obs_sections):             # <<<<<<<<<<<<<<
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  *                 self.n_obs_sections))
  */
-  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 169, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 171, __pyx_L1_error)}
   __pyx_t_13 = (((__pyx_v_self->rover_observations.shape[3]) != __pyx_v_self->n_obs_sections) != 0);
   __pyx_t_6 = __pyx_t_13;
   __pyx_L22_bool_binop_done:;
 
-  /* "rover_domain.pyx":168
+  /* "rover_domain.pyx":170
  * 
  *         # Recreate all invalid return data
  *         if (self.rover_observations.shape[0] != self.n_rovers or             # <<<<<<<<<<<<<<
@@ -4352,39 +4369,39 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":170
+    /* "rover_domain.pyx":172
  *         if (self.rover_observations.shape[0] != self.n_rovers or
  *                 self.rover_observations.shape[3] != self.n_obs_sections):
  *             self.rover_observations = np.zeros((self.n_rovers, 2,             # <<<<<<<<<<<<<<
  *                 self.n_obs_sections))
  *         if self.rover_rewards.shape[0] != self.n_rovers:
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_4, __pyx_n_s_np); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
-    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __pyx_t_11 = __Pyx_PyObject_GetAttrStr(__pyx_t_4, __pyx_n_s_zeros); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-    __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_4);
 
-    /* "rover_domain.pyx":171
+    /* "rover_domain.pyx":173
  *                 self.rover_observations.shape[3] != self.n_obs_sections):
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  *                 self.n_obs_sections))             # <<<<<<<<<<<<<<
  *         if self.rover_rewards.shape[0] != self.n_rovers:
  *             self.rover_rewards = np.zeros(self.n_rovers)
  */
-    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_obs_sections); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 171, __pyx_L1_error)
+    __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_obs_sections); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 173, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_2);
 
-    /* "rover_domain.pyx":170
+    /* "rover_domain.pyx":172
  *         if (self.rover_observations.shape[0] != self.n_rovers or
  *                 self.rover_observations.shape[3] != self.n_obs_sections):
  *             self.rover_observations = np.zeros((self.n_rovers, 2,             # <<<<<<<<<<<<<<
  *                 self.n_obs_sections))
  *         if self.rover_rewards.shape[0] != self.n_rovers:
  */
-    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __pyx_t_1 = PyTuple_New(3); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_GIVEREF(__pyx_t_4);
     PyTuple_SET_ITEM(__pyx_t_1, 0, __pyx_t_4);
@@ -4408,17 +4425,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_11, __pyx_t_2, __pyx_t_1) : __Pyx_PyObject_CallOneArg(__pyx_t_11, __pyx_t_1);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 170, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 170, __pyx_L1_error)
+    __pyx_t_12 = __Pyx_PyObject_to_MemoryviewSlice_dsdsds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_12.memview)) __PYX_ERR(0, 172, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_observations, 0);
     __pyx_v_self->rover_observations = __pyx_t_12;
     __pyx_t_12.memview = NULL;
     __pyx_t_12.data = NULL;
 
-    /* "rover_domain.pyx":168
+    /* "rover_domain.pyx":170
  * 
  *         # Recreate all invalid return data
  *         if (self.rover_observations.shape[0] != self.n_rovers or             # <<<<<<<<<<<<<<
@@ -4427,30 +4444,30 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":172
+  /* "rover_domain.pyx":174
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  *                 self.n_obs_sections))
  *         if self.rover_rewards.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
  *             self.rover_rewards = np.zeros(self.n_rovers)
  * 
  */
-  if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 172, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 174, __pyx_L1_error)}
   __pyx_t_6 = (((__pyx_v_self->rover_rewards.shape[0]) != __pyx_v_self->n_rovers) != 0);
   if (__pyx_t_6) {
 
-    /* "rover_domain.pyx":173
+    /* "rover_domain.pyx":175
  *                 self.n_obs_sections))
  *         if self.rover_rewards.shape[0] != self.n_rovers:
  *             self.rover_rewards = np.zeros(self.n_rovers)             # <<<<<<<<<<<<<<
  * 
  *         # Copy over initial data to working data
  */
-    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __Pyx_GetModuleGlobalName(__pyx_t_11, __pyx_n_s_np); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
-    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_1 = __Pyx_PyObject_GetAttrStr(__pyx_t_11, __pyx_n_s_zeros); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    __pyx_t_11 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_11 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_11);
     __pyx_t_2 = NULL;
     if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_1))) {
@@ -4465,17 +4482,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
     __pyx_t_3 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_1, __pyx_t_2, __pyx_t_11) : __Pyx_PyObject_CallOneArg(__pyx_t_1, __pyx_t_11);
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
-    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 173, __pyx_L1_error)
+    if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_3);
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
-    __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 173, __pyx_L1_error)
+    __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_3, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 175, __pyx_L1_error)
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_rewards, 0);
     __pyx_v_self->rover_rewards = __pyx_t_5;
     __pyx_t_5.memview = NULL;
     __pyx_t_5.data = NULL;
 
-    /* "rover_domain.pyx":172
+    /* "rover_domain.pyx":174
  *             self.rover_observations = np.zeros((self.n_rovers, 2,
  *                 self.n_obs_sections))
  *         if self.rover_rewards.shape[0] != self.n_rovers:             # <<<<<<<<<<<<<<
@@ -4484,49 +4501,49 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
  */
   }
 
-  /* "rover_domain.pyx":176
+  /* "rover_domain.pyx":178
  * 
  *         # Copy over initial data to working data
  *         self.rover_positions[...] = self.init_rover_positions             # <<<<<<<<<<<<<<
  *         self.rover_orientations[...] = self.init_rover_orientations
  * 
  */
-  if (unlikely(!__pyx_v_self->init_rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 176, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->init_rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 178, __pyx_L1_error)}
   __pyx_t_8 = __pyx_v_self->init_rover_positions;
   __PYX_INC_MEMVIEW(&__pyx_t_8, 1);
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 176, __pyx_L1_error)}
-  if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_v_self->rover_positions, 2, 2, 0) < 0)) __PYX_ERR(0, 176, __pyx_L1_error)
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 178, __pyx_L1_error)}
+  if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_v_self->rover_positions, 2, 2, 0) < 0)) __PYX_ERR(0, 178, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_t_8, 1);
   __pyx_t_8.memview = NULL;
   __pyx_t_8.data = NULL;
 
-  /* "rover_domain.pyx":177
+  /* "rover_domain.pyx":179
  *         # Copy over initial data to working data
  *         self.rover_positions[...] = self.init_rover_positions
  *         self.rover_orientations[...] = self.init_rover_orientations             # <<<<<<<<<<<<<<
  * 
  *         # Store first rover positions in histories
  */
-  if (unlikely(!__pyx_v_self->init_rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 177, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->init_rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 179, __pyx_L1_error)}
   __pyx_t_8 = __pyx_v_self->init_rover_orientations;
   __PYX_INC_MEMVIEW(&__pyx_t_8, 1);
-  if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 177, __pyx_L1_error)}
-  if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_v_self->rover_orientations, 2, 2, 0) < 0)) __PYX_ERR(0, 177, __pyx_L1_error)
+  if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 179, __pyx_L1_error)}
+  if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_v_self->rover_orientations, 2, 2, 0) < 0)) __PYX_ERR(0, 179, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_t_8, 1);
   __pyx_t_8.memview = NULL;
   __pyx_t_8.data = NULL;
 
-  /* "rover_domain.pyx":181
+  /* "rover_domain.pyx":183
  *         # Store first rover positions in histories
  *         # todo avoiding slicing for speed?
  *         self.rover_position_histories[0,...] = self.init_rover_positions             # <<<<<<<<<<<<<<
  * 
  *     cpdef void stop_prematurely(self):
  */
-  if (unlikely(!__pyx_v_self->init_rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 181, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->init_rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 183, __pyx_L1_error)}
   __pyx_t_8 = __pyx_v_self->init_rover_positions;
   __PYX_INC_MEMVIEW(&__pyx_t_8, 1);
-  if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 181, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 183, __pyx_L1_error)}
   __pyx_t_14.data = __pyx_v_self->rover_position_histories.data;
   __pyx_t_14.memview = __pyx_v_self->rover_position_histories.memview;
   __PYX_INC_MEMVIEW(&__pyx_t_14, 0);
@@ -4539,7 +4556,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_reset(struct __pyx_obj_12rover_
         if (!__Pyx_is_valid_index(__pyx_tmp_idx, __pyx_tmp_shape)) {
             PyErr_SetString(PyExc_IndexError,
                             "Index out of bounds (axis 0)");
-            __PYX_ERR(0, 181, __pyx_L1_error)
+            __PYX_ERR(0, 183, __pyx_L1_error)
         }
         __pyx_t_14.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -4552,7 +4569,7 @@ __pyx_t_14.shape[1] = __pyx_v_self->rover_position_histories.shape[2];
 __pyx_t_14.strides[1] = __pyx_v_self->rover_position_histories.strides[2];
     __pyx_t_14.suboffsets[1] = -1;
 
-if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_14, 2, 2, 0) < 0)) __PYX_ERR(0, 181, __pyx_L1_error)
+if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_14, 2, 2, 0) < 0)) __PYX_ERR(0, 183, __pyx_L1_error)
   __PYX_XDEC_MEMVIEW(&__pyx_t_14, 1);
   __pyx_t_14.memview = NULL;
   __pyx_t_14.data = NULL;
@@ -4560,7 +4577,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_14, 2, 2, 0) < 0)
   __pyx_t_8.memview = NULL;
   __pyx_t_8.data = NULL;
 
-  /* "rover_domain.pyx":99
+  /* "rover_domain.pyx":101
  * 
  * 
  *     cpdef void reset(self):             # <<<<<<<<<<<<<<
@@ -4607,7 +4624,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_2reset(struct __pyx_obj_1
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("reset", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_reset(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 99, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_reset(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 101, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4624,7 +4641,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_2reset(struct __pyx_obj_1
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":183
+/* "rover_domain.pyx":185
  *         self.rover_position_histories[0,...] = self.init_rover_positions
  * 
  *     cpdef void stop_prematurely(self):             # <<<<<<<<<<<<<<
@@ -4651,7 +4668,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_stop_prematurely(struct __pyx_o
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_stop_prematurely); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_stop_prematurely); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_5stop_prematurely)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -4667,7 +4684,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_stop_prematurely(struct __pyx_o
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 183, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 185, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -4687,7 +4704,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_stop_prematurely(struct __pyx_o
     #endif
   }
 
-  /* "rover_domain.pyx":184
+  /* "rover_domain.pyx":186
  * 
  *     cpdef void stop_prematurely(self):
  *         self.n_steps = self.step_id             # <<<<<<<<<<<<<<
@@ -4697,7 +4714,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_stop_prematurely(struct __pyx_o
   __pyx_t_5 = __pyx_v_self->step_id;
   __pyx_v_self->n_steps = __pyx_t_5;
 
-  /* "rover_domain.pyx":185
+  /* "rover_domain.pyx":187
  *     cpdef void stop_prematurely(self):
  *         self.n_steps = self.step_id
  *         self.done = True             # <<<<<<<<<<<<<<
@@ -4710,7 +4727,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_stop_prematurely(struct __pyx_o
   __Pyx_DECREF(((PyObject *)__pyx_v_self->done));
   __pyx_v_self->done = ((PyBoolObject *)Py_True);
 
-  /* "rover_domain.pyx":183
+  /* "rover_domain.pyx":185
  *         self.rover_position_histories[0,...] = self.init_rover_positions
  * 
  *     cpdef void stop_prematurely(self):             # <<<<<<<<<<<<<<
@@ -4749,7 +4766,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_4stop_prematurely(struct 
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("stop_prematurely", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_stop_prematurely(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 183, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_stop_prematurely(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 185, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -4766,7 +4783,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_4stop_prematurely(struct 
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":187
+/* "rover_domain.pyx":189
  *         self.done = True
  * 
  *     def step(self, double[:, :] actions, evaluate = None):             # <<<<<<<<<<<<<<
@@ -4811,7 +4828,7 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_7step(PyObject *__pyx_v_s
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "step") < 0)) __PYX_ERR(0, 187, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "step") < 0)) __PYX_ERR(0, 189, __pyx_L3_error)
       }
     } else {
       switch (PyTuple_GET_SIZE(__pyx_args)) {
@@ -4822,12 +4839,12 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_7step(PyObject *__pyx_v_s
         default: goto __pyx_L5_argtuple_error;
       }
     }
-    __pyx_v_actions = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_actions.memview)) __PYX_ERR(0, 187, __pyx_L3_error)
+    __pyx_v_actions = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(values[0], PyBUF_WRITABLE); if (unlikely(!__pyx_v_actions.memview)) __PYX_ERR(0, 189, __pyx_L3_error)
     __pyx_v_evaluate = values[1];
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("step", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 187, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("step", 0, 1, 2, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 189, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("rover_domain.RoverDomain.step", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -4860,19 +4877,19 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_6step(struct __pyx_obj_12
   int __pyx_t_14;
   __Pyx_RefNannySetupContext("step", 0);
 
-  /* "rover_domain.pyx":191
+  /* "rover_domain.pyx":193
  *         Provided for convenience, not recommended for performance
  *         """
  *         self.rover_local_rewards = np.zeros(self.n_rovers)             # <<<<<<<<<<<<<<
  *         if not self.done:
  *             if actions is not None:
  */
-  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __Pyx_GetModuleGlobalName(__pyx_t_2, __pyx_n_s_np); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
-  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_t_3 = __Pyx_PyObject_GetAttrStr(__pyx_t_2, __pyx_n_s_zeros); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_t_2 = PyInt_FromSsize_t(__pyx_v_self->n_rovers); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __pyx_t_4 = NULL;
   if (CYTHON_UNPACK_METHODS && unlikely(PyMethod_Check(__pyx_t_3))) {
@@ -4887,28 +4904,28 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_6step(struct __pyx_obj_12
   __pyx_t_1 = (__pyx_t_4) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_4, __pyx_t_2) : __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_2);
   __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
-  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 191, __pyx_L1_error)
+  if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 191, __pyx_L1_error)
+  __pyx_t_5 = __Pyx_PyObject_to_MemoryviewSlice_ds_double(__pyx_t_1, PyBUF_WRITABLE); if (unlikely(!__pyx_t_5.memview)) __PYX_ERR(0, 193, __pyx_L1_error)
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
   __PYX_XDEC_MEMVIEW(&__pyx_v_self->rover_local_rewards, 0);
   __pyx_v_self->rover_local_rewards = __pyx_t_5;
   __pyx_t_5.memview = NULL;
   __pyx_t_5.data = NULL;
 
-  /* "rover_domain.pyx":192
+  /* "rover_domain.pyx":194
  *         """
  *         self.rover_local_rewards = np.zeros(self.n_rovers)
  *         if not self.done:             # <<<<<<<<<<<<<<
  *             if actions is not None:
  *                 self.move_rovers(actions)
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->done)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 192, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->done)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 194, __pyx_L1_error)
   __pyx_t_7 = ((!__pyx_t_6) != 0);
   if (__pyx_t_7) {
 
-    /* "rover_domain.pyx":193
+    /* "rover_domain.pyx":195
  *         self.rover_local_rewards = np.zeros(self.n_rovers)
  *         if not self.done:
  *             if actions is not None:             # <<<<<<<<<<<<<<
@@ -4918,7 +4935,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_6step(struct __pyx_obj_12
     __pyx_t_7 = ((((PyObject *) __pyx_v_actions.memview) != Py_None) != 0);
     if (__pyx_t_7) {
 
-      /* "rover_domain.pyx":194
+      /* "rover_domain.pyx":196
  *         if not self.done:
  *             if actions is not None:
  *                 self.move_rovers(actions)             # <<<<<<<<<<<<<<
@@ -4927,7 +4944,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_6step(struct __pyx_obj_12
  */
       ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->move_rovers(__pyx_v_self, __pyx_v_actions, 0);
 
-      /* "rover_domain.pyx":193
+      /* "rover_domain.pyx":195
  *         self.rover_local_rewards = np.zeros(self.n_rovers)
  *         if not self.done:
  *             if actions is not None:             # <<<<<<<<<<<<<<
@@ -4936,7 +4953,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_6step(struct __pyx_obj_12
  */
     }
 
-    /* "rover_domain.pyx":195
+    /* "rover_domain.pyx":197
  *             if actions is not None:
  *                 self.move_rovers(actions)
  *             self.step_id += 1             # <<<<<<<<<<<<<<
@@ -4945,25 +4962,25 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_6step(struct __pyx_obj_12
  */
     __pyx_v_self->step_id = (__pyx_v_self->step_id + 1);
 
-    /* "rover_domain.pyx":202
+    /* "rover_domain.pyx":204
  *             # (step_id = 0) must be stored in rover_position_histories[1]
  *             self.rover_position_histories[self.step_id,...]\
  *                 = self.rover_positions             # <<<<<<<<<<<<<<
  * 
  *         self.done = self.step_id >= self.n_steps
  */
-    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 202, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 204, __pyx_L1_error)}
     __pyx_t_8 = __pyx_v_self->rover_positions;
     __PYX_INC_MEMVIEW(&__pyx_t_8, 1);
 
-    /* "rover_domain.pyx":201
+    /* "rover_domain.pyx":203
  *             # is stored in rover_position_histories[0], so the first step
  *             # (step_id = 0) must be stored in rover_position_histories[1]
  *             self.rover_position_histories[self.step_id,...]\             # <<<<<<<<<<<<<<
  *                 = self.rover_positions
  * 
  */
-    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 201, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 203, __pyx_L1_error)}
     __pyx_t_9.data = __pyx_v_self->rover_position_histories.data;
     __pyx_t_9.memview = __pyx_v_self->rover_position_histories.memview;
     __PYX_INC_MEMVIEW(&__pyx_t_9, 0);
@@ -4976,7 +4993,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_6step(struct __pyx_obj_12
         if (!__Pyx_is_valid_index(__pyx_tmp_idx, __pyx_tmp_shape)) {
             PyErr_SetString(PyExc_IndexError,
                             "Index out of bounds (axis 0)");
-            __PYX_ERR(0, 201, __pyx_L1_error)
+            __PYX_ERR(0, 203, __pyx_L1_error)
         }
         __pyx_t_9.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -4989,7 +5006,7 @@ __pyx_t_9.shape[1] = __pyx_v_self->rover_position_histories.shape[2];
 __pyx_t_9.strides[1] = __pyx_v_self->rover_position_histories.strides[2];
     __pyx_t_9.suboffsets[1] = -1;
 
-if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0)) __PYX_ERR(0, 201, __pyx_L1_error)
+if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0)) __PYX_ERR(0, 203, __pyx_L1_error)
     __PYX_XDEC_MEMVIEW(&__pyx_t_9, 1);
     __pyx_t_9.memview = NULL;
     __pyx_t_9.data = NULL;
@@ -4997,7 +5014,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
     __pyx_t_8.memview = NULL;
     __pyx_t_8.data = NULL;
 
-    /* "rover_domain.pyx":192
+    /* "rover_domain.pyx":194
  *         """
  *         self.rover_local_rewards = np.zeros(self.n_rovers)
  *         if not self.done:             # <<<<<<<<<<<<<<
@@ -5006,33 +5023,33 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
  */
   }
 
-  /* "rover_domain.pyx":204
+  /* "rover_domain.pyx":206
  *                 = self.rover_positions
  * 
  *         self.done = self.step_id >= self.n_steps             # <<<<<<<<<<<<<<
  *         if evaluate:
  *             evaluate(self)
  */
-  __pyx_t_1 = __Pyx_PyBool_FromLong((__pyx_v_self->step_id >= __pyx_v_self->n_steps)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 204, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_PyBool_FromLong((__pyx_v_self->step_id >= __pyx_v_self->n_steps)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cpython_4bool_bool)))) __PYX_ERR(0, 204, __pyx_L1_error)
+  if (!(likely(__Pyx_TypeTest(__pyx_t_1, __pyx_ptype_7cpython_4bool_bool)))) __PYX_ERR(0, 206, __pyx_L1_error)
   __Pyx_GIVEREF(__pyx_t_1);
   __Pyx_GOTREF(__pyx_v_self->done);
   __Pyx_DECREF(((PyObject *)__pyx_v_self->done));
   __pyx_v_self->done = ((PyBoolObject *)__pyx_t_1);
   __pyx_t_1 = 0;
 
-  /* "rover_domain.pyx":205
+  /* "rover_domain.pyx":207
  * 
  *         self.done = self.step_id >= self.n_steps
  *         if evaluate:             # <<<<<<<<<<<<<<
  *             evaluate(self)
  *         else:
  */
-  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_evaluate); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 205, __pyx_L1_error)
+  __pyx_t_7 = __Pyx_PyObject_IsTrue(__pyx_v_evaluate); if (unlikely(__pyx_t_7 < 0)) __PYX_ERR(0, 207, __pyx_L1_error)
   if (__pyx_t_7) {
 
-    /* "rover_domain.pyx":206
+    /* "rover_domain.pyx":208
  *         self.done = self.step_id >= self.n_steps
  *         if evaluate:
  *             evaluate(self)             # <<<<<<<<<<<<<<
@@ -5052,12 +5069,12 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
     }
     __pyx_t_1 = (__pyx_t_2) ? __Pyx_PyObject_Call2Args(__pyx_t_3, __pyx_t_2, ((PyObject *)__pyx_v_self)) : __Pyx_PyObject_CallOneArg(__pyx_t_3, ((PyObject *)__pyx_v_self));
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
-    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 206, __pyx_L1_error)
+    if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 208, __pyx_L1_error)
     __Pyx_GOTREF(__pyx_t_1);
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-    /* "rover_domain.pyx":205
+    /* "rover_domain.pyx":207
  * 
  *         self.done = self.step_id >= self.n_steps
  *         if evaluate:             # <<<<<<<<<<<<<<
@@ -5067,7 +5084,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
     goto __pyx_L5;
   }
 
-  /* "rover_domain.pyx":208
+  /* "rover_domain.pyx":210
  *             evaluate(self)
  *         else:
  *             for poi_id in range(self.n_pois):             # <<<<<<<<<<<<<<
@@ -5080,14 +5097,14 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
     for (__pyx_t_12 = 0; __pyx_t_12 < __pyx_t_11; __pyx_t_12+=1) {
       __pyx_v_poi_id = __pyx_t_12;
 
-      /* "rover_domain.pyx":209
+      /* "rover_domain.pyx":211
  *         else:
  *             for poi_id in range(self.n_pois):
  *                 if self.poi_status[poi_id]:             # <<<<<<<<<<<<<<
  *                     self.update_local_step_reward_from_poi(poi_id)
  *         self.update_observations()
  */
-      if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 209, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 211, __pyx_L1_error)}
       __pyx_t_13 = __pyx_v_poi_id;
       __pyx_t_14 = -1;
       if (__pyx_t_13 < 0) {
@@ -5096,12 +5113,12 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
       } else if (unlikely(__pyx_t_13 >= __pyx_v_self->poi_status.shape[0])) __pyx_t_14 = 0;
       if (unlikely(__pyx_t_14 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_14);
-        __PYX_ERR(0, 209, __pyx_L1_error)
+        __PYX_ERR(0, 211, __pyx_L1_error)
       }
       __pyx_t_7 = ((*((double *) ( /* dim=0 */ (__pyx_v_self->poi_status.data + __pyx_t_13 * __pyx_v_self->poi_status.strides[0]) ))) != 0);
       if (__pyx_t_7) {
 
-        /* "rover_domain.pyx":210
+        /* "rover_domain.pyx":212
  *             for poi_id in range(self.n_pois):
  *                 if self.poi_status[poi_id]:
  *                     self.update_local_step_reward_from_poi(poi_id)             # <<<<<<<<<<<<<<
@@ -5110,7 +5127,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
  */
         (void)(((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->update_local_step_reward_from_poi(__pyx_v_self, __pyx_v_poi_id, 0));
 
-        /* "rover_domain.pyx":209
+        /* "rover_domain.pyx":211
  *         else:
  *             for poi_id in range(self.n_pois):
  *                 if self.poi_status[poi_id]:             # <<<<<<<<<<<<<<
@@ -5122,7 +5139,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
   }
   __pyx_L5:;
 
-  /* "rover_domain.pyx":211
+  /* "rover_domain.pyx":213
  *                 if self.poi_status[poi_id]:
  *                     self.update_local_step_reward_from_poi(poi_id)
  *         self.update_observations()             # <<<<<<<<<<<<<<
@@ -5131,7 +5148,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
  */
   ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->update_observations(__pyx_v_self, 0);
 
-  /* "rover_domain.pyx":213
+  /* "rover_domain.pyx":215
  *         self.update_observations()
  * 
  *         return self.rover_observations, self.rover_local_rewards, self.done, self             # <<<<<<<<<<<<<<
@@ -5139,13 +5156,13 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
  * 
  */
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 213, __pyx_L1_error)}
-  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->rover_observations, 3, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 213, __pyx_L1_error)
+  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 215, __pyx_L1_error)}
+  __pyx_t_1 = __pyx_memoryview_fromslice(__pyx_v_self->rover_observations, 3, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
-  if (unlikely(!__pyx_v_self->rover_local_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 213, __pyx_L1_error)}
-  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_self->rover_local_rewards, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 213, __pyx_L1_error)
+  if (unlikely(!__pyx_v_self->rover_local_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 215, __pyx_L1_error)}
+  __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_self->rover_local_rewards, 1, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_3);
-  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 213, __pyx_L1_error)
+  __pyx_t_2 = PyTuple_New(4); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 215, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_2);
   __Pyx_GIVEREF(__pyx_t_1);
   PyTuple_SET_ITEM(__pyx_t_2, 0, __pyx_t_1);
@@ -5163,7 +5180,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
   __pyx_t_2 = 0;
   goto __pyx_L0;
 
-  /* "rover_domain.pyx":187
+  /* "rover_domain.pyx":189
  *         self.done = True
  * 
  *     def step(self, double[:, :] actions, evaluate = None):             # <<<<<<<<<<<<<<
@@ -5189,7 +5206,7 @@ if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_8, __pyx_t_9, 2, 2, 0) < 0))
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":216
+/* "rover_domain.pyx":218
  * 
  * 
  *     cpdef void move_rovers(self, double[:, :] actions):             # <<<<<<<<<<<<<<
@@ -5270,11 +5287,11 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_move_rovers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_move_rovers); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_9move_rovers)) {
-        if (unlikely(!__pyx_v_actions.memview)) { __Pyx_RaiseUnboundLocalError("actions"); __PYX_ERR(0, 216, __pyx_L1_error) }
-        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_actions, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 216, __pyx_L1_error)
+        if (unlikely(!__pyx_v_actions.memview)) { __Pyx_RaiseUnboundLocalError("actions"); __PYX_ERR(0, 218, __pyx_L1_error) }
+        __pyx_t_3 = __pyx_memoryview_fromslice(__pyx_v_actions, 2, (PyObject *(*)(char *)) __pyx_memview_get_double, (int (*)(char *, PyObject *)) __pyx_memview_set_double, 0);; if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 218, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -5290,7 +5307,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 216, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 218, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -5310,7 +5327,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     #endif
   }
 
-  /* "rover_domain.pyx":221
+  /* "rover_domain.pyx":223
  * 
  *         # clip actions
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -5322,7 +5339,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_rover_id = __pyx_t_8;
 
-    /* "rover_domain.pyx":222
+    /* "rover_domain.pyx":224
  *         # clip actions
  *         for rover_id in range(self.n_rovers):
  *             actions[rover_id, 0] = min(max(-1, actions[rover_id, 0]), 1)             # <<<<<<<<<<<<<<
@@ -5343,7 +5360,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     } else if (unlikely(__pyx_t_11 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 222, __pyx_L1_error)
+      __PYX_ERR(0, 224, __pyx_L1_error)
     }
     __pyx_t_13 = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_10 * __pyx_v_actions.strides[0]) ) + __pyx_t_11 * __pyx_v_actions.strides[1]) )));
     __pyx_t_14 = -1L;
@@ -5371,11 +5388,11 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     } else if (unlikely(__pyx_t_17 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 222, __pyx_L1_error)
+      __PYX_ERR(0, 224, __pyx_L1_error)
     }
     *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_16 * __pyx_v_actions.strides[0]) ) + __pyx_t_17 * __pyx_v_actions.strides[1]) )) = __pyx_t_15;
 
-    /* "rover_domain.pyx":223
+    /* "rover_domain.pyx":225
  *         for rover_id in range(self.n_rovers):
  *             actions[rover_id, 0] = min(max(-1, actions[rover_id, 0]), 1)
  *             actions[rover_id, 1] = min(max(-1, actions[rover_id, 1]), 1)             # <<<<<<<<<<<<<<
@@ -5396,7 +5413,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     } else if (unlikely(__pyx_t_19 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 223, __pyx_L1_error)
+      __PYX_ERR(0, 225, __pyx_L1_error)
     }
     __pyx_t_15 = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_18 * __pyx_v_actions.strides[0]) ) + __pyx_t_19 * __pyx_v_actions.strides[1]) )));
     __pyx_t_14 = -1L;
@@ -5424,22 +5441,22 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     } else if (unlikely(__pyx_t_21 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 223, __pyx_L1_error)
+      __PYX_ERR(0, 225, __pyx_L1_error)
     }
     *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_20 * __pyx_v_actions.strides[0]) ) + __pyx_t_21 * __pyx_v_actions.strides[1]) )) = __pyx_t_13;
   }
 
-  /* "rover_domain.pyx":226
+  /* "rover_domain.pyx":228
  * 
  * 
  *         if self.reorients:             # <<<<<<<<<<<<<<
  *             # Translate and Reorient all rovers based on their actions
  *             for rover_id in range(self.n_rovers):
  */
-  __pyx_t_22 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->reorients)); if (unlikely(__pyx_t_22 < 0)) __PYX_ERR(0, 226, __pyx_L1_error)
+  __pyx_t_22 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->reorients)); if (unlikely(__pyx_t_22 < 0)) __PYX_ERR(0, 228, __pyx_L1_error)
   if (__pyx_t_22) {
 
-    /* "rover_domain.pyx":228
+    /* "rover_domain.pyx":230
  *         if self.reorients:
  *             # Translate and Reorient all rovers based on their actions
  *             for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -5451,14 +5468,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_rover_id = __pyx_t_8;
 
-      /* "rover_domain.pyx":231
+      /* "rover_domain.pyx":233
  * 
  *                 # turn action into global frame motion
  *                 dx = (self.rover_orientations[rover_id, 0]             # <<<<<<<<<<<<<<
  *                     * actions[rover_id, 0]
  *                     - self.rover_orientations[rover_id, 1]
  */
-      if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 231, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 233, __pyx_L1_error)}
       __pyx_t_23 = __pyx_v_rover_id;
       __pyx_t_24 = 0;
       __pyx_t_12 = -1;
@@ -5472,10 +5489,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_24 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 231, __pyx_L1_error)
+        __PYX_ERR(0, 233, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":232
+      /* "rover_domain.pyx":234
  *                 # turn action into global frame motion
  *                 dx = (self.rover_orientations[rover_id, 0]
  *                     * actions[rover_id, 0]             # <<<<<<<<<<<<<<
@@ -5495,17 +5512,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_26 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 232, __pyx_L1_error)
+        __PYX_ERR(0, 234, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":233
+      /* "rover_domain.pyx":235
  *                 dx = (self.rover_orientations[rover_id, 0]
  *                     * actions[rover_id, 0]
  *                     - self.rover_orientations[rover_id, 1]             # <<<<<<<<<<<<<<
  *                     * actions[rover_id, 1])
  *                 dy = (self.rover_orientations[rover_id, 0]
  */
-      if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 233, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 235, __pyx_L1_error)}
       __pyx_t_27 = __pyx_v_rover_id;
       __pyx_t_28 = 1;
       __pyx_t_12 = -1;
@@ -5519,10 +5536,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_28 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 233, __pyx_L1_error)
+        __PYX_ERR(0, 235, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":234
+      /* "rover_domain.pyx":236
  *                     * actions[rover_id, 0]
  *                     - self.rover_orientations[rover_id, 1]
  *                     * actions[rover_id, 1])             # <<<<<<<<<<<<<<
@@ -5542,10 +5559,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_30 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 234, __pyx_L1_error)
+        __PYX_ERR(0, 236, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":233
+      /* "rover_domain.pyx":235
  *                 dx = (self.rover_orientations[rover_id, 0]
  *                     * actions[rover_id, 0]
  *                     - self.rover_orientations[rover_id, 1]             # <<<<<<<<<<<<<<
@@ -5554,14 +5571,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
  */
       __pyx_v_dx = (((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_23 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_24 * __pyx_v_self->rover_orientations.strides[1]) ))) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_25 * __pyx_v_actions.strides[0]) ) + __pyx_t_26 * __pyx_v_actions.strides[1]) )))) - ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_27 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_28 * __pyx_v_self->rover_orientations.strides[1]) ))) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_29 * __pyx_v_actions.strides[0]) ) + __pyx_t_30 * __pyx_v_actions.strides[1]) )))));
 
-      /* "rover_domain.pyx":235
+      /* "rover_domain.pyx":237
  *                     - self.rover_orientations[rover_id, 1]
  *                     * actions[rover_id, 1])
  *                 dy = (self.rover_orientations[rover_id, 0]             # <<<<<<<<<<<<<<
  *                     * actions[rover_id, 1]
  *                     + self.rover_orientations[rover_id, 1]
  */
-      if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 235, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 237, __pyx_L1_error)}
       __pyx_t_31 = __pyx_v_rover_id;
       __pyx_t_32 = 0;
       __pyx_t_12 = -1;
@@ -5575,10 +5592,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_32 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 235, __pyx_L1_error)
+        __PYX_ERR(0, 237, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":236
+      /* "rover_domain.pyx":238
  *                     * actions[rover_id, 1])
  *                 dy = (self.rover_orientations[rover_id, 0]
  *                     * actions[rover_id, 1]             # <<<<<<<<<<<<<<
@@ -5598,17 +5615,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_34 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 236, __pyx_L1_error)
+        __PYX_ERR(0, 238, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":237
+      /* "rover_domain.pyx":239
  *                 dy = (self.rover_orientations[rover_id, 0]
  *                     * actions[rover_id, 1]
  *                     + self.rover_orientations[rover_id, 1]             # <<<<<<<<<<<<<<
  *                     * actions[rover_id, 0])
  * 
  */
-      if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 237, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 239, __pyx_L1_error)}
       __pyx_t_35 = __pyx_v_rover_id;
       __pyx_t_36 = 1;
       __pyx_t_12 = -1;
@@ -5622,10 +5639,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_36 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 237, __pyx_L1_error)
+        __PYX_ERR(0, 239, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":238
+      /* "rover_domain.pyx":240
  *                     * actions[rover_id, 1]
  *                     + self.rover_orientations[rover_id, 1]
  *                     * actions[rover_id, 0])             # <<<<<<<<<<<<<<
@@ -5645,10 +5662,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_38 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 238, __pyx_L1_error)
+        __PYX_ERR(0, 240, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":237
+      /* "rover_domain.pyx":239
  *                 dy = (self.rover_orientations[rover_id, 0]
  *                     * actions[rover_id, 1]
  *                     + self.rover_orientations[rover_id, 1]             # <<<<<<<<<<<<<<
@@ -5657,14 +5674,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
  */
       __pyx_v_dy = (((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_31 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_32 * __pyx_v_self->rover_orientations.strides[1]) ))) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_33 * __pyx_v_actions.strides[0]) ) + __pyx_t_34 * __pyx_v_actions.strides[1]) )))) + ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_35 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_36 * __pyx_v_self->rover_orientations.strides[1]) ))) * (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_37 * __pyx_v_actions.strides[0]) ) + __pyx_t_38 * __pyx_v_actions.strides[1]) )))));
 
-      /* "rover_domain.pyx":242
+      /* "rover_domain.pyx":244
  * 
  *                 # globally move and reorient agent
  *                 self.rover_positions[rover_id, 0] += dx             # <<<<<<<<<<<<<<
  *                 self.rover_positions[rover_id, 1] += dy
  * 
  */
-      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 242, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 244, __pyx_L1_error)}
       __pyx_t_39 = __pyx_v_rover_id;
       __pyx_t_40 = 0;
       __pyx_t_12 = -1;
@@ -5678,18 +5695,18 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_40 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 242, __pyx_L1_error)
+        __PYX_ERR(0, 244, __pyx_L1_error)
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_39 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_40 * __pyx_v_self->rover_positions.strides[1]) )) += __pyx_v_dx;
 
-      /* "rover_domain.pyx":243
+      /* "rover_domain.pyx":245
  *                 # globally move and reorient agent
  *                 self.rover_positions[rover_id, 0] += dx
  *                 self.rover_positions[rover_id, 1] += dy             # <<<<<<<<<<<<<<
  * 
  *                 # Reorient agent in the direction of movement in the global
  */
-      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 243, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 245, __pyx_L1_error)}
       __pyx_t_41 = __pyx_v_rover_id;
       __pyx_t_42 = 1;
       __pyx_t_12 = -1;
@@ -5703,11 +5720,11 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_42 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 243, __pyx_L1_error)
+        __PYX_ERR(0, 245, __pyx_L1_error)
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_41 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_42 * __pyx_v_self->rover_positions.strides[1]) )) += __pyx_v_dy;
 
-      /* "rover_domain.pyx":248
+      /* "rover_domain.pyx":250
  *                 # frame.  Avoid divide by 0 (by skipping the reorientation step
  *                 # entirely).
  *                 if not (dx == 0. and dy == 0.):             # <<<<<<<<<<<<<<
@@ -5726,7 +5743,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       __pyx_t_43 = ((!__pyx_t_22) != 0);
       if (__pyx_t_43) {
 
-        /* "rover_domain.pyx":249
+        /* "rover_domain.pyx":251
  *                 # entirely).
  *                 if not (dx == 0. and dy == 0.):
  *                     norm = sqrt(dx*dx +  dy*dy)             # <<<<<<<<<<<<<<
@@ -5735,7 +5752,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
  */
         __pyx_v_norm = sqrt(((__pyx_v_dx * __pyx_v_dx) + (__pyx_v_dy * __pyx_v_dy)));
 
-        /* "rover_domain.pyx":250
+        /* "rover_domain.pyx":252
  *                 if not (dx == 0. and dy == 0.):
  *                     norm = sqrt(dx*dx +  dy*dy)
  *                     self.rover_orientations[rover_id,0] = dx / norm             # <<<<<<<<<<<<<<
@@ -5744,9 +5761,9 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
  */
         if (unlikely(__pyx_v_norm == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 250, __pyx_L1_error)
+          __PYX_ERR(0, 252, __pyx_L1_error)
         }
-        if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 250, __pyx_L1_error)}
+        if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 252, __pyx_L1_error)}
         __pyx_t_44 = __pyx_v_rover_id;
         __pyx_t_45 = 0;
         __pyx_t_12 = -1;
@@ -5760,11 +5777,11 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
         } else if (unlikely(__pyx_t_45 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_12 = 1;
         if (unlikely(__pyx_t_12 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_12);
-          __PYX_ERR(0, 250, __pyx_L1_error)
+          __PYX_ERR(0, 252, __pyx_L1_error)
         }
         *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_44 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_45 * __pyx_v_self->rover_orientations.strides[1]) )) = (__pyx_v_dx / __pyx_v_norm);
 
-        /* "rover_domain.pyx":251
+        /* "rover_domain.pyx":253
  *                     norm = sqrt(dx*dx +  dy*dy)
  *                     self.rover_orientations[rover_id,0] = dx / norm
  *                     self.rover_orientations[rover_id,1] = dy / norm             # <<<<<<<<<<<<<<
@@ -5773,9 +5790,9 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
  */
         if (unlikely(__pyx_v_norm == 0)) {
           PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-          __PYX_ERR(0, 251, __pyx_L1_error)
+          __PYX_ERR(0, 253, __pyx_L1_error)
         }
-        if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 251, __pyx_L1_error)}
+        if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 253, __pyx_L1_error)}
         __pyx_t_46 = __pyx_v_rover_id;
         __pyx_t_47 = 1;
         __pyx_t_12 = -1;
@@ -5789,11 +5806,11 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
         } else if (unlikely(__pyx_t_47 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_12 = 1;
         if (unlikely(__pyx_t_12 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_12);
-          __PYX_ERR(0, 251, __pyx_L1_error)
+          __PYX_ERR(0, 253, __pyx_L1_error)
         }
         *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_46 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_47 * __pyx_v_self->rover_orientations.strides[1]) )) = (__pyx_v_dy / __pyx_v_norm);
 
-        /* "rover_domain.pyx":248
+        /* "rover_domain.pyx":250
  *                 # frame.  Avoid divide by 0 (by skipping the reorientation step
  *                 # entirely).
  *                 if not (dx == 0. and dy == 0.):             # <<<<<<<<<<<<<<
@@ -5803,7 +5820,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       }
     }
 
-    /* "rover_domain.pyx":226
+    /* "rover_domain.pyx":228
  * 
  * 
  *         if self.reorients:             # <<<<<<<<<<<<<<
@@ -5813,7 +5830,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     goto __pyx_L5;
   }
 
-  /* "rover_domain.pyx":254
+  /* "rover_domain.pyx":256
  *         # Else domain translates but does not reorients agents
  *         else:
  *             for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -5826,7 +5843,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
     for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
       __pyx_v_rover_id = __pyx_t_8;
 
-      /* "rover_domain.pyx":255
+      /* "rover_domain.pyx":257
  *         else:
  *             for rover_id in range(self.n_rovers):
  *                 self.rover_positions[rover_id, 0] += actions[rover_id, 0]             # <<<<<<<<<<<<<<
@@ -5846,9 +5863,9 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_49 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 255, __pyx_L1_error)
+        __PYX_ERR(0, 257, __pyx_L1_error)
       }
-      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 255, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 257, __pyx_L1_error)}
       __pyx_t_50 = __pyx_v_rover_id;
       __pyx_t_51 = 0;
       __pyx_t_12 = -1;
@@ -5862,11 +5879,11 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_51 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 255, __pyx_L1_error)
+        __PYX_ERR(0, 257, __pyx_L1_error)
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_50 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_51 * __pyx_v_self->rover_positions.strides[1]) )) += (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_48 * __pyx_v_actions.strides[0]) ) + __pyx_t_49 * __pyx_v_actions.strides[1]) )));
 
-      /* "rover_domain.pyx":256
+      /* "rover_domain.pyx":258
  *             for rover_id in range(self.n_rovers):
  *                 self.rover_positions[rover_id, 0] += actions[rover_id, 0]
  *                 self.rover_positions[rover_id, 1] += actions[rover_id, 1]             # <<<<<<<<<<<<<<
@@ -5886,9 +5903,9 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_53 >= __pyx_v_actions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 256, __pyx_L1_error)
+        __PYX_ERR(0, 258, __pyx_L1_error)
       }
-      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 256, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 258, __pyx_L1_error)}
       __pyx_t_54 = __pyx_v_rover_id;
       __pyx_t_55 = 1;
       __pyx_t_12 = -1;
@@ -5902,14 +5919,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_move_rovers(struct __pyx_obj_12
       } else if (unlikely(__pyx_t_55 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_12 = 1;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 256, __pyx_L1_error)
+        __PYX_ERR(0, 258, __pyx_L1_error)
       }
       *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_54 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_55 * __pyx_v_self->rover_positions.strides[1]) )) += (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_actions.data + __pyx_t_52 * __pyx_v_actions.strides[0]) ) + __pyx_t_53 * __pyx_v_actions.strides[1]) )));
     }
   }
   __pyx_L5:;
 
-  /* "rover_domain.pyx":216
+  /* "rover_domain.pyx":218
  * 
  * 
  *     cpdef void move_rovers(self, double[:, :] actions):             # <<<<<<<<<<<<<<
@@ -5938,7 +5955,7 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_9move_rovers(PyObject *__
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("move_rovers (wrapper)", 0);
   assert(__pyx_arg_actions); {
-    __pyx_v_actions = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_actions, PyBUF_WRITABLE); if (unlikely(!__pyx_v_actions.memview)) __PYX_ERR(0, 216, __pyx_L3_error)
+    __pyx_v_actions = __Pyx_PyObject_to_MemoryviewSlice_dsds_double(__pyx_arg_actions, PyBUF_WRITABLE); if (unlikely(!__pyx_v_actions.memview)) __PYX_ERR(0, 218, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -5959,8 +5976,8 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_8move_rovers(struct __pyx
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("move_rovers", 0);
   __Pyx_XDECREF(__pyx_r);
-  if (unlikely(!__pyx_v_actions.memview)) { __Pyx_RaiseUnboundLocalError("actions"); __PYX_ERR(0, 216, __pyx_L1_error) }
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_move_rovers(__pyx_v_self, __pyx_v_actions, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 216, __pyx_L1_error)
+  if (unlikely(!__pyx_v_actions.memview)) { __Pyx_RaiseUnboundLocalError("actions"); __PYX_ERR(0, 218, __pyx_L1_error) }
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_move_rovers(__pyx_v_self, __pyx_v_actions, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 218, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -5978,7 +5995,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_8move_rovers(struct __pyx
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":265
+/* "rover_domain.pyx":267
  * 
  * 
  *     cpdef double calc_step_eval_from_poi(self, Py_ssize_t poi_id):             # <<<<<<<<<<<<<<
@@ -6037,10 +6054,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_step_eval_from_poi); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_step_eval_from_poi); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_11calc_step_eval_from_poi)) {
-        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_poi_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 265, __pyx_L1_error)
+        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_poi_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 267, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -6056,10 +6073,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 265, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 267, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 265, __pyx_L1_error)
+        __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 267, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6078,7 +6095,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     #endif
   }
 
-  /* "rover_domain.pyx":271
+  /* "rover_domain.pyx":273
  *         cdef Py_ssize_t rover_id, near_rover_id
  * 
  *         sqr_dists_to_poi.alloc(buf, self.n_rovers)             # <<<<<<<<<<<<<<
@@ -6089,10 +6106,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     __pyx_v_sqr_dists_to_poi.alloc(__pyx_v_12rover_domain_buf, __pyx_v_self->n_rovers);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 271, __pyx_L1_error)
+    __PYX_ERR(0, 273, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":274
+  /* "rover_domain.pyx":276
  * 
  *         # Get the rover square distances to POIs.
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -6104,14 +6121,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_rover_id = __pyx_t_9;
 
-    /* "rover_domain.pyx":275
+    /* "rover_domain.pyx":277
  *         # Get the rover square distances to POIs.
  *         for rover_id in range(self.n_rovers):
  *             displ_x = (self.rover_positions[rover_id, 0]             # <<<<<<<<<<<<<<
  *                 - self.poi_positions[poi_id, 0])
  *             displ_y = (self.rover_positions[rover_id, 1]
  */
-    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 275, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 277, __pyx_L1_error)}
     __pyx_t_10 = __pyx_v_rover_id;
     __pyx_t_11 = 0;
     __pyx_t_12 = -1;
@@ -6125,17 +6142,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     } else if (unlikely(__pyx_t_11 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 275, __pyx_L1_error)
+      __PYX_ERR(0, 277, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":276
+    /* "rover_domain.pyx":278
  *         for rover_id in range(self.n_rovers):
  *             displ_x = (self.rover_positions[rover_id, 0]
  *                 - self.poi_positions[poi_id, 0])             # <<<<<<<<<<<<<<
  *             displ_y = (self.rover_positions[rover_id, 1]
  *                 - self.poi_positions[poi_id, 1])
  */
-    if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 276, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 278, __pyx_L1_error)}
     __pyx_t_13 = __pyx_v_poi_id;
     __pyx_t_14 = 0;
     __pyx_t_12 = -1;
@@ -6149,18 +6166,18 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     } else if (unlikely(__pyx_t_14 >= __pyx_v_self->poi_positions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 276, __pyx_L1_error)
+      __PYX_ERR(0, 278, __pyx_L1_error)
     }
     __pyx_v_displ_x = ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_10 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_11 * __pyx_v_self->rover_positions.strides[1]) ))) - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->poi_positions.data + __pyx_t_13 * __pyx_v_self->poi_positions.strides[0]) ) + __pyx_t_14 * __pyx_v_self->poi_positions.strides[1]) ))));
 
-    /* "rover_domain.pyx":277
+    /* "rover_domain.pyx":279
  *             displ_x = (self.rover_positions[rover_id, 0]
  *                 - self.poi_positions[poi_id, 0])
  *             displ_y = (self.rover_positions[rover_id, 1]             # <<<<<<<<<<<<<<
  *                 - self.poi_positions[poi_id, 1])
  *             sqr_dists_to_poi[rover_id] = displ_x*displ_x + displ_y*displ_y
  */
-    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 277, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 279, __pyx_L1_error)}
     __pyx_t_15 = __pyx_v_rover_id;
     __pyx_t_16 = 1;
     __pyx_t_12 = -1;
@@ -6174,17 +6191,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     } else if (unlikely(__pyx_t_16 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 277, __pyx_L1_error)
+      __PYX_ERR(0, 279, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":278
+    /* "rover_domain.pyx":280
  *                 - self.poi_positions[poi_id, 0])
  *             displ_y = (self.rover_positions[rover_id, 1]
  *                 - self.poi_positions[poi_id, 1])             # <<<<<<<<<<<<<<
  *             sqr_dists_to_poi[rover_id] = displ_x*displ_x + displ_y*displ_y
  * 
  */
-    if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 278, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 280, __pyx_L1_error)}
     __pyx_t_17 = __pyx_v_poi_id;
     __pyx_t_18 = 1;
     __pyx_t_12 = -1;
@@ -6198,11 +6215,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     } else if (unlikely(__pyx_t_18 >= __pyx_v_self->poi_positions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 278, __pyx_L1_error)
+      __PYX_ERR(0, 280, __pyx_L1_error)
     }
     __pyx_v_displ_y = ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_15 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_16 * __pyx_v_self->rover_positions.strides[1]) ))) - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->poi_positions.data + __pyx_t_17 * __pyx_v_self->poi_positions.strides[0]) ) + __pyx_t_18 * __pyx_v_self->poi_positions.strides[1]) ))));
 
-    /* "rover_domain.pyx":279
+    /* "rover_domain.pyx":281
  *             displ_y = (self.rover_positions[rover_id, 1]
  *                 - self.poi_positions[poi_id, 1])
  *             sqr_dists_to_poi[rover_id] = displ_x*displ_x + displ_y*displ_y             # <<<<<<<<<<<<<<
@@ -6213,11 +6230,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
       (__pyx_v_sqr_dists_to_poi[__pyx_v_rover_id]) = ((__pyx_v_displ_x * __pyx_v_displ_x) + (__pyx_v_displ_y * __pyx_v_displ_y));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 279, __pyx_L1_error)
+      __PYX_ERR(0, 281, __pyx_L1_error)
     }
   }
 
-  /* "rover_domain.pyx":284
+  /* "rover_domain.pyx":286
  *         # Sort (n_req) closest rovers for evaluation
  *         # Sqr_dists_to_poi is no longer in rover order!
  *         partial_sort(sqr_dists_to_poi.begin(),             # <<<<<<<<<<<<<<
@@ -6228,10 +6245,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     __pyx_t_19 = __pyx_v_sqr_dists_to_poi.begin();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 284, __pyx_L1_error)
+    __PYX_ERR(0, 286, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":285
+  /* "rover_domain.pyx":287
  *         # Sqr_dists_to_poi is no longer in rover order!
  *         partial_sort(sqr_dists_to_poi.begin(),
  *             sqr_dists_to_poi.begin() + self.n_req,             # <<<<<<<<<<<<<<
@@ -6242,10 +6259,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     __pyx_t_20 = __pyx_v_sqr_dists_to_poi.begin();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 285, __pyx_L1_error)
+    __PYX_ERR(0, 287, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":286
+  /* "rover_domain.pyx":288
  *         partial_sort(sqr_dists_to_poi.begin(),
  *             sqr_dists_to_poi.begin() + self.n_req,
  *             sqr_dists_to_poi.end())             # <<<<<<<<<<<<<<
@@ -6256,10 +6273,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     __pyx_t_21 = __pyx_v_sqr_dists_to_poi.end();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 286, __pyx_L1_error)
+    __PYX_ERR(0, 288, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":284
+  /* "rover_domain.pyx":286
  *         # Sort (n_req) closest rovers for evaluation
  *         # Sqr_dists_to_poi is no longer in rover order!
  *         partial_sort(sqr_dists_to_poi.begin(),             # <<<<<<<<<<<<<<
@@ -6268,7 +6285,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
  */
   std::partial_sort<std::vector<double> ::iterator>(__pyx_t_19, (__pyx_t_20 + __pyx_v_self->n_req), __pyx_t_21);
 
-  /* "rover_domain.pyx":292
+  /* "rover_domain.pyx":294
  *         # Is there (n_req) rovers observing? Only need to check the (n_req)th
  *         # closest rover
  *         if (sqr_dists_to_poi[self.n_req-1] >             # <<<<<<<<<<<<<<
@@ -6279,10 +6296,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     __pyx_t_6 = __pyx_v_sqr_dists_to_poi[(__pyx_v_self->n_req - 1)];
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 292, __pyx_L1_error)
+    __PYX_ERR(0, 294, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":293
+  /* "rover_domain.pyx":295
  *         # closest rover
  *         if (sqr_dists_to_poi[self.n_req-1] >
  *                 self.interaction_dist * self.interaction_dist):             # <<<<<<<<<<<<<<
@@ -6291,7 +6308,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
  */
   __pyx_t_22 = ((__pyx_t_6 > (__pyx_v_self->interaction_dist * __pyx_v_self->interaction_dist)) != 0);
 
-  /* "rover_domain.pyx":292
+  /* "rover_domain.pyx":294
  *         # Is there (n_req) rovers observing? Only need to check the (n_req)th
  *         # closest rover
  *         if (sqr_dists_to_poi[self.n_req-1] >             # <<<<<<<<<<<<<<
@@ -6300,7 +6317,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
  */
   if (__pyx_t_22) {
 
-    /* "rover_domain.pyx":295
+    /* "rover_domain.pyx":297
  *                 self.interaction_dist * self.interaction_dist):
  *             # Not close enough?, then there is no reward for this POI
  *             return 0.             # <<<<<<<<<<<<<<
@@ -6310,7 +6327,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     __pyx_r = 0.;
     goto __pyx_L0;
 
-    /* "rover_domain.pyx":292
+    /* "rover_domain.pyx":294
  *         # Is there (n_req) rovers observing? Only need to check the (n_req)th
  *         # closest rover
  *         if (sqr_dists_to_poi[self.n_req-1] >             # <<<<<<<<<<<<<<
@@ -6319,14 +6336,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
  */
   }
 
-  /* "rover_domain.pyx":301
+  /* "rover_domain.pyx":303
  * 
  *         #Yes? Continue evaluation
  *         self.poi_status[poi_id] = False             # <<<<<<<<<<<<<<
  *         if self.discounts_eval:
  *             sqr_dist_sum = 0.
  */
-  if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 301, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 303, __pyx_L1_error)}
   __pyx_t_23 = __pyx_v_poi_id;
   __pyx_t_12 = -1;
   if (__pyx_t_23 < 0) {
@@ -6335,21 +6352,21 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
   } else if (unlikely(__pyx_t_23 >= __pyx_v_self->poi_status.shape[0])) __pyx_t_12 = 0;
   if (unlikely(__pyx_t_12 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_12);
-    __PYX_ERR(0, 301, __pyx_L1_error)
+    __PYX_ERR(0, 303, __pyx_L1_error)
   }
   *((double *) ( /* dim=0 */ (__pyx_v_self->poi_status.data + __pyx_t_23 * __pyx_v_self->poi_status.strides[0]) )) = 0;
 
-  /* "rover_domain.pyx":302
+  /* "rover_domain.pyx":304
  *         #Yes? Continue evaluation
  *         self.poi_status[poi_id] = False
  *         if self.discounts_eval:             # <<<<<<<<<<<<<<
  *             sqr_dist_sum = 0.
  *             # Get sum sqr distance of nearest rovers
  */
-  __pyx_t_22 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->discounts_eval)); if (unlikely(__pyx_t_22 < 0)) __PYX_ERR(0, 302, __pyx_L1_error)
+  __pyx_t_22 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->discounts_eval)); if (unlikely(__pyx_t_22 < 0)) __PYX_ERR(0, 304, __pyx_L1_error)
   if (__pyx_t_22) {
 
-    /* "rover_domain.pyx":303
+    /* "rover_domain.pyx":305
  *         self.poi_status[poi_id] = False
  *         if self.discounts_eval:
  *             sqr_dist_sum = 0.             # <<<<<<<<<<<<<<
@@ -6358,7 +6375,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
  */
     __pyx_v_sqr_dist_sum = 0.;
 
-    /* "rover_domain.pyx":305
+    /* "rover_domain.pyx":307
  *             sqr_dist_sum = 0.
  *             # Get sum sqr distance of nearest rovers
  *             for near_rover_id in range(self.n_req):             # <<<<<<<<<<<<<<
@@ -6370,7 +6387,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
       __pyx_v_near_rover_id = __pyx_t_9;
 
-      /* "rover_domain.pyx":306
+      /* "rover_domain.pyx":308
  *             # Get sum sqr distance of nearest rovers
  *             for near_rover_id in range(self.n_req):
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]             # <<<<<<<<<<<<<<
@@ -6381,30 +6398,30 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
         __pyx_t_6 = __pyx_v_sqr_dists_to_poi[__pyx_v_near_rover_id];
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 306, __pyx_L1_error)
+        __PYX_ERR(0, 308, __pyx_L1_error)
       }
       __pyx_v_sqr_dist_sum = (__pyx_v_sqr_dist_sum + __pyx_t_6);
     }
 
-    /* "rover_domain.pyx":308
+    /* "rover_domain.pyx":310
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]
  * 
  *             if self.reward_structure == 'inv_distance':             # <<<<<<<<<<<<<<
  *                 return self.poi_values[poi_id] / max(self.min_dist, sqr_dist_sum)
  *             elif self.reward_structure == 'soft-distance':
  */
-    __pyx_t_22 = (__Pyx_PyUnicode_Equals(__pyx_v_self->reward_structure, __pyx_n_u_inv_distance, Py_EQ)); if (unlikely(__pyx_t_22 < 0)) __PYX_ERR(0, 308, __pyx_L1_error)
+    __pyx_t_22 = (__Pyx_PyUnicode_Equals(__pyx_v_self->reward_structure, __pyx_n_u_inv_distance, Py_EQ)); if (unlikely(__pyx_t_22 < 0)) __PYX_ERR(0, 310, __pyx_L1_error)
     __pyx_t_24 = (__pyx_t_22 != 0);
     if (__pyx_t_24) {
 
-      /* "rover_domain.pyx":309
+      /* "rover_domain.pyx":311
  * 
  *             if self.reward_structure == 'inv_distance':
  *                 return self.poi_values[poi_id] / max(self.min_dist, sqr_dist_sum)             # <<<<<<<<<<<<<<
  *             elif self.reward_structure == 'soft-distance':
  *                 return self.poi_values[poi_id] - 0.01 * sqr_dist_sum
  */
-      if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 309, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 311, __pyx_L1_error)}
       __pyx_t_25 = __pyx_v_poi_id;
       __pyx_t_12 = -1;
       if (__pyx_t_25 < 0) {
@@ -6413,7 +6430,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
       } else if (unlikely(__pyx_t_25 >= __pyx_v_self->poi_values.shape[0])) __pyx_t_12 = 0;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 309, __pyx_L1_error)
+        __PYX_ERR(0, 311, __pyx_L1_error)
       }
       __pyx_t_6 = (*((double *) ( /* dim=0 */ (__pyx_v_self->poi_values.data + __pyx_t_25 * __pyx_v_self->poi_values.strides[0]) )));
       __pyx_t_26 = __pyx_v_sqr_dist_sum;
@@ -6426,12 +6443,12 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
       __pyx_t_26 = __pyx_t_28;
       if (unlikely(__pyx_t_26 == 0)) {
         PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-        __PYX_ERR(0, 309, __pyx_L1_error)
+        __PYX_ERR(0, 311, __pyx_L1_error)
       }
       __pyx_r = (__pyx_t_6 / __pyx_t_26);
       goto __pyx_L0;
 
-      /* "rover_domain.pyx":308
+      /* "rover_domain.pyx":310
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]
  * 
  *             if self.reward_structure == 'inv_distance':             # <<<<<<<<<<<<<<
@@ -6440,25 +6457,25 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
  */
     }
 
-    /* "rover_domain.pyx":310
+    /* "rover_domain.pyx":312
  *             if self.reward_structure == 'inv_distance':
  *                 return self.poi_values[poi_id] / max(self.min_dist, sqr_dist_sum)
  *             elif self.reward_structure == 'soft-distance':             # <<<<<<<<<<<<<<
  *                 return self.poi_values[poi_id] - 0.01 * sqr_dist_sum
  *         # Do not discount POI evaluation
  */
-    __pyx_t_24 = (__Pyx_PyUnicode_Equals(__pyx_v_self->reward_structure, __pyx_kp_u_soft_distance_2, Py_EQ)); if (unlikely(__pyx_t_24 < 0)) __PYX_ERR(0, 310, __pyx_L1_error)
+    __pyx_t_24 = (__Pyx_PyUnicode_Equals(__pyx_v_self->reward_structure, __pyx_kp_u_soft_distance_2, Py_EQ)); if (unlikely(__pyx_t_24 < 0)) __PYX_ERR(0, 312, __pyx_L1_error)
     __pyx_t_22 = (__pyx_t_24 != 0);
     if (__pyx_t_22) {
 
-      /* "rover_domain.pyx":311
+      /* "rover_domain.pyx":313
  *                 return self.poi_values[poi_id] / max(self.min_dist, sqr_dist_sum)
  *             elif self.reward_structure == 'soft-distance':
  *                 return self.poi_values[poi_id] - 0.01 * sqr_dist_sum             # <<<<<<<<<<<<<<
  *         # Do not discount POI evaluation
  *         else:
  */
-      if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 311, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 313, __pyx_L1_error)}
       __pyx_t_29 = __pyx_v_poi_id;
       __pyx_t_12 = -1;
       if (__pyx_t_29 < 0) {
@@ -6467,12 +6484,12 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
       } else if (unlikely(__pyx_t_29 >= __pyx_v_self->poi_values.shape[0])) __pyx_t_12 = 0;
       if (unlikely(__pyx_t_12 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_12);
-        __PYX_ERR(0, 311, __pyx_L1_error)
+        __PYX_ERR(0, 313, __pyx_L1_error)
       }
       __pyx_r = ((*((double *) ( /* dim=0 */ (__pyx_v_self->poi_values.data + __pyx_t_29 * __pyx_v_self->poi_values.strides[0]) ))) - (0.01 * __pyx_v_sqr_dist_sum));
       goto __pyx_L0;
 
-      /* "rover_domain.pyx":310
+      /* "rover_domain.pyx":312
  *             if self.reward_structure == 'inv_distance':
  *                 return self.poi_values[poi_id] / max(self.min_dist, sqr_dist_sum)
  *             elif self.reward_structure == 'soft-distance':             # <<<<<<<<<<<<<<
@@ -6481,7 +6498,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
  */
     }
 
-    /* "rover_domain.pyx":302
+    /* "rover_domain.pyx":304
  *         #Yes? Continue evaluation
  *         self.poi_status[poi_id] = False
  *         if self.discounts_eval:             # <<<<<<<<<<<<<<
@@ -6491,7 +6508,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     goto __pyx_L6;
   }
 
-  /* "rover_domain.pyx":314
+  /* "rover_domain.pyx":316
  *         # Do not discount POI evaluation
  *         else:
  *             return self.poi_values[poi_id]             # <<<<<<<<<<<<<<
@@ -6499,7 +6516,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
  * 
  */
   /*else*/ {
-    if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 314, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 316, __pyx_L1_error)}
     __pyx_t_30 = __pyx_v_poi_id;
     __pyx_t_12 = -1;
     if (__pyx_t_30 < 0) {
@@ -6508,14 +6525,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(struc
     } else if (unlikely(__pyx_t_30 >= __pyx_v_self->poi_values.shape[0])) __pyx_t_12 = 0;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 314, __pyx_L1_error)
+      __PYX_ERR(0, 316, __pyx_L1_error)
     }
     __pyx_r = (*((double *) ( /* dim=0 */ (__pyx_v_self->poi_values.data + __pyx_t_30 * __pyx_v_self->poi_values.strides[0]) )));
     goto __pyx_L0;
   }
   __pyx_L6:;
 
-  /* "rover_domain.pyx":265
+  /* "rover_domain.pyx":267
  * 
  * 
  *     cpdef double calc_step_eval_from_poi(self, Py_ssize_t poi_id):             # <<<<<<<<<<<<<<
@@ -6547,7 +6564,7 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_11calc_step_eval_from_poi
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calc_step_eval_from_poi (wrapper)", 0);
   assert(__pyx_arg_poi_id); {
-    __pyx_v_poi_id = __Pyx_PyIndex_AsSsize_t(__pyx_arg_poi_id); if (unlikely((__pyx_v_poi_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 265, __pyx_L3_error)
+    __pyx_v_poi_id = __Pyx_PyIndex_AsSsize_t(__pyx_arg_poi_id); if (unlikely((__pyx_v_poi_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 267, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -6568,7 +6585,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_10calc_step_eval_from_poi
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("calc_step_eval_from_poi", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(__pyx_v_self, __pyx_v_poi_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 265, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_step_eval_from_poi(__pyx_v_self, __pyx_v_poi_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 267, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -6585,7 +6602,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_10calc_step_eval_from_poi
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":319
+/* "rover_domain.pyx":321
  * 
  * 
  *     cpdef double update_local_step_reward_from_poi(self, Py_ssize_t poi_id):             # <<<<<<<<<<<<<<
@@ -6649,10 +6666,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_local_step_reward_from_po); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_local_step_reward_from_po); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_13update_local_step_reward_from_poi)) {
-        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_poi_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 319, __pyx_L1_error)
+        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_poi_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 321, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -6668,10 +6685,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 319, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 321, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 319, __pyx_L1_error)
+        __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 321, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -6690,7 +6707,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     #endif
   }
 
-  /* "rover_domain.pyx":325
+  /* "rover_domain.pyx":327
  *         cdef double displ_x, displ_y, sqr_dist_sum, l_reward
  *         cdef Py_ssize_t rover_id, near_rover_id
  *         sqr_dists_to_poi.alloc(buf, self.n_rovers)             # <<<<<<<<<<<<<<
@@ -6701,10 +6718,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     __pyx_v_sqr_dists_to_poi.alloc(__pyx_v_12rover_domain_buf, __pyx_v_self->n_rovers);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 325, __pyx_L1_error)
+    __PYX_ERR(0, 327, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":326
+  /* "rover_domain.pyx":328
  *         cdef Py_ssize_t rover_id, near_rover_id
  *         sqr_dists_to_poi.alloc(buf, self.n_rovers)
  *         srq_dists_to_poi_unsorted.alloc(buf, self.n_rovers)             # <<<<<<<<<<<<<<
@@ -6715,10 +6732,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     __pyx_v_srq_dists_to_poi_unsorted.alloc(__pyx_v_12rover_domain_buf, __pyx_v_self->n_rovers);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 326, __pyx_L1_error)
+    __PYX_ERR(0, 328, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":328
+  /* "rover_domain.pyx":330
  *         srq_dists_to_poi_unsorted.alloc(buf, self.n_rovers)
  *         # Get the rover square distances to POIs.
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -6730,14 +6747,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_rover_id = __pyx_t_9;
 
-    /* "rover_domain.pyx":329
+    /* "rover_domain.pyx":331
  *         # Get the rover square distances to POIs.
  *         for rover_id in range(self.n_rovers):
  *             displ_x = (self.rover_positions[rover_id, 0]             # <<<<<<<<<<<<<<
  *                 - self.poi_positions[poi_id, 0])
  *             displ_y = (self.rover_positions[rover_id, 1]
  */
-    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 329, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 331, __pyx_L1_error)}
     __pyx_t_10 = __pyx_v_rover_id;
     __pyx_t_11 = 0;
     __pyx_t_12 = -1;
@@ -6751,17 +6768,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     } else if (unlikely(__pyx_t_11 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 329, __pyx_L1_error)
+      __PYX_ERR(0, 331, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":330
+    /* "rover_domain.pyx":332
  *         for rover_id in range(self.n_rovers):
  *             displ_x = (self.rover_positions[rover_id, 0]
  *                 - self.poi_positions[poi_id, 0])             # <<<<<<<<<<<<<<
  *             displ_y = (self.rover_positions[rover_id, 1]
  *                 - self.poi_positions[poi_id, 1])
  */
-    if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 330, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 332, __pyx_L1_error)}
     __pyx_t_13 = __pyx_v_poi_id;
     __pyx_t_14 = 0;
     __pyx_t_12 = -1;
@@ -6775,18 +6792,18 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     } else if (unlikely(__pyx_t_14 >= __pyx_v_self->poi_positions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 330, __pyx_L1_error)
+      __PYX_ERR(0, 332, __pyx_L1_error)
     }
     __pyx_v_displ_x = ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_10 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_11 * __pyx_v_self->rover_positions.strides[1]) ))) - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->poi_positions.data + __pyx_t_13 * __pyx_v_self->poi_positions.strides[0]) ) + __pyx_t_14 * __pyx_v_self->poi_positions.strides[1]) ))));
 
-    /* "rover_domain.pyx":331
+    /* "rover_domain.pyx":333
  *             displ_x = (self.rover_positions[rover_id, 0]
  *                 - self.poi_positions[poi_id, 0])
  *             displ_y = (self.rover_positions[rover_id, 1]             # <<<<<<<<<<<<<<
  *                 - self.poi_positions[poi_id, 1])
  *             sqr_dists_to_poi[rover_id] = displ_x*displ_x + displ_y*displ_y
  */
-    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 331, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 333, __pyx_L1_error)}
     __pyx_t_15 = __pyx_v_rover_id;
     __pyx_t_16 = 1;
     __pyx_t_12 = -1;
@@ -6800,17 +6817,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     } else if (unlikely(__pyx_t_16 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 331, __pyx_L1_error)
+      __PYX_ERR(0, 333, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":332
+    /* "rover_domain.pyx":334
  *                 - self.poi_positions[poi_id, 0])
  *             displ_y = (self.rover_positions[rover_id, 1]
  *                 - self.poi_positions[poi_id, 1])             # <<<<<<<<<<<<<<
  *             sqr_dists_to_poi[rover_id] = displ_x*displ_x + displ_y*displ_y
  *             srq_dists_to_poi_unsorted[rover_id] = sqr_dists_to_poi[rover_id]
  */
-    if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 332, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 334, __pyx_L1_error)}
     __pyx_t_17 = __pyx_v_poi_id;
     __pyx_t_18 = 1;
     __pyx_t_12 = -1;
@@ -6824,11 +6841,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     } else if (unlikely(__pyx_t_18 >= __pyx_v_self->poi_positions.shape[1])) __pyx_t_12 = 1;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 332, __pyx_L1_error)
+      __PYX_ERR(0, 334, __pyx_L1_error)
     }
     __pyx_v_displ_y = ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_15 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_16 * __pyx_v_self->rover_positions.strides[1]) ))) - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->poi_positions.data + __pyx_t_17 * __pyx_v_self->poi_positions.strides[0]) ) + __pyx_t_18 * __pyx_v_self->poi_positions.strides[1]) ))));
 
-    /* "rover_domain.pyx":333
+    /* "rover_domain.pyx":335
  *             displ_y = (self.rover_positions[rover_id, 1]
  *                 - self.poi_positions[poi_id, 1])
  *             sqr_dists_to_poi[rover_id] = displ_x*displ_x + displ_y*displ_y             # <<<<<<<<<<<<<<
@@ -6839,10 +6856,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
       (__pyx_v_sqr_dists_to_poi[__pyx_v_rover_id]) = ((__pyx_v_displ_x * __pyx_v_displ_x) + (__pyx_v_displ_y * __pyx_v_displ_y));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 333, __pyx_L1_error)
+      __PYX_ERR(0, 335, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":334
+    /* "rover_domain.pyx":336
  *                 - self.poi_positions[poi_id, 1])
  *             sqr_dists_to_poi[rover_id] = displ_x*displ_x + displ_y*displ_y
  *             srq_dists_to_poi_unsorted[rover_id] = sqr_dists_to_poi[rover_id]             # <<<<<<<<<<<<<<
@@ -6853,17 +6870,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
       __pyx_t_6 = __pyx_v_sqr_dists_to_poi[__pyx_v_rover_id];
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 334, __pyx_L1_error)
+      __PYX_ERR(0, 336, __pyx_L1_error)
     }
     try {
       (__pyx_v_srq_dists_to_poi_unsorted[__pyx_v_rover_id]) = __pyx_t_6;
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 334, __pyx_L1_error)
+      __PYX_ERR(0, 336, __pyx_L1_error)
     }
   }
 
-  /* "rover_domain.pyx":338
+  /* "rover_domain.pyx":340
  *         # Sort (n_req) closest rovers for evaluation
  *         # Sqr_dists_to_poi is no longer in rover order!
  *         partial_sort(sqr_dists_to_poi.begin(),             # <<<<<<<<<<<<<<
@@ -6874,10 +6891,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     __pyx_t_19 = __pyx_v_sqr_dists_to_poi.begin();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 338, __pyx_L1_error)
+    __PYX_ERR(0, 340, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":339
+  /* "rover_domain.pyx":341
  *         # Sqr_dists_to_poi is no longer in rover order!
  *         partial_sort(sqr_dists_to_poi.begin(),
  *             sqr_dists_to_poi.begin() + self.n_req,             # <<<<<<<<<<<<<<
@@ -6888,10 +6905,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     __pyx_t_20 = __pyx_v_sqr_dists_to_poi.begin();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 339, __pyx_L1_error)
+    __PYX_ERR(0, 341, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":340
+  /* "rover_domain.pyx":342
  *         partial_sort(sqr_dists_to_poi.begin(),
  *             sqr_dists_to_poi.begin() + self.n_req,
  *             sqr_dists_to_poi.end())             # <<<<<<<<<<<<<<
@@ -6902,10 +6919,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     __pyx_t_21 = __pyx_v_sqr_dists_to_poi.end();
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 340, __pyx_L1_error)
+    __PYX_ERR(0, 342, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":338
+  /* "rover_domain.pyx":340
  *         # Sort (n_req) closest rovers for evaluation
  *         # Sqr_dists_to_poi is no longer in rover order!
  *         partial_sort(sqr_dists_to_poi.begin(),             # <<<<<<<<<<<<<<
@@ -6914,7 +6931,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  */
   std::partial_sort<std::vector<double> ::iterator>(__pyx_t_19, (__pyx_t_20 + __pyx_v_self->n_req), __pyx_t_21);
 
-  /* "rover_domain.pyx":344
+  /* "rover_domain.pyx":346
  *         # Is there (n_req) rovers observing? Only need to check the (n_req)th
  *         # closest rover
  *         if (sqr_dists_to_poi[self.n_req-1] >             # <<<<<<<<<<<<<<
@@ -6925,10 +6942,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     __pyx_t_6 = __pyx_v_sqr_dists_to_poi[(__pyx_v_self->n_req - 1)];
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 344, __pyx_L1_error)
+    __PYX_ERR(0, 346, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":345
+  /* "rover_domain.pyx":347
  *         # closest rover
  *         if (sqr_dists_to_poi[self.n_req-1] >
  *                 self.interaction_dist * self.interaction_dist):             # <<<<<<<<<<<<<<
@@ -6937,7 +6954,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  */
   __pyx_t_22 = ((__pyx_t_6 > (__pyx_v_self->interaction_dist * __pyx_v_self->interaction_dist)) != 0);
 
-  /* "rover_domain.pyx":344
+  /* "rover_domain.pyx":346
  *         # Is there (n_req) rovers observing? Only need to check the (n_req)th
  *         # closest rover
  *         if (sqr_dists_to_poi[self.n_req-1] >             # <<<<<<<<<<<<<<
@@ -6946,7 +6963,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  */
   if (__pyx_t_22) {
 
-    /* "rover_domain.pyx":347
+    /* "rover_domain.pyx":349
  *                 self.interaction_dist * self.interaction_dist):
  *             # Not close enough?, then there is no reward for this POI
  *             return 0.             # <<<<<<<<<<<<<<
@@ -6956,7 +6973,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     __pyx_r = 0.;
     goto __pyx_L0;
 
-    /* "rover_domain.pyx":344
+    /* "rover_domain.pyx":346
  *         # Is there (n_req) rovers observing? Only need to check the (n_req)th
  *         # closest rover
  *         if (sqr_dists_to_poi[self.n_req-1] >             # <<<<<<<<<<<<<<
@@ -6965,14 +6982,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  */
   }
 
-  /* "rover_domain.pyx":349
+  /* "rover_domain.pyx":351
  *             return 0.
  * 
  *         self.poi_status[poi_id] = False             # <<<<<<<<<<<<<<
  *         if self.discounts_eval:
  *             sqr_dist_sum = 0.
  */
-  if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 349, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 351, __pyx_L1_error)}
   __pyx_t_23 = __pyx_v_poi_id;
   __pyx_t_12 = -1;
   if (__pyx_t_23 < 0) {
@@ -6981,21 +6998,21 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
   } else if (unlikely(__pyx_t_23 >= __pyx_v_self->poi_status.shape[0])) __pyx_t_12 = 0;
   if (unlikely(__pyx_t_12 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_12);
-    __PYX_ERR(0, 349, __pyx_L1_error)
+    __PYX_ERR(0, 351, __pyx_L1_error)
   }
   *((double *) ( /* dim=0 */ (__pyx_v_self->poi_status.data + __pyx_t_23 * __pyx_v_self->poi_status.strides[0]) )) = 0;
 
-  /* "rover_domain.pyx":350
+  /* "rover_domain.pyx":352
  * 
  *         self.poi_status[poi_id] = False
  *         if self.discounts_eval:             # <<<<<<<<<<<<<<
  *             sqr_dist_sum = 0.
  *             # Get sum sqr distance of nearest rovers
  */
-  __pyx_t_22 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->discounts_eval)); if (unlikely(__pyx_t_22 < 0)) __PYX_ERR(0, 350, __pyx_L1_error)
+  __pyx_t_22 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->discounts_eval)); if (unlikely(__pyx_t_22 < 0)) __PYX_ERR(0, 352, __pyx_L1_error)
   if (__pyx_t_22) {
 
-    /* "rover_domain.pyx":351
+    /* "rover_domain.pyx":353
  *         self.poi_status[poi_id] = False
  *         if self.discounts_eval:
  *             sqr_dist_sum = 0.             # <<<<<<<<<<<<<<
@@ -7004,7 +7021,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  */
     __pyx_v_sqr_dist_sum = 0.;
 
-    /* "rover_domain.pyx":353
+    /* "rover_domain.pyx":355
  *             sqr_dist_sum = 0.
  *             # Get sum sqr distance of nearest rovers
  *             for near_rover_id in range(self.n_req):             # <<<<<<<<<<<<<<
@@ -7016,7 +7033,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
       __pyx_v_near_rover_id = __pyx_t_9;
 
-      /* "rover_domain.pyx":354
+      /* "rover_domain.pyx":356
  *             # Get sum sqr distance of nearest rovers
  *             for near_rover_id in range(self.n_req):
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]             # <<<<<<<<<<<<<<
@@ -7027,19 +7044,19 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
         __pyx_t_6 = __pyx_v_sqr_dists_to_poi[__pyx_v_near_rover_id];
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 354, __pyx_L1_error)
+        __PYX_ERR(0, 356, __pyx_L1_error)
       }
       __pyx_v_sqr_dist_sum = (__pyx_v_sqr_dist_sum + __pyx_t_6);
     }
 
-    /* "rover_domain.pyx":355
+    /* "rover_domain.pyx":357
  *             for near_rover_id in range(self.n_req):
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]
  *             l_reward = self.poi_values[poi_id] / max(self.min_dist,             # <<<<<<<<<<<<<<
  *                 sqr_dist_sum)
  * 
  */
-    if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 355, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 357, __pyx_L1_error)}
     __pyx_t_24 = __pyx_v_poi_id;
     __pyx_t_12 = -1;
     if (__pyx_t_24 < 0) {
@@ -7048,11 +7065,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     } else if (unlikely(__pyx_t_24 >= __pyx_v_self->poi_values.shape[0])) __pyx_t_12 = 0;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 355, __pyx_L1_error)
+      __PYX_ERR(0, 357, __pyx_L1_error)
     }
     __pyx_t_6 = (*((double *) ( /* dim=0 */ (__pyx_v_self->poi_values.data + __pyx_t_24 * __pyx_v_self->poi_values.strides[0]) )));
 
-    /* "rover_domain.pyx":356
+    /* "rover_domain.pyx":358
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]
  *             l_reward = self.poi_values[poi_id] / max(self.min_dist,
  *                 sqr_dist_sum)             # <<<<<<<<<<<<<<
@@ -7061,7 +7078,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  */
     __pyx_t_25 = __pyx_v_sqr_dist_sum;
 
-    /* "rover_domain.pyx":355
+    /* "rover_domain.pyx":357
  *             for near_rover_id in range(self.n_req):
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]
  *             l_reward = self.poi_values[poi_id] / max(self.min_dist,             # <<<<<<<<<<<<<<
@@ -7070,7 +7087,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  */
     __pyx_t_26 = __pyx_v_self->min_dist;
 
-    /* "rover_domain.pyx":356
+    /* "rover_domain.pyx":358
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]
  *             l_reward = self.poi_values[poi_id] / max(self.min_dist,
  *                 sqr_dist_sum)             # <<<<<<<<<<<<<<
@@ -7084,7 +7101,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     }
     __pyx_t_25 = __pyx_t_27;
 
-    /* "rover_domain.pyx":355
+    /* "rover_domain.pyx":357
  *             for near_rover_id in range(self.n_req):
  *                 sqr_dist_sum += sqr_dists_to_poi[near_rover_id]
  *             l_reward = self.poi_values[poi_id] / max(self.min_dist,             # <<<<<<<<<<<<<<
@@ -7093,11 +7110,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  */
     if (unlikely(__pyx_t_25 == 0)) {
       PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-      __PYX_ERR(0, 355, __pyx_L1_error)
+      __PYX_ERR(0, 357, __pyx_L1_error)
     }
     __pyx_v_l_reward = (__pyx_t_6 / __pyx_t_25);
 
-    /* "rover_domain.pyx":350
+    /* "rover_domain.pyx":352
  * 
  *         self.poi_status[poi_id] = False
  *         if self.discounts_eval:             # <<<<<<<<<<<<<<
@@ -7107,7 +7124,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     goto __pyx_L6;
   }
 
-  /* "rover_domain.pyx":360
+  /* "rover_domain.pyx":362
  *         # Do not discount POI evaluation
  *         else:
  *             l_reward = self.poi_values[poi_id]             # <<<<<<<<<<<<<<
@@ -7115,7 +7132,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
  * 
  */
   /*else*/ {
-    if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 360, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->poi_values.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 362, __pyx_L1_error)}
     __pyx_t_28 = __pyx_v_poi_id;
     __pyx_t_12 = -1;
     if (__pyx_t_28 < 0) {
@@ -7124,13 +7141,13 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     } else if (unlikely(__pyx_t_28 >= __pyx_v_self->poi_values.shape[0])) __pyx_t_12 = 0;
     if (unlikely(__pyx_t_12 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_12);
-      __PYX_ERR(0, 360, __pyx_L1_error)
+      __PYX_ERR(0, 362, __pyx_L1_error)
     }
     __pyx_v_l_reward = (*((double *) ( /* dim=0 */ (__pyx_v_self->poi_values.data + __pyx_t_28 * __pyx_v_self->poi_values.strides[0]) )));
   }
   __pyx_L6:;
 
-  /* "rover_domain.pyx":364
+  /* "rover_domain.pyx":366
  * 
  *         #Yes? Continue evaluation
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -7142,7 +7159,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_rover_id = __pyx_t_9;
 
-    /* "rover_domain.pyx":365
+    /* "rover_domain.pyx":367
  *         #Yes? Continue evaluation
  *         for rover_id in range(self.n_rovers):
  *             for closest_rover_id in range(self.n_req):             # <<<<<<<<<<<<<<
@@ -7154,7 +7171,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     for (__pyx_t_31 = 0; __pyx_t_31 < __pyx_t_30; __pyx_t_31+=1) {
       __pyx_v_closest_rover_id = __pyx_t_31;
 
-      /* "rover_domain.pyx":366
+      /* "rover_domain.pyx":368
  *         for rover_id in range(self.n_rovers):
  *             for closest_rover_id in range(self.n_req):
  *                 if sqr_dists_to_poi[closest_rover_id] == (srq_dists_to_poi_unsorted[rover_id]):             # <<<<<<<<<<<<<<
@@ -7165,25 +7182,25 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
         __pyx_t_25 = __pyx_v_sqr_dists_to_poi[__pyx_v_closest_rover_id];
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 366, __pyx_L1_error)
+        __PYX_ERR(0, 368, __pyx_L1_error)
       }
       try {
         __pyx_t_6 = __pyx_v_srq_dists_to_poi_unsorted[__pyx_v_rover_id];
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 366, __pyx_L1_error)
+        __PYX_ERR(0, 368, __pyx_L1_error)
       }
       __pyx_t_22 = ((__pyx_t_25 == __pyx_t_6) != 0);
       if (__pyx_t_22) {
 
-        /* "rover_domain.pyx":367
+        /* "rover_domain.pyx":369
  *             for closest_rover_id in range(self.n_req):
  *                 if sqr_dists_to_poi[closest_rover_id] == (srq_dists_to_poi_unsorted[rover_id]):
  *                     self.rover_local_rewards[rover_id] += l_reward             # <<<<<<<<<<<<<<
  *                     sqr_dists_to_poi[closest_rover_id] = -1.
  * 
  */
-        if (unlikely(!__pyx_v_self->rover_local_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 367, __pyx_L1_error)}
+        if (unlikely(!__pyx_v_self->rover_local_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 369, __pyx_L1_error)}
         __pyx_t_32 = __pyx_v_rover_id;
         __pyx_t_12 = -1;
         if (__pyx_t_32 < 0) {
@@ -7192,11 +7209,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
         } else if (unlikely(__pyx_t_32 >= __pyx_v_self->rover_local_rewards.shape[0])) __pyx_t_12 = 0;
         if (unlikely(__pyx_t_12 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_12);
-          __PYX_ERR(0, 367, __pyx_L1_error)
+          __PYX_ERR(0, 369, __pyx_L1_error)
         }
         *((double *) ( /* dim=0 */ (__pyx_v_self->rover_local_rewards.data + __pyx_t_32 * __pyx_v_self->rover_local_rewards.strides[0]) )) += __pyx_v_l_reward;
 
-        /* "rover_domain.pyx":368
+        /* "rover_domain.pyx":370
  *                 if sqr_dists_to_poi[closest_rover_id] == (srq_dists_to_poi_unsorted[rover_id]):
  *                     self.rover_local_rewards[rover_id] += l_reward
  *                     sqr_dists_to_poi[closest_rover_id] = -1.             # <<<<<<<<<<<<<<
@@ -7207,10 +7224,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
           (__pyx_v_sqr_dists_to_poi[__pyx_v_closest_rover_id]) = -1.;
         } catch(...) {
           __Pyx_CppExn2PyErr();
-          __PYX_ERR(0, 368, __pyx_L1_error)
+          __PYX_ERR(0, 370, __pyx_L1_error)
         }
 
-        /* "rover_domain.pyx":366
+        /* "rover_domain.pyx":368
  *         for rover_id in range(self.n_rovers):
  *             for closest_rover_id in range(self.n_req):
  *                 if sqr_dists_to_poi[closest_rover_id] == (srq_dists_to_poi_unsorted[rover_id]):             # <<<<<<<<<<<<<<
@@ -7221,7 +7238,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
     }
   }
 
-  /* "rover_domain.pyx":370
+  /* "rover_domain.pyx":372
  *                     sqr_dists_to_poi[closest_rover_id] = -1.
  * 
  *         return 0.             # <<<<<<<<<<<<<<
@@ -7231,7 +7248,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from
   __pyx_r = 0.;
   goto __pyx_L0;
 
-  /* "rover_domain.pyx":319
+  /* "rover_domain.pyx":321
  * 
  * 
  *     cpdef double update_local_step_reward_from_poi(self, Py_ssize_t poi_id):             # <<<<<<<<<<<<<<
@@ -7261,7 +7278,7 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_13update_local_step_rewar
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("update_local_step_reward_from_poi (wrapper)", 0);
   assert(__pyx_arg_poi_id); {
-    __pyx_v_poi_id = __Pyx_PyIndex_AsSsize_t(__pyx_arg_poi_id); if (unlikely((__pyx_v_poi_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 319, __pyx_L3_error)
+    __pyx_v_poi_id = __Pyx_PyIndex_AsSsize_t(__pyx_arg_poi_id); if (unlikely((__pyx_v_poi_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 321, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7282,7 +7299,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_12update_local_step_rewar
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("update_local_step_reward_from_poi", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from_poi(__pyx_v_self, __pyx_v_poi_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 319, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_update_local_step_reward_from_poi(__pyx_v_self, __pyx_v_poi_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 321, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7299,7 +7316,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_12update_local_step_rewar
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":375
+/* "rover_domain.pyx":377
  * 
  * 
  *     cpdef double calc_step_global_eval(self):             # <<<<<<<<<<<<<<
@@ -7335,7 +7352,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_step_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_step_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 377, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_15calc_step_global_eval)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -7351,10 +7368,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 375, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 377, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 375, __pyx_L1_error)
+        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 377, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_5;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7373,7 +7390,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
     #endif
   }
 
-  /* "rover_domain.pyx":379
+  /* "rover_domain.pyx":381
  *         cdef Py_ssize_t poi_id
  * 
  *         eval = 0.             # <<<<<<<<<<<<<<
@@ -7382,7 +7399,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
  */
   __pyx_v_eval = 0.;
 
-  /* "rover_domain.pyx":380
+  /* "rover_domain.pyx":382
  * 
  *         eval = 0.
  *         for poi_id in range(self.n_pois):             # <<<<<<<<<<<<<<
@@ -7394,14 +7411,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
   for (__pyx_t_8 = 0; __pyx_t_8 < __pyx_t_7; __pyx_t_8+=1) {
     __pyx_v_poi_id = __pyx_t_8;
 
-    /* "rover_domain.pyx":381
+    /* "rover_domain.pyx":383
  *         eval = 0.
  *         for poi_id in range(self.n_pois):
  *             if self.poi_status[poi_id]:             # <<<<<<<<<<<<<<
  *                 eval += self.calc_step_eval_from_poi(poi_id)
  * 
  */
-    if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 381, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 383, __pyx_L1_error)}
     __pyx_t_9 = __pyx_v_poi_id;
     __pyx_t_10 = -1;
     if (__pyx_t_9 < 0) {
@@ -7410,12 +7427,12 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
     } else if (unlikely(__pyx_t_9 >= __pyx_v_self->poi_status.shape[0])) __pyx_t_10 = 0;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 381, __pyx_L1_error)
+      __PYX_ERR(0, 383, __pyx_L1_error)
     }
     __pyx_t_11 = ((*((double *) ( /* dim=0 */ (__pyx_v_self->poi_status.data + __pyx_t_9 * __pyx_v_self->poi_status.strides[0]) ))) != 0);
     if (__pyx_t_11) {
 
-      /* "rover_domain.pyx":382
+      /* "rover_domain.pyx":384
  *         for poi_id in range(self.n_pois):
  *             if self.poi_status[poi_id]:
  *                 eval += self.calc_step_eval_from_poi(poi_id)             # <<<<<<<<<<<<<<
@@ -7424,7 +7441,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
  */
       __pyx_v_eval = (__pyx_v_eval + ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_step_eval_from_poi(__pyx_v_self, __pyx_v_poi_id, 0));
 
-      /* "rover_domain.pyx":381
+      /* "rover_domain.pyx":383
  *         eval = 0.
  *         for poi_id in range(self.n_pois):
  *             if self.poi_status[poi_id]:             # <<<<<<<<<<<<<<
@@ -7434,7 +7451,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
     }
   }
 
-  /* "rover_domain.pyx":384
+  /* "rover_domain.pyx":386
  *                 eval += self.calc_step_eval_from_poi(poi_id)
  * 
  *         return eval             # <<<<<<<<<<<<<<
@@ -7444,7 +7461,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(struct 
   __pyx_r = __pyx_v_eval;
   goto __pyx_L0;
 
-  /* "rover_domain.pyx":375
+  /* "rover_domain.pyx":377
  * 
  * 
  *     cpdef double calc_step_global_eval(self):             # <<<<<<<<<<<<<<
@@ -7484,7 +7501,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_14calc_step_global_eval(s
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("calc_step_global_eval", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 375, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_step_global_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 377, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7501,7 +7518,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_14calc_step_global_eval(s
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":386
+/* "rover_domain.pyx":388
  *         return eval
  * 
  *     cpdef double calc_step_cfact_global_eval(self, Py_ssize_t rover_id):             # <<<<<<<<<<<<<<
@@ -7547,10 +7564,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_step_cfact_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_step_cfact_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 388, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_17calc_step_cfact_global_eval)) {
-        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_rover_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 386, __pyx_L1_error)
+        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_rover_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 388, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -7566,10 +7583,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 386, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 388, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 386, __pyx_L1_error)
+        __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 388, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7588,7 +7605,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
     #endif
   }
 
-  /* "rover_domain.pyx":390
+  /* "rover_domain.pyx":392
  * 
  *         cdef double actual_x, actual_y, far, eval
  *         far = 1000000. # That's far enough, right?             # <<<<<<<<<<<<<<
@@ -7597,14 +7614,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
  */
   __pyx_v_far = 1000000.;
 
-  /* "rover_domain.pyx":393
+  /* "rover_domain.pyx":395
  * 
  *         # Store actual positions for later reassignment
  *         actual_x = self.rover_positions[rover_id, 0]             # <<<<<<<<<<<<<<
  *         actual_y = self.rover_positions[rover_id, 1]
  * 
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 393, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 395, __pyx_L1_error)}
   __pyx_t_7 = __pyx_v_rover_id;
   __pyx_t_8 = 0;
   __pyx_t_9 = -1;
@@ -7618,18 +7635,18 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
   } else if (unlikely(__pyx_t_8 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_9 = 1;
   if (unlikely(__pyx_t_9 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_9);
-    __PYX_ERR(0, 393, __pyx_L1_error)
+    __PYX_ERR(0, 395, __pyx_L1_error)
   }
   __pyx_v_actual_x = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_7 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_8 * __pyx_v_self->rover_positions.strides[1]) )));
 
-  /* "rover_domain.pyx":394
+  /* "rover_domain.pyx":396
  *         # Store actual positions for later reassignment
  *         actual_x = self.rover_positions[rover_id, 0]
  *         actual_y = self.rover_positions[rover_id, 1]             # <<<<<<<<<<<<<<
  * 
  *         # Move rover artificially
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 394, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 396, __pyx_L1_error)}
   __pyx_t_10 = __pyx_v_rover_id;
   __pyx_t_11 = 1;
   __pyx_t_9 = -1;
@@ -7643,18 +7660,18 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
   } else if (unlikely(__pyx_t_11 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_9 = 1;
   if (unlikely(__pyx_t_9 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_9);
-    __PYX_ERR(0, 394, __pyx_L1_error)
+    __PYX_ERR(0, 396, __pyx_L1_error)
   }
   __pyx_v_actual_y = (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_10 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_11 * __pyx_v_self->rover_positions.strides[1]) )));
 
-  /* "rover_domain.pyx":397
+  /* "rover_domain.pyx":399
  * 
  *         # Move rover artificially
  *         self.rover_positions[rover_id, 0] = far             # <<<<<<<<<<<<<<
  *         self.rover_positions[rover_id, 1] = far
  * 
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 397, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 399, __pyx_L1_error)}
   __pyx_t_12 = __pyx_v_rover_id;
   __pyx_t_13 = 0;
   __pyx_t_9 = -1;
@@ -7668,18 +7685,18 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
   } else if (unlikely(__pyx_t_13 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_9 = 1;
   if (unlikely(__pyx_t_9 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_9);
-    __PYX_ERR(0, 397, __pyx_L1_error)
+    __PYX_ERR(0, 399, __pyx_L1_error)
   }
   *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_12 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_13 * __pyx_v_self->rover_positions.strides[1]) )) = __pyx_v_far;
 
-  /* "rover_domain.pyx":398
+  /* "rover_domain.pyx":400
  *         # Move rover artificially
  *         self.rover_positions[rover_id, 0] = far
  *         self.rover_positions[rover_id, 1] = far             # <<<<<<<<<<<<<<
  * 
  *         # Calculate /counterfactual/ evaluation
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 398, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 400, __pyx_L1_error)}
   __pyx_t_14 = __pyx_v_rover_id;
   __pyx_t_15 = 1;
   __pyx_t_9 = -1;
@@ -7693,11 +7710,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
   } else if (unlikely(__pyx_t_15 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_9 = 1;
   if (unlikely(__pyx_t_9 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_9);
-    __PYX_ERR(0, 398, __pyx_L1_error)
+    __PYX_ERR(0, 400, __pyx_L1_error)
   }
   *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_14 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_15 * __pyx_v_self->rover_positions.strides[1]) )) = __pyx_v_far;
 
-  /* "rover_domain.pyx":401
+  /* "rover_domain.pyx":403
  * 
  *         # Calculate /counterfactual/ evaluation
  *         eval = self.calc_step_global_eval()             # <<<<<<<<<<<<<<
@@ -7706,14 +7723,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
  */
   __pyx_v_eval = ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_step_global_eval(__pyx_v_self, 0);
 
-  /* "rover_domain.pyx":404
+  /* "rover_domain.pyx":406
  * 
  *         # Move rover back
  *         self.rover_positions[rover_id, 0] = actual_x             # <<<<<<<<<<<<<<
  *         self.rover_positions[rover_id, 1] = actual_y
  * 
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 404, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 406, __pyx_L1_error)}
   __pyx_t_16 = __pyx_v_rover_id;
   __pyx_t_17 = 0;
   __pyx_t_9 = -1;
@@ -7727,18 +7744,18 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
   } else if (unlikely(__pyx_t_17 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_9 = 1;
   if (unlikely(__pyx_t_9 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_9);
-    __PYX_ERR(0, 404, __pyx_L1_error)
+    __PYX_ERR(0, 406, __pyx_L1_error)
   }
   *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_16 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_17 * __pyx_v_self->rover_positions.strides[1]) )) = __pyx_v_actual_x;
 
-  /* "rover_domain.pyx":405
+  /* "rover_domain.pyx":407
  *         # Move rover back
  *         self.rover_positions[rover_id, 0] = actual_x
  *         self.rover_positions[rover_id, 1] = actual_y             # <<<<<<<<<<<<<<
  * 
  *         return eval
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 405, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 407, __pyx_L1_error)}
   __pyx_t_18 = __pyx_v_rover_id;
   __pyx_t_19 = 1;
   __pyx_t_9 = -1;
@@ -7752,11 +7769,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
   } else if (unlikely(__pyx_t_19 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_9 = 1;
   if (unlikely(__pyx_t_9 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_9);
-    __PYX_ERR(0, 405, __pyx_L1_error)
+    __PYX_ERR(0, 407, __pyx_L1_error)
   }
   *((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_18 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_19 * __pyx_v_self->rover_positions.strides[1]) )) = __pyx_v_actual_y;
 
-  /* "rover_domain.pyx":407
+  /* "rover_domain.pyx":409
  *         self.rover_positions[rover_id, 1] = actual_y
  * 
  *         return eval             # <<<<<<<<<<<<<<
@@ -7766,7 +7783,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(s
   __pyx_r = __pyx_v_eval;
   goto __pyx_L0;
 
-  /* "rover_domain.pyx":386
+  /* "rover_domain.pyx":388
  *         return eval
  * 
  *     cpdef double calc_step_cfact_global_eval(self, Py_ssize_t rover_id):             # <<<<<<<<<<<<<<
@@ -7796,7 +7813,7 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_17calc_step_cfact_global_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calc_step_cfact_global_eval (wrapper)", 0);
   assert(__pyx_arg_rover_id); {
-    __pyx_v_rover_id = __Pyx_PyIndex_AsSsize_t(__pyx_arg_rover_id); if (unlikely((__pyx_v_rover_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 386, __pyx_L3_error)
+    __pyx_v_rover_id = __Pyx_PyIndex_AsSsize_t(__pyx_arg_rover_id); if (unlikely((__pyx_v_rover_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 388, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -7817,7 +7834,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_16calc_step_cfact_global_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("calc_step_cfact_global_eval", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(__pyx_v_self, __pyx_v_rover_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 386, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_step_cfact_global_eval(__pyx_v_self, __pyx_v_rover_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 388, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -7834,7 +7851,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_16calc_step_cfact_global_
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":410
+/* "rover_domain.pyx":412
  * 
  * 
  *     cpdef double calc_traj_global_eval(self):             # <<<<<<<<<<<<<<
@@ -7877,7 +7894,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_traj_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 410, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_traj_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 412, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_19calc_traj_global_eval)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -7893,10 +7910,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 410, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 412, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 410, __pyx_L1_error)
+        __pyx_t_5 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_5 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 412, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_5;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -7915,18 +7932,18 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
     #endif
   }
 
-  /* "rover_domain.pyx":416
+  /* "rover_domain.pyx":418
  * 
  *         # Only evaluate trajectories at the end
  *         if not self.done:             # <<<<<<<<<<<<<<
  *             return 0.
  * 
  */
-  __pyx_t_6 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->done)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 416, __pyx_L1_error)
+  __pyx_t_6 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->done)); if (unlikely(__pyx_t_6 < 0)) __PYX_ERR(0, 418, __pyx_L1_error)
   __pyx_t_7 = ((!__pyx_t_6) != 0);
   if (__pyx_t_7) {
 
-    /* "rover_domain.pyx":417
+    /* "rover_domain.pyx":419
  *         # Only evaluate trajectories at the end
  *         if not self.done:
  *             return 0.             # <<<<<<<<<<<<<<
@@ -7936,7 +7953,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
     __pyx_r = 0.;
     goto __pyx_L0;
 
-    /* "rover_domain.pyx":416
+    /* "rover_domain.pyx":418
  * 
  *         # Only evaluate trajectories at the end
  *         if not self.done:             # <<<<<<<<<<<<<<
@@ -7945,7 +7962,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
  */
   }
 
-  /* "rover_domain.pyx":420
+  /* "rover_domain.pyx":422
  * 
  *         # Initialize evaluations to 0
  *         eval = 0.             # <<<<<<<<<<<<<<
@@ -7954,7 +7971,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
  */
   __pyx_v_eval = 0.;
 
-  /* "rover_domain.pyx":421
+  /* "rover_domain.pyx":423
  *         # Initialize evaluations to 0
  *         eval = 0.
  *         poi_evals.alloc(buf, self.n_pois)             # <<<<<<<<<<<<<<
@@ -7965,10 +7982,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
     __pyx_v_poi_evals.alloc(__pyx_v_12rover_domain_buf, __pyx_v_self->n_pois);
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 421, __pyx_L1_error)
+    __PYX_ERR(0, 423, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":422
+  /* "rover_domain.pyx":424
  *         eval = 0.
  *         poi_evals.alloc(buf, self.n_pois)
  *         for poi_id in range(self.n_pois):             # <<<<<<<<<<<<<<
@@ -7980,7 +7997,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
     __pyx_v_poi_id = __pyx_t_10;
 
-    /* "rover_domain.pyx":423
+    /* "rover_domain.pyx":425
  *         poi_evals.alloc(buf, self.n_pois)
  *         for poi_id in range(self.n_pois):
  *             poi_evals[poi_id] = 0             # <<<<<<<<<<<<<<
@@ -7991,11 +8008,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
       (__pyx_v_poi_evals[__pyx_v_poi_id]) = 0.0;
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 423, __pyx_L1_error)
+      __PYX_ERR(0, 425, __pyx_L1_error)
     }
   }
 
-  /* "rover_domain.pyx":427
+  /* "rover_domain.pyx":429
  * 
  *         # Get evaluation for poi, for each step, storing the max
  *         for step_id in range(self.n_steps+1):             # <<<<<<<<<<<<<<
@@ -8007,14 +8024,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
     __pyx_v_step_id = __pyx_t_10;
 
-    /* "rover_domain.pyx":430
+    /* "rover_domain.pyx":432
  *             # Go back in time
  *             self.rover_positions[...] = \
  *                 self.rover_position_histories[step_id, ...]             # <<<<<<<<<<<<<<
  * 
  *             # Keep best step eval for each poi
  */
-    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 430, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 432, __pyx_L1_error)}
     __pyx_t_11.data = __pyx_v_self->rover_position_histories.data;
     __pyx_t_11.memview = __pyx_v_self->rover_position_histories.memview;
     __PYX_INC_MEMVIEW(&__pyx_t_11, 0);
@@ -8027,7 +8044,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(struct 
         if (!__Pyx_is_valid_index(__pyx_tmp_idx, __pyx_tmp_shape)) {
             PyErr_SetString(PyExc_IndexError,
                             "Index out of bounds (axis 0)");
-            __PYX_ERR(0, 430, __pyx_L1_error)
+            __PYX_ERR(0, 432, __pyx_L1_error)
         }
         __pyx_t_11.data += __pyx_tmp_idx * __pyx_tmp_stride;
 }
@@ -8040,21 +8057,21 @@ __pyx_t_11.shape[1] = __pyx_v_self->rover_position_histories.shape[2];
 __pyx_t_11.strides[1] = __pyx_v_self->rover_position_histories.strides[2];
     __pyx_t_11.suboffsets[1] = -1;
 
-if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 429, __pyx_L1_error)}
+if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 431, __pyx_L1_error)}
 
-    /* "rover_domain.pyx":429
+    /* "rover_domain.pyx":431
  *         for step_id in range(self.n_steps+1):
  *             # Go back in time
  *             self.rover_positions[...] = \             # <<<<<<<<<<<<<<
  *                 self.rover_position_histories[step_id, ...]
  * 
  */
-    if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_11, __pyx_v_self->rover_positions, 2, 2, 0) < 0)) __PYX_ERR(0, 429, __pyx_L1_error)
+    if (unlikely(__pyx_memoryview_copy_contents(__pyx_t_11, __pyx_v_self->rover_positions, 2, 2, 0) < 0)) __PYX_ERR(0, 431, __pyx_L1_error)
     __PYX_XDEC_MEMVIEW(&__pyx_t_11, 1);
     __pyx_t_11.memview = NULL;
     __pyx_t_11.data = NULL;
 
-    /* "rover_domain.pyx":433
+    /* "rover_domain.pyx":435
  * 
  *             # Keep best step eval for each poi
  *             for poi_id in range(self.n_pois):             # <<<<<<<<<<<<<<
@@ -8066,7 +8083,7 @@ if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_Att
     for (__pyx_t_14 = 0; __pyx_t_14 < __pyx_t_13; __pyx_t_14+=1) {
       __pyx_v_poi_id = __pyx_t_14;
 
-      /* "rover_domain.pyx":435
+      /* "rover_domain.pyx":437
  *             for poi_id in range(self.n_pois):
  *                 poi_evals[poi_id] = max(poi_evals[poi_id],
  *                     self.calc_step_eval_from_poi(poi_id))             # <<<<<<<<<<<<<<
@@ -8075,7 +8092,7 @@ if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_Att
  */
       __pyx_t_5 = ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_step_eval_from_poi(__pyx_v_self, __pyx_v_poi_id, 0);
 
-      /* "rover_domain.pyx":434
+      /* "rover_domain.pyx":436
  *             # Keep best step eval for each poi
  *             for poi_id in range(self.n_pois):
  *                 poi_evals[poi_id] = max(poi_evals[poi_id],             # <<<<<<<<<<<<<<
@@ -8086,10 +8103,10 @@ if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_Att
         __pyx_t_15 = __pyx_v_poi_evals[__pyx_v_poi_id];
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 434, __pyx_L1_error)
+        __PYX_ERR(0, 436, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":435
+      /* "rover_domain.pyx":437
  *             for poi_id in range(self.n_pois):
  *                 poi_evals[poi_id] = max(poi_evals[poi_id],
  *                     self.calc_step_eval_from_poi(poi_id))             # <<<<<<<<<<<<<<
@@ -8102,7 +8119,7 @@ if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_Att
         __pyx_t_16 = __pyx_t_15;
       }
 
-      /* "rover_domain.pyx":434
+      /* "rover_domain.pyx":436
  *             # Keep best step eval for each poi
  *             for poi_id in range(self.n_pois):
  *                 poi_evals[poi_id] = max(poi_evals[poi_id],             # <<<<<<<<<<<<<<
@@ -8113,12 +8130,12 @@ if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_Att
         (__pyx_v_poi_evals[__pyx_v_poi_id]) = __pyx_t_16;
       } catch(...) {
         __Pyx_CppExn2PyErr();
-        __PYX_ERR(0, 434, __pyx_L1_error)
+        __PYX_ERR(0, 436, __pyx_L1_error)
       }
     }
   }
 
-  /* "rover_domain.pyx":439
+  /* "rover_domain.pyx":441
  * 
  *         # Set evaluation to the sum of all POI-specific evaluations
  *         for poi_id in range(self.n_pois):             # <<<<<<<<<<<<<<
@@ -8130,7 +8147,7 @@ if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_Att
   for (__pyx_t_10 = 0; __pyx_t_10 < __pyx_t_9; __pyx_t_10+=1) {
     __pyx_v_poi_id = __pyx_t_10;
 
-    /* "rover_domain.pyx":440
+    /* "rover_domain.pyx":442
  *         # Set evaluation to the sum of all POI-specific evaluations
  *         for poi_id in range(self.n_pois):
  *             eval += poi_evals[poi_id]             # <<<<<<<<<<<<<<
@@ -8141,12 +8158,12 @@ if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_Att
       __pyx_t_16 = __pyx_v_poi_evals[__pyx_v_poi_id];
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 440, __pyx_L1_error)
+      __PYX_ERR(0, 442, __pyx_L1_error)
     }
     __pyx_v_eval = (__pyx_v_eval + __pyx_t_16);
   }
 
-  /* "rover_domain.pyx":442
+  /* "rover_domain.pyx":444
  *             eval += poi_evals[poi_id]
  * 
  *         return eval             # <<<<<<<<<<<<<<
@@ -8156,7 +8173,7 @@ if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_Att
   __pyx_r = __pyx_v_eval;
   goto __pyx_L0;
 
-  /* "rover_domain.pyx":410
+  /* "rover_domain.pyx":412
  * 
  * 
  *     cpdef double calc_traj_global_eval(self):             # <<<<<<<<<<<<<<
@@ -8197,7 +8214,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_18calc_traj_global_eval(s
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("calc_traj_global_eval", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 410, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_traj_global_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 412, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -8214,7 +8231,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_18calc_traj_global_eval(s
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":445
+/* "rover_domain.pyx":447
  * 
  * 
  *     cpdef double calc_traj_cfact_global_eval(self, Py_ssize_t rover_id):             # <<<<<<<<<<<<<<
@@ -8270,10 +8287,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_traj_cfact_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 445, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_calc_traj_cfact_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 447, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_21calc_traj_cfact_global_eval)) {
-        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_rover_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 445, __pyx_L1_error)
+        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_rover_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 447, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_4 = __pyx_t_1; __pyx_t_5 = NULL;
@@ -8289,10 +8306,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
         __pyx_t_2 = (__pyx_t_5) ? __Pyx_PyObject_Call2Args(__pyx_t_4, __pyx_t_5, __pyx_t_3) : __Pyx_PyObject_CallOneArg(__pyx_t_4, __pyx_t_3);
         __Pyx_XDECREF(__pyx_t_5); __pyx_t_5 = 0;
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 445, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 447, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
-        __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 445, __pyx_L1_error)
+        __pyx_t_6 = __pyx_PyFloat_AsDouble(__pyx_t_2); if (unlikely((__pyx_t_6 == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 447, __pyx_L1_error)
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
         __pyx_r = __pyx_t_6;
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
@@ -8311,7 +8328,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     #endif
   }
 
-  /* "rover_domain.pyx":450
+  /* "rover_domain.pyx":452
  *         cdef double  far, eval
  *         cdef Py_ssize_t step_id
  *         far = 1000000. # That's far enough, right?             # <<<<<<<<<<<<<<
@@ -8320,7 +8337,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
  */
   __pyx_v_far = 1000000.;
 
-  /* "rover_domain.pyx":452
+  /* "rover_domain.pyx":454
  *         far = 1000000. # That's far enough, right?
  * 
  *         actual_x_hist.alloc(buf, self.n_steps+1)             # <<<<<<<<<<<<<<
@@ -8331,10 +8348,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     __pyx_v_actual_x_hist.alloc(__pyx_v_12rover_domain_buf, (__pyx_v_self->n_steps + 1));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 452, __pyx_L1_error)
+    __PYX_ERR(0, 454, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":453
+  /* "rover_domain.pyx":455
  * 
  *         actual_x_hist.alloc(buf, self.n_steps+1)
  *         actual_y_hist.alloc(buf, self.n_steps+1)             # <<<<<<<<<<<<<<
@@ -8345,10 +8362,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     __pyx_v_actual_y_hist.alloc(__pyx_v_12rover_domain_buf, (__pyx_v_self->n_steps + 1));
   } catch(...) {
     __Pyx_CppExn2PyErr();
-    __PYX_ERR(0, 453, __pyx_L1_error)
+    __PYX_ERR(0, 455, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":455
+  /* "rover_domain.pyx":457
  *         actual_y_hist.alloc(buf, self.n_steps+1)
  * 
  *         for step_id in range(self.n_steps+1):             # <<<<<<<<<<<<<<
@@ -8360,14 +8377,14 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_step_id = __pyx_t_9;
 
-    /* "rover_domain.pyx":458
+    /* "rover_domain.pyx":460
  *             # Store actual positions for later reassignment
  *             actual_x_hist[step_id] = \
  *                 self.rover_position_histories[step_id, rover_id, 0]             # <<<<<<<<<<<<<<
  *             actual_y_hist[step_id] = \
  *                 self.rover_position_histories[step_id, rover_id, 1]
  */
-    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 458, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 460, __pyx_L1_error)}
     __pyx_t_10 = __pyx_v_step_id;
     __pyx_t_11 = __pyx_v_rover_id;
     __pyx_t_12 = 0;
@@ -8386,10 +8403,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     } else if (unlikely(__pyx_t_12 >= __pyx_v_self->rover_position_histories.shape[2])) __pyx_t_13 = 2;
     if (unlikely(__pyx_t_13 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_13);
-      __PYX_ERR(0, 458, __pyx_L1_error)
+      __PYX_ERR(0, 460, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":457
+    /* "rover_domain.pyx":459
  *         for step_id in range(self.n_steps+1):
  *             # Store actual positions for later reassignment
  *             actual_x_hist[step_id] = \             # <<<<<<<<<<<<<<
@@ -8400,17 +8417,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
       (__pyx_v_actual_x_hist[__pyx_v_step_id]) = (*((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_position_histories.data + __pyx_t_10 * __pyx_v_self->rover_position_histories.strides[0]) ) + __pyx_t_11 * __pyx_v_self->rover_position_histories.strides[1]) ) + __pyx_t_12 * __pyx_v_self->rover_position_histories.strides[2]) )));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 457, __pyx_L1_error)
+      __PYX_ERR(0, 459, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":460
+    /* "rover_domain.pyx":462
  *                 self.rover_position_histories[step_id, rover_id, 0]
  *             actual_y_hist[step_id] = \
  *                 self.rover_position_histories[step_id, rover_id, 1]             # <<<<<<<<<<<<<<
  * 
  *             # Move rover artificially
  */
-    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 460, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 462, __pyx_L1_error)}
     __pyx_t_14 = __pyx_v_step_id;
     __pyx_t_15 = __pyx_v_rover_id;
     __pyx_t_16 = 1;
@@ -8429,10 +8446,10 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     } else if (unlikely(__pyx_t_16 >= __pyx_v_self->rover_position_histories.shape[2])) __pyx_t_13 = 2;
     if (unlikely(__pyx_t_13 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_13);
-      __PYX_ERR(0, 460, __pyx_L1_error)
+      __PYX_ERR(0, 462, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":459
+    /* "rover_domain.pyx":461
  *             actual_x_hist[step_id] = \
  *                 self.rover_position_histories[step_id, rover_id, 0]
  *             actual_y_hist[step_id] = \             # <<<<<<<<<<<<<<
@@ -8443,17 +8460,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
       (__pyx_v_actual_y_hist[__pyx_v_step_id]) = (*((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_position_histories.data + __pyx_t_14 * __pyx_v_self->rover_position_histories.strides[0]) ) + __pyx_t_15 * __pyx_v_self->rover_position_histories.strides[1]) ) + __pyx_t_16 * __pyx_v_self->rover_position_histories.strides[2]) )));
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 459, __pyx_L1_error)
+      __PYX_ERR(0, 461, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":463
+    /* "rover_domain.pyx":465
  * 
  *             # Move rover artificially
  *             self.rover_position_histories[step_id, rover_id, 0] = far             # <<<<<<<<<<<<<<
  *             self.rover_position_histories[step_id, rover_id, 1] = far
  * 
  */
-    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 463, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 465, __pyx_L1_error)}
     __pyx_t_17 = __pyx_v_step_id;
     __pyx_t_18 = __pyx_v_rover_id;
     __pyx_t_19 = 0;
@@ -8472,18 +8489,18 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     } else if (unlikely(__pyx_t_19 >= __pyx_v_self->rover_position_histories.shape[2])) __pyx_t_13 = 2;
     if (unlikely(__pyx_t_13 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_13);
-      __PYX_ERR(0, 463, __pyx_L1_error)
+      __PYX_ERR(0, 465, __pyx_L1_error)
     }
     *((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_position_histories.data + __pyx_t_17 * __pyx_v_self->rover_position_histories.strides[0]) ) + __pyx_t_18 * __pyx_v_self->rover_position_histories.strides[1]) ) + __pyx_t_19 * __pyx_v_self->rover_position_histories.strides[2]) )) = __pyx_v_far;
 
-    /* "rover_domain.pyx":464
+    /* "rover_domain.pyx":466
  *             # Move rover artificially
  *             self.rover_position_histories[step_id, rover_id, 0] = far
  *             self.rover_position_histories[step_id, rover_id, 1] = far             # <<<<<<<<<<<<<<
  * 
  *         # Calculate /counterfactual/ evaluation
  */
-    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 464, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 466, __pyx_L1_error)}
     __pyx_t_20 = __pyx_v_step_id;
     __pyx_t_21 = __pyx_v_rover_id;
     __pyx_t_22 = 1;
@@ -8502,12 +8519,12 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     } else if (unlikely(__pyx_t_22 >= __pyx_v_self->rover_position_histories.shape[2])) __pyx_t_13 = 2;
     if (unlikely(__pyx_t_13 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_13);
-      __PYX_ERR(0, 464, __pyx_L1_error)
+      __PYX_ERR(0, 466, __pyx_L1_error)
     }
     *((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_position_histories.data + __pyx_t_20 * __pyx_v_self->rover_position_histories.strides[0]) ) + __pyx_t_21 * __pyx_v_self->rover_position_histories.strides[1]) ) + __pyx_t_22 * __pyx_v_self->rover_position_histories.strides[2]) )) = __pyx_v_far;
   }
 
-  /* "rover_domain.pyx":467
+  /* "rover_domain.pyx":469
  * 
  *         # Calculate /counterfactual/ evaluation
  *         eval = self.calc_traj_global_eval()             # <<<<<<<<<<<<<<
@@ -8516,7 +8533,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
  */
   __pyx_v_eval = ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_traj_global_eval(__pyx_v_self, 0);
 
-  /* "rover_domain.pyx":469
+  /* "rover_domain.pyx":471
  *         eval = self.calc_traj_global_eval()
  * 
  *         for step_id in range(self.n_steps+1):             # <<<<<<<<<<<<<<
@@ -8528,7 +8545,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
   for (__pyx_t_9 = 0; __pyx_t_9 < __pyx_t_8; __pyx_t_9+=1) {
     __pyx_v_step_id = __pyx_t_9;
 
-    /* "rover_domain.pyx":472
+    /* "rover_domain.pyx":474
  *             # Move rover back
  *             self.rover_position_histories[step_id, rover_id, 0] = \
  *                 actual_x_hist[step_id]             # <<<<<<<<<<<<<<
@@ -8539,17 +8556,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
       __pyx_t_6 = __pyx_v_actual_x_hist[__pyx_v_step_id];
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 472, __pyx_L1_error)
+      __PYX_ERR(0, 474, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":471
+    /* "rover_domain.pyx":473
  *         for step_id in range(self.n_steps+1):
  *             # Move rover back
  *             self.rover_position_histories[step_id, rover_id, 0] = \             # <<<<<<<<<<<<<<
  *                 actual_x_hist[step_id]
  *             self.rover_position_histories[step_id, rover_id, 1] = \
  */
-    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 471, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 473, __pyx_L1_error)}
     __pyx_t_23 = __pyx_v_step_id;
     __pyx_t_24 = __pyx_v_rover_id;
     __pyx_t_25 = 0;
@@ -8568,11 +8585,11 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     } else if (unlikely(__pyx_t_25 >= __pyx_v_self->rover_position_histories.shape[2])) __pyx_t_13 = 2;
     if (unlikely(__pyx_t_13 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_13);
-      __PYX_ERR(0, 471, __pyx_L1_error)
+      __PYX_ERR(0, 473, __pyx_L1_error)
     }
     *((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_position_histories.data + __pyx_t_23 * __pyx_v_self->rover_position_histories.strides[0]) ) + __pyx_t_24 * __pyx_v_self->rover_position_histories.strides[1]) ) + __pyx_t_25 * __pyx_v_self->rover_position_histories.strides[2]) )) = __pyx_t_6;
 
-    /* "rover_domain.pyx":474
+    /* "rover_domain.pyx":476
  *                 actual_x_hist[step_id]
  *             self.rover_position_histories[step_id, rover_id, 1] = \
  *                 actual_y_hist[step_id]             # <<<<<<<<<<<<<<
@@ -8583,17 +8600,17 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
       __pyx_t_6 = __pyx_v_actual_y_hist[__pyx_v_step_id];
     } catch(...) {
       __Pyx_CppExn2PyErr();
-      __PYX_ERR(0, 474, __pyx_L1_error)
+      __PYX_ERR(0, 476, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":473
+    /* "rover_domain.pyx":475
  *             self.rover_position_histories[step_id, rover_id, 0] = \
  *                 actual_x_hist[step_id]
  *             self.rover_position_histories[step_id, rover_id, 1] = \             # <<<<<<<<<<<<<<
  *                 actual_y_hist[step_id]
  * 
  */
-    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 473, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_position_histories.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 475, __pyx_L1_error)}
     __pyx_t_26 = __pyx_v_step_id;
     __pyx_t_27 = __pyx_v_rover_id;
     __pyx_t_28 = 1;
@@ -8612,12 +8629,12 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
     } else if (unlikely(__pyx_t_28 >= __pyx_v_self->rover_position_histories.shape[2])) __pyx_t_13 = 2;
     if (unlikely(__pyx_t_13 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_13);
-      __PYX_ERR(0, 473, __pyx_L1_error)
+      __PYX_ERR(0, 475, __pyx_L1_error)
     }
     *((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_position_histories.data + __pyx_t_26 * __pyx_v_self->rover_position_histories.strides[0]) ) + __pyx_t_27 * __pyx_v_self->rover_position_histories.strides[1]) ) + __pyx_t_28 * __pyx_v_self->rover_position_histories.strides[2]) )) = __pyx_t_6;
   }
 
-  /* "rover_domain.pyx":477
+  /* "rover_domain.pyx":479
  * 
  * 
  *         return eval             # <<<<<<<<<<<<<<
@@ -8627,7 +8644,7 @@ static double __pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(s
   __pyx_r = __pyx_v_eval;
   goto __pyx_L0;
 
-  /* "rover_domain.pyx":445
+  /* "rover_domain.pyx":447
  * 
  * 
  *     cpdef double calc_traj_cfact_global_eval(self, Py_ssize_t rover_id):             # <<<<<<<<<<<<<<
@@ -8657,7 +8674,7 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_21calc_traj_cfact_global_
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("calc_traj_cfact_global_eval (wrapper)", 0);
   assert(__pyx_arg_rover_id); {
-    __pyx_v_rover_id = __Pyx_PyIndex_AsSsize_t(__pyx_arg_rover_id); if (unlikely((__pyx_v_rover_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 445, __pyx_L3_error)
+    __pyx_v_rover_id = __Pyx_PyIndex_AsSsize_t(__pyx_arg_rover_id); if (unlikely((__pyx_v_rover_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 447, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L3_error:;
@@ -8678,7 +8695,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_20calc_traj_cfact_global_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("calc_traj_cfact_global_eval", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(__pyx_v_self, __pyx_v_rover_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 445, __pyx_L1_error)
+  __pyx_t_1 = PyFloat_FromDouble(__pyx_f_12rover_domain_11RoverDomain_calc_traj_cfact_global_eval(__pyx_v_self, __pyx_v_rover_id, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 447, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -8695,7 +8712,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_20calc_traj_cfact_global_
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":479
+/* "rover_domain.pyx":481
  *         return eval
  * 
  *     cpdef void add_to_sensor(self, Py_ssize_t rover_id,             # <<<<<<<<<<<<<<
@@ -8758,18 +8775,18 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_to_sensor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 479, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_add_to_sensor); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 481, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_23add_to_sensor)) {
-        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_rover_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 479, __pyx_L1_error)
+        __pyx_t_3 = PyInt_FromSsize_t(__pyx_v_rover_id); if (unlikely(!__pyx_t_3)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_3);
-        __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_type_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 479, __pyx_L1_error)
+        __pyx_t_4 = PyInt_FromSsize_t(__pyx_v_type_id); if (unlikely(!__pyx_t_4)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_4);
-        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_other_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 479, __pyx_L1_error)
+        __pyx_t_5 = PyFloat_FromDouble(__pyx_v_other_x); if (unlikely(!__pyx_t_5)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_5);
-        __pyx_t_6 = PyFloat_FromDouble(__pyx_v_other_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 479, __pyx_L1_error)
+        __pyx_t_6 = PyFloat_FromDouble(__pyx_v_other_y); if (unlikely(!__pyx_t_6)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_6);
-        __pyx_t_7 = PyFloat_FromDouble(__pyx_v_val); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 479, __pyx_L1_error)
+        __pyx_t_7 = PyFloat_FromDouble(__pyx_v_val); if (unlikely(!__pyx_t_7)) __PYX_ERR(0, 481, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_7);
         __Pyx_INCREF(__pyx_t_1);
         __pyx_t_8 = __pyx_t_1; __pyx_t_9 = NULL;
@@ -8787,7 +8804,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
         #if CYTHON_FAST_PYCALL
         if (PyFunction_Check(__pyx_t_8)) {
           PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_t_6, __pyx_t_7};
-          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 479, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 481, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -8800,7 +8817,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
         #if CYTHON_FAST_PYCCALL
         if (__Pyx_PyFastCFunction_Check(__pyx_t_8)) {
           PyObject *__pyx_temp[6] = {__pyx_t_9, __pyx_t_3, __pyx_t_4, __pyx_t_5, __pyx_t_6, __pyx_t_7};
-          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 479, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyCFunction_FastCall(__pyx_t_8, __pyx_temp+1-__pyx_t_10, 5+__pyx_t_10); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 481, __pyx_L1_error)
           __Pyx_XDECREF(__pyx_t_9); __pyx_t_9 = 0;
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
@@ -8811,7 +8828,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
         } else
         #endif
         {
-          __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 479, __pyx_L1_error)
+          __pyx_t_11 = PyTuple_New(5+__pyx_t_10); if (unlikely(!__pyx_t_11)) __PYX_ERR(0, 481, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_11);
           if (__pyx_t_9) {
             __Pyx_GIVEREF(__pyx_t_9); PyTuple_SET_ITEM(__pyx_t_11, 0, __pyx_t_9); __pyx_t_9 = NULL;
@@ -8831,7 +8848,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
           __pyx_t_5 = 0;
           __pyx_t_6 = 0;
           __pyx_t_7 = 0;
-          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 479, __pyx_L1_error)
+          __pyx_t_2 = __Pyx_PyObject_Call(__pyx_t_8, __pyx_t_11, NULL); if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 481, __pyx_L1_error)
           __Pyx_GOTREF(__pyx_t_2);
           __Pyx_DECREF(__pyx_t_11); __pyx_t_11 = 0;
         }
@@ -8853,14 +8870,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
     #endif
   }
 
-  /* "rover_domain.pyx":487
+  /* "rover_domain.pyx":489
  * 
  *             # Get global (gf) frame displacement
  *             gf_displ_x = (other_x - self.rover_positions[rover_id, 0])             # <<<<<<<<<<<<<<
  *             gf_displ_y = (other_y - self.rover_positions[rover_id, 1])
  * 
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 487, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 489, __pyx_L1_error)}
   __pyx_t_12 = __pyx_v_rover_id;
   __pyx_t_13 = 0;
   __pyx_t_10 = -1;
@@ -8874,18 +8891,18 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
   } else if (unlikely(__pyx_t_13 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_10 = 1;
   if (unlikely(__pyx_t_10 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_10);
-    __PYX_ERR(0, 487, __pyx_L1_error)
+    __PYX_ERR(0, 489, __pyx_L1_error)
   }
   __pyx_v_gf_displ_x = (__pyx_v_other_x - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_12 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_13 * __pyx_v_self->rover_positions.strides[1]) ))));
 
-  /* "rover_domain.pyx":488
+  /* "rover_domain.pyx":490
  *             # Get global (gf) frame displacement
  *             gf_displ_x = (other_x - self.rover_positions[rover_id, 0])
  *             gf_displ_y = (other_y - self.rover_positions[rover_id, 1])             # <<<<<<<<<<<<<<
  * 
  *             # Set displacement value used by sensor to global frame
  */
-  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 488, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 490, __pyx_L1_error)}
   __pyx_t_14 = __pyx_v_rover_id;
   __pyx_t_15 = 1;
   __pyx_t_10 = -1;
@@ -8899,11 +8916,11 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
   } else if (unlikely(__pyx_t_15 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_10 = 1;
   if (unlikely(__pyx_t_10 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_10);
-    __PYX_ERR(0, 488, __pyx_L1_error)
+    __PYX_ERR(0, 490, __pyx_L1_error)
   }
   __pyx_v_gf_displ_y = (__pyx_v_other_y - (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_positions.data + __pyx_t_14 * __pyx_v_self->rover_positions.strides[0]) ) + __pyx_t_15 * __pyx_v_self->rover_positions.strides[1]) ))));
 
-  /* "rover_domain.pyx":491
+  /* "rover_domain.pyx":493
  * 
  *             # Set displacement value used by sensor to global frame
  *             displ_x = gf_displ_x             # <<<<<<<<<<<<<<
@@ -8912,7 +8929,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
   __pyx_v_displ_x = __pyx_v_gf_displ_x;
 
-  /* "rover_domain.pyx":492
+  /* "rover_domain.pyx":494
  *             # Set displacement value used by sensor to global frame
  *             displ_x = gf_displ_x
  *             displ_y = gf_displ_y             # <<<<<<<<<<<<<<
@@ -8921,24 +8938,24 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
   __pyx_v_displ_y = __pyx_v_gf_displ_y;
 
-  /* "rover_domain.pyx":495
+  /* "rover_domain.pyx":497
  * 
  *             # /May/ reorient displacement for observations
  *             if self.reorients:             # <<<<<<<<<<<<<<
  *                 # Get rover frame (rf) displacement
  *                 rf_displ_x = (self.rover_orientations[rover_id, 0]
  */
-  __pyx_t_16 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->reorients)); if (unlikely(__pyx_t_16 < 0)) __PYX_ERR(0, 495, __pyx_L1_error)
+  __pyx_t_16 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->reorients)); if (unlikely(__pyx_t_16 < 0)) __PYX_ERR(0, 497, __pyx_L1_error)
   if (__pyx_t_16) {
 
-    /* "rover_domain.pyx":497
+    /* "rover_domain.pyx":499
  *             if self.reorients:
  *                 # Get rover frame (rf) displacement
  *                 rf_displ_x = (self.rover_orientations[rover_id, 0]             # <<<<<<<<<<<<<<
  *                     * displ_x
  *                     + self.rover_orientations[rover_id, 1]
  */
-    if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 497, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 499, __pyx_L1_error)}
     __pyx_t_17 = __pyx_v_rover_id;
     __pyx_t_18 = 0;
     __pyx_t_10 = -1;
@@ -8952,17 +8969,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
     } else if (unlikely(__pyx_t_18 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_10 = 1;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 497, __pyx_L1_error)
+      __PYX_ERR(0, 499, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":499
+    /* "rover_domain.pyx":501
  *                 rf_displ_x = (self.rover_orientations[rover_id, 0]
  *                     * displ_x
  *                     + self.rover_orientations[rover_id, 1]             # <<<<<<<<<<<<<<
  *                     * displ_y)
  *                 rf_displ_y = (self.rover_orientations[rover_id, 0]
  */
-    if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 499, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 501, __pyx_L1_error)}
     __pyx_t_19 = __pyx_v_rover_id;
     __pyx_t_20 = 1;
     __pyx_t_10 = -1;
@@ -8976,10 +8993,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
     } else if (unlikely(__pyx_t_20 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_10 = 1;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 499, __pyx_L1_error)
+      __PYX_ERR(0, 501, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":500
+    /* "rover_domain.pyx":502
  *                     * displ_x
  *                     + self.rover_orientations[rover_id, 1]
  *                     * displ_y)             # <<<<<<<<<<<<<<
@@ -8988,14 +9005,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
     __pyx_v_rf_displ_x = (((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_17 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_18 * __pyx_v_self->rover_orientations.strides[1]) ))) * __pyx_v_displ_x) + ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_19 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_20 * __pyx_v_self->rover_orientations.strides[1]) ))) * __pyx_v_displ_y));
 
-    /* "rover_domain.pyx":501
+    /* "rover_domain.pyx":503
  *                     + self.rover_orientations[rover_id, 1]
  *                     * displ_y)
  *                 rf_displ_y = (self.rover_orientations[rover_id, 0]             # <<<<<<<<<<<<<<
  *                     * displ_y
  *                     - self.rover_orientations[rover_id, 1]
  */
-    if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 501, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 503, __pyx_L1_error)}
     __pyx_t_21 = __pyx_v_rover_id;
     __pyx_t_22 = 0;
     __pyx_t_10 = -1;
@@ -9009,17 +9026,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
     } else if (unlikely(__pyx_t_22 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_10 = 1;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 501, __pyx_L1_error)
+      __PYX_ERR(0, 503, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":503
+    /* "rover_domain.pyx":505
  *                 rf_displ_y = (self.rover_orientations[rover_id, 0]
  *                     * displ_y
  *                     - self.rover_orientations[rover_id, 1]             # <<<<<<<<<<<<<<
  *                     * displ_x)
  *                 # Set displacement value used by sensor to rover frame
  */
-    if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 503, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_orientations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 505, __pyx_L1_error)}
     __pyx_t_23 = __pyx_v_rover_id;
     __pyx_t_24 = 1;
     __pyx_t_10 = -1;
@@ -9033,10 +9050,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
     } else if (unlikely(__pyx_t_24 >= __pyx_v_self->rover_orientations.shape[1])) __pyx_t_10 = 1;
     if (unlikely(__pyx_t_10 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_10);
-      __PYX_ERR(0, 503, __pyx_L1_error)
+      __PYX_ERR(0, 505, __pyx_L1_error)
     }
 
-    /* "rover_domain.pyx":504
+    /* "rover_domain.pyx":506
  *                     * displ_y
  *                     - self.rover_orientations[rover_id, 1]
  *                     * displ_x)             # <<<<<<<<<<<<<<
@@ -9045,7 +9062,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
     __pyx_v_rf_displ_y = (((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_21 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_22 * __pyx_v_self->rover_orientations.strides[1]) ))) * __pyx_v_displ_y) - ((*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_orientations.data + __pyx_t_23 * __pyx_v_self->rover_orientations.strides[0]) ) + __pyx_t_24 * __pyx_v_self->rover_orientations.strides[1]) ))) * __pyx_v_displ_x));
 
-    /* "rover_domain.pyx":506
+    /* "rover_domain.pyx":508
  *                     * displ_x)
  *                 # Set displacement value used by sensor to rover frame
  *                 displ_x = rf_displ_x             # <<<<<<<<<<<<<<
@@ -9054,7 +9071,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
     __pyx_v_displ_x = __pyx_v_rf_displ_x;
 
-    /* "rover_domain.pyx":507
+    /* "rover_domain.pyx":509
  *                 # Set displacement value used by sensor to rover frame
  *                 displ_x = rf_displ_x
  *                 displ_y = rf_displ_y             # <<<<<<<<<<<<<<
@@ -9063,7 +9080,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
     __pyx_v_displ_y = __pyx_v_rf_displ_y;
 
-    /* "rover_domain.pyx":495
+    /* "rover_domain.pyx":497
  * 
  *             # /May/ reorient displacement for observations
  *             if self.reorients:             # <<<<<<<<<<<<<<
@@ -9072,7 +9089,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
   }
 
-  /* "rover_domain.pyx":509
+  /* "rover_domain.pyx":511
  *                 displ_y = rf_displ_y
  * 
  *             dist = cmath.sqrt(displ_x*displ_x + displ_y*displ_y)             # <<<<<<<<<<<<<<
@@ -9081,7 +9098,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
   __pyx_v_dist = sqrt(((__pyx_v_displ_x * __pyx_v_displ_x) + (__pyx_v_displ_y * __pyx_v_displ_y)));
 
-  /* "rover_domain.pyx":513
+  /* "rover_domain.pyx":515
  *             # By bounding distance value we
  *             # implicitly bound sensor values
  *             if dist < self.min_dist:             # <<<<<<<<<<<<<<
@@ -9091,7 +9108,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
   __pyx_t_16 = ((__pyx_v_dist < __pyx_v_self->min_dist) != 0);
   if (__pyx_t_16) {
 
-    /* "rover_domain.pyx":514
+    /* "rover_domain.pyx":516
  *             # implicitly bound sensor values
  *             if dist < self.min_dist:
  *                 dist = self.min_dist             # <<<<<<<<<<<<<<
@@ -9101,7 +9118,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
     __pyx_t_25 = __pyx_v_self->min_dist;
     __pyx_v_dist = __pyx_t_25;
 
-    /* "rover_domain.pyx":513
+    /* "rover_domain.pyx":515
  *             # By bounding distance value we
  *             # implicitly bound sensor values
  *             if dist < self.min_dist:             # <<<<<<<<<<<<<<
@@ -9110,7 +9127,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
   }
 
-  /* "rover_domain.pyx":517
+  /* "rover_domain.pyx":519
  * 
  *             # Get arc tangent (angle) of displacement
  *             angle = cmath.atan2(displ_y, displ_x)             # <<<<<<<<<<<<<<
@@ -9119,7 +9136,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
   __pyx_v_angle = atan2(__pyx_v_displ_y, __pyx_v_displ_x);
 
-  /* "rover_domain.pyx":521
+  /* "rover_domain.pyx":523
  *             #  Get intermediate Section Index by discretizing angle
  *             sec_id_temp = cmath.floor(
  *                 (angle + cmath.pi)             # <<<<<<<<<<<<<<
@@ -9128,7 +9145,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
   __pyx_t_25 = (__pyx_v_angle + M_PI);
 
-  /* "rover_domain.pyx":522
+  /* "rover_domain.pyx":524
  *             sec_id_temp = cmath.floor(
  *                 (angle + cmath.pi)
  *                 / (2 * cmath.pi)             # <<<<<<<<<<<<<<
@@ -9138,10 +9155,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
   __pyx_t_26 = (2.0 * M_PI);
   if (unlikely(__pyx_t_26 == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 522, __pyx_L1_error)
+    __PYX_ERR(0, 524, __pyx_L1_error)
   }
 
-  /* "rover_domain.pyx":520
+  /* "rover_domain.pyx":522
  * 
  *             #  Get intermediate Section Index by discretizing angle
  *             sec_id_temp = cmath.floor(             # <<<<<<<<<<<<<<
@@ -9150,7 +9167,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
  */
   __pyx_v_sec_id_temp = floor(((__pyx_t_25 / __pyx_t_26) * __pyx_v_self->n_obs_sections));
 
-  /* "rover_domain.pyx":526
+  /* "rover_domain.pyx":528
  * 
  *             # Clip and convert to get Section id
  *             sec_id = <Py_ssize_t>min(max(0, sec_id_temp), self.n_obs_sections-1)             # <<<<<<<<<<<<<<
@@ -9173,7 +9190,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
   }
   __pyx_v_sec_id = ((Py_ssize_t)__pyx_t_25);
 
-  /* "rover_domain.pyx":529
+  /* "rover_domain.pyx":531
  * 
  * 
  *             self.rover_observations[rover_id,type_id,sec_id] += val/(dist*dist)             # <<<<<<<<<<<<<<
@@ -9183,9 +9200,9 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
   __pyx_t_25 = (__pyx_v_dist * __pyx_v_dist);
   if (unlikely(__pyx_t_25 == 0)) {
     PyErr_SetString(PyExc_ZeroDivisionError, "float division");
-    __PYX_ERR(0, 529, __pyx_L1_error)
+    __PYX_ERR(0, 531, __pyx_L1_error)
   }
-  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 529, __pyx_L1_error)}
+  if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 531, __pyx_L1_error)}
   __pyx_t_29 = __pyx_v_rover_id;
   __pyx_t_30 = __pyx_v_type_id;
   __pyx_t_31 = __pyx_v_sec_id;
@@ -9204,11 +9221,11 @@ static void __pyx_f_12rover_domain_11RoverDomain_add_to_sensor(struct __pyx_obj_
   } else if (unlikely(__pyx_t_31 >= __pyx_v_self->rover_observations.shape[2])) __pyx_t_10 = 2;
   if (unlikely(__pyx_t_10 != -1)) {
     __Pyx_RaiseBufferIndexError(__pyx_t_10);
-    __PYX_ERR(0, 529, __pyx_L1_error)
+    __PYX_ERR(0, 531, __pyx_L1_error)
   }
   *((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_observations.data + __pyx_t_29 * __pyx_v_self->rover_observations.strides[0]) ) + __pyx_t_30 * __pyx_v_self->rover_observations.strides[1]) ) + __pyx_t_31 * __pyx_v_self->rover_observations.strides[2]) )) += (__pyx_v_val / __pyx_t_25);
 
-  /* "rover_domain.pyx":479
+  /* "rover_domain.pyx":481
  *         return eval
  * 
  *     cpdef void add_to_sensor(self, Py_ssize_t rover_id,             # <<<<<<<<<<<<<<
@@ -9274,29 +9291,29 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_23add_to_sensor(PyObject 
         case  1:
         if (likely((values[1] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_type_id)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, 1); __PYX_ERR(0, 479, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, 1); __PYX_ERR(0, 481, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  2:
         if (likely((values[2] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_other_x)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, 2); __PYX_ERR(0, 479, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, 2); __PYX_ERR(0, 481, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  3:
         if (likely((values[3] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_other_y)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, 3); __PYX_ERR(0, 479, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, 3); __PYX_ERR(0, 481, __pyx_L3_error)
         }
         CYTHON_FALLTHROUGH;
         case  4:
         if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_val)) != 0)) kw_args--;
         else {
-          __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, 4); __PYX_ERR(0, 479, __pyx_L3_error)
+          __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, 4); __PYX_ERR(0, 481, __pyx_L3_error)
         }
       }
       if (unlikely(kw_args > 0)) {
-        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_to_sensor") < 0)) __PYX_ERR(0, 479, __pyx_L3_error)
+        if (unlikely(__Pyx_ParseOptionalKeywords(__pyx_kwds, __pyx_pyargnames, 0, values, pos_args, "add_to_sensor") < 0)) __PYX_ERR(0, 481, __pyx_L3_error)
       }
     } else if (PyTuple_GET_SIZE(__pyx_args) != 5) {
       goto __pyx_L5_argtuple_error;
@@ -9307,15 +9324,15 @@ static PyObject *__pyx_pw_12rover_domain_11RoverDomain_23add_to_sensor(PyObject 
       values[3] = PyTuple_GET_ITEM(__pyx_args, 3);
       values[4] = PyTuple_GET_ITEM(__pyx_args, 4);
     }
-    __pyx_v_rover_id = __Pyx_PyIndex_AsSsize_t(values[0]); if (unlikely((__pyx_v_rover_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 479, __pyx_L3_error)
-    __pyx_v_type_id = __Pyx_PyIndex_AsSsize_t(values[1]); if (unlikely((__pyx_v_type_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 480, __pyx_L3_error)
-    __pyx_v_other_x = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_other_x == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 480, __pyx_L3_error)
-    __pyx_v_other_y = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_other_y == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 480, __pyx_L3_error)
-    __pyx_v_val = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_val == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 480, __pyx_L3_error)
+    __pyx_v_rover_id = __Pyx_PyIndex_AsSsize_t(values[0]); if (unlikely((__pyx_v_rover_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 481, __pyx_L3_error)
+    __pyx_v_type_id = __Pyx_PyIndex_AsSsize_t(values[1]); if (unlikely((__pyx_v_type_id == (Py_ssize_t)-1) && PyErr_Occurred())) __PYX_ERR(0, 482, __pyx_L3_error)
+    __pyx_v_other_x = __pyx_PyFloat_AsDouble(values[2]); if (unlikely((__pyx_v_other_x == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 482, __pyx_L3_error)
+    __pyx_v_other_y = __pyx_PyFloat_AsDouble(values[3]); if (unlikely((__pyx_v_other_y == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 482, __pyx_L3_error)
+    __pyx_v_val = __pyx_PyFloat_AsDouble(values[4]); if (unlikely((__pyx_v_val == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 482, __pyx_L3_error)
   }
   goto __pyx_L4_argument_unpacking_done;
   __pyx_L5_argtuple_error:;
-  __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 479, __pyx_L3_error)
+  __Pyx_RaiseArgtupleInvalid("add_to_sensor", 1, 5, 5, PyTuple_GET_SIZE(__pyx_args)); __PYX_ERR(0, 481, __pyx_L3_error)
   __pyx_L3_error:;
   __Pyx_AddTraceback("rover_domain.RoverDomain.add_to_sensor", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __Pyx_RefNannyFinishContext();
@@ -9334,7 +9351,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_22add_to_sensor(struct __
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("add_to_sensor", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_add_to_sensor(__pyx_v_self, __pyx_v_rover_id, __pyx_v_type_id, __pyx_v_other_x, __pyx_v_other_y, __pyx_v_val, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 479, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_add_to_sensor(__pyx_v_self, __pyx_v_rover_id, __pyx_v_type_id, __pyx_v_other_x, __pyx_v_other_y, __pyx_v_val, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 481, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9351,7 +9368,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_22add_to_sensor(struct __
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":531
+/* "rover_domain.pyx":533
  *             self.rover_observations[rover_id,type_id,sec_id] += val/(dist*dist)
  * 
  *     cpdef void update_observations(self):             # <<<<<<<<<<<<<<
@@ -9387,10 +9404,12 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
   Py_ssize_t __pyx_t_18;
   Py_ssize_t __pyx_t_19;
   Py_ssize_t __pyx_t_20;
-  Py_ssize_t __pyx_t_21;
+  int __pyx_t_21;
   Py_ssize_t __pyx_t_22;
   Py_ssize_t __pyx_t_23;
   Py_ssize_t __pyx_t_24;
+  Py_ssize_t __pyx_t_25;
+  Py_ssize_t __pyx_t_26;
   __Pyx_RefNannySetupContext("update_observations", 0);
   /* Check if called by wrapper */
   if (unlikely(__pyx_skip_dispatch)) ;
@@ -9402,7 +9421,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_observations); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 531, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_observations); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 533, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_25update_observations)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -9418,7 +9437,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 531, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 533, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -9438,7 +9457,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
     #endif
   }
 
-  /* "rover_domain.pyx":536
+  /* "rover_domain.pyx":538
  * 
  *         # Zero all observations
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -9450,7 +9469,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
   for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
     __pyx_v_rover_id = __pyx_t_7;
 
-    /* "rover_domain.pyx":537
+    /* "rover_domain.pyx":539
  *         # Zero all observations
  *         for rover_id in range(self.n_rovers):
  *             for type_id in range(2):             # <<<<<<<<<<<<<<
@@ -9460,7 +9479,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
     for (__pyx_t_8 = 0; __pyx_t_8 < 2; __pyx_t_8+=1) {
       __pyx_v_type_id = __pyx_t_8;
 
-      /* "rover_domain.pyx":538
+      /* "rover_domain.pyx":540
  *         for rover_id in range(self.n_rovers):
  *             for type_id in range(2):
  *                 for section_id in range(self.n_obs_sections):             # <<<<<<<<<<<<<<
@@ -9472,14 +9491,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
       for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
         __pyx_v_section_id = __pyx_t_11;
 
-        /* "rover_domain.pyx":539
+        /* "rover_domain.pyx":541
  *             for type_id in range(2):
  *                 for section_id in range(self.n_obs_sections):
  *                     self.rover_observations[rover_id, type_id, section_id] = 0.             # <<<<<<<<<<<<<<
  * 
  * 
  */
-        if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 539, __pyx_L1_error)}
+        if (unlikely(!__pyx_v_self->rover_observations.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 541, __pyx_L1_error)}
         __pyx_t_12 = __pyx_v_rover_id;
         __pyx_t_13 = __pyx_v_type_id;
         __pyx_t_14 = __pyx_v_section_id;
@@ -9498,14 +9517,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
         } else if (unlikely(__pyx_t_14 >= __pyx_v_self->rover_observations.shape[2])) __pyx_t_15 = 2;
         if (unlikely(__pyx_t_15 != -1)) {
           __Pyx_RaiseBufferIndexError(__pyx_t_15);
-          __PYX_ERR(0, 539, __pyx_L1_error)
+          __PYX_ERR(0, 541, __pyx_L1_error)
         }
         *((double *) ( /* dim=2 */ (( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->rover_observations.data + __pyx_t_12 * __pyx_v_self->rover_observations.strides[0]) ) + __pyx_t_13 * __pyx_v_self->rover_observations.strides[1]) ) + __pyx_t_14 * __pyx_v_self->rover_observations.strides[2]) )) = 0.;
       }
     }
   }
 
-  /* "rover_domain.pyx":542
+  /* "rover_domain.pyx":544
  * 
  * 
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -9517,7 +9536,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
   for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
     __pyx_v_rover_id = __pyx_t_7;
 
-    /* "rover_domain.pyx":546
+    /* "rover_domain.pyx":548
  * 
  *             # Update rover type observations
  *             for other_rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -9529,7 +9548,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_other_rover_id = __pyx_t_11;
 
-      /* "rover_domain.pyx":549
+      /* "rover_domain.pyx":551
  * 
  *                 # agents do not sense self (ergo skip self comparison)
  *                 if rover_id == other_rover_id:             # <<<<<<<<<<<<<<
@@ -9539,7 +9558,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
       __pyx_t_16 = ((__pyx_v_rover_id == __pyx_v_other_rover_id) != 0);
       if (__pyx_t_16) {
 
-        /* "rover_domain.pyx":550
+        /* "rover_domain.pyx":552
  *                 # agents do not sense self (ergo skip self comparison)
  *                 if rover_id == other_rover_id:
  *                     continue             # <<<<<<<<<<<<<<
@@ -9548,7 +9567,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
  */
         goto __pyx_L11_continue;
 
-        /* "rover_domain.pyx":549
+        /* "rover_domain.pyx":551
  * 
  *                 # agents do not sense self (ergo skip self comparison)
  *                 if rover_id == other_rover_id:             # <<<<<<<<<<<<<<
@@ -9557,14 +9576,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
  */
       }
 
-      /* "rover_domain.pyx":553
+      /* "rover_domain.pyx":555
  * 
  *                 self.add_to_sensor(rover_id, 0,
  *                     self.rover_positions[rover_id, 0],             # <<<<<<<<<<<<<<
  *                     self.rover_positions[rover_id, 1], 1.)
  * 
  */
-      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 553, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 555, __pyx_L1_error)}
       __pyx_t_17 = __pyx_v_rover_id;
       __pyx_t_18 = 0;
       __pyx_t_15 = -1;
@@ -9578,17 +9597,17 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
       } else if (unlikely(__pyx_t_18 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_15 = 1;
       if (unlikely(__pyx_t_15 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        __PYX_ERR(0, 553, __pyx_L1_error)
+        __PYX_ERR(0, 555, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":554
+      /* "rover_domain.pyx":556
  *                 self.add_to_sensor(rover_id, 0,
  *                     self.rover_positions[rover_id, 0],
  *                     self.rover_positions[rover_id, 1], 1.)             # <<<<<<<<<<<<<<
  * 
  *             # Update POI type observations
  */
-      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 554, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->rover_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 556, __pyx_L1_error)}
       __pyx_t_19 = __pyx_v_rover_id;
       __pyx_t_20 = 1;
       __pyx_t_15 = -1;
@@ -9602,10 +9621,10 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
       } else if (unlikely(__pyx_t_20 >= __pyx_v_self->rover_positions.shape[1])) __pyx_t_15 = 1;
       if (unlikely(__pyx_t_15 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        __PYX_ERR(0, 554, __pyx_L1_error)
+        __PYX_ERR(0, 556, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":552
+      /* "rover_domain.pyx":554
  *                     continue
  * 
  *                 self.add_to_sensor(rover_id, 0,             # <<<<<<<<<<<<<<
@@ -9616,52 +9635,59 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
       __pyx_L11_continue:;
     }
 
-    /* "rover_domain.pyx":557
+    /* "rover_domain.pyx":559
  * 
  *             # Update POI type observations
  *             for poi_id in range(self.n_pois):             # <<<<<<<<<<<<<<
  * 
- *                 self.add_to_sensor(rover_id, 1,
+ *                 if self.poi_disappear and self.poi_status[poi_id] == False: continue
  */
     __pyx_t_9 = __pyx_v_self->n_pois;
     __pyx_t_10 = __pyx_t_9;
     for (__pyx_t_11 = 0; __pyx_t_11 < __pyx_t_10; __pyx_t_11+=1) {
       __pyx_v_poi_id = __pyx_t_11;
 
-      /* "rover_domain.pyx":560
+      /* "rover_domain.pyx":561
+ *             for poi_id in range(self.n_pois):
+ * 
+ *                 if self.poi_disappear and self.poi_status[poi_id] == False: continue             # <<<<<<<<<<<<<<
+ * 
+ *                 self.add_to_sensor(rover_id, 1,
+ */
+      __pyx_t_21 = __Pyx_PyObject_IsTrue(((PyObject *)__pyx_v_self->poi_disappear)); if (unlikely(__pyx_t_21 < 0)) __PYX_ERR(0, 561, __pyx_L1_error)
+      if (__pyx_t_21) {
+      } else {
+        __pyx_t_16 = __pyx_t_21;
+        goto __pyx_L17_bool_binop_done;
+      }
+      if (unlikely(!__pyx_v_self->poi_status.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 561, __pyx_L1_error)}
+      __pyx_t_22 = __pyx_v_poi_id;
+      __pyx_t_15 = -1;
+      if (__pyx_t_22 < 0) {
+        __pyx_t_22 += __pyx_v_self->poi_status.shape[0];
+        if (unlikely(__pyx_t_22 < 0)) __pyx_t_15 = 0;
+      } else if (unlikely(__pyx_t_22 >= __pyx_v_self->poi_status.shape[0])) __pyx_t_15 = 0;
+      if (unlikely(__pyx_t_15 != -1)) {
+        __Pyx_RaiseBufferIndexError(__pyx_t_15);
+        __PYX_ERR(0, 561, __pyx_L1_error)
+      }
+      __pyx_t_21 = (((*((double *) ( /* dim=0 */ (__pyx_v_self->poi_status.data + __pyx_t_22 * __pyx_v_self->poi_status.strides[0]) ))) == 0) != 0);
+      __pyx_t_16 = __pyx_t_21;
+      __pyx_L17_bool_binop_done:;
+      if (__pyx_t_16) {
+        goto __pyx_L14_continue;
+      }
+
+      /* "rover_domain.pyx":564
  * 
  *                 self.add_to_sensor(rover_id, 1,
  *                     self.poi_positions[poi_id, 0],             # <<<<<<<<<<<<<<
  *                     self.poi_positions[poi_id, 1], 1.)
  * 
  */
-      if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 560, __pyx_L1_error)}
-      __pyx_t_21 = __pyx_v_poi_id;
-      __pyx_t_22 = 0;
-      __pyx_t_15 = -1;
-      if (__pyx_t_21 < 0) {
-        __pyx_t_21 += __pyx_v_self->poi_positions.shape[0];
-        if (unlikely(__pyx_t_21 < 0)) __pyx_t_15 = 0;
-      } else if (unlikely(__pyx_t_21 >= __pyx_v_self->poi_positions.shape[0])) __pyx_t_15 = 0;
-      if (__pyx_t_22 < 0) {
-        __pyx_t_22 += __pyx_v_self->poi_positions.shape[1];
-        if (unlikely(__pyx_t_22 < 0)) __pyx_t_15 = 1;
-      } else if (unlikely(__pyx_t_22 >= __pyx_v_self->poi_positions.shape[1])) __pyx_t_15 = 1;
-      if (unlikely(__pyx_t_15 != -1)) {
-        __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        __PYX_ERR(0, 560, __pyx_L1_error)
-      }
-
-      /* "rover_domain.pyx":561
- *                 self.add_to_sensor(rover_id, 1,
- *                     self.poi_positions[poi_id, 0],
- *                     self.poi_positions[poi_id, 1], 1.)             # <<<<<<<<<<<<<<
- * 
- * 
- */
-      if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 561, __pyx_L1_error)}
+      if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 564, __pyx_L1_error)}
       __pyx_t_23 = __pyx_v_poi_id;
-      __pyx_t_24 = 1;
+      __pyx_t_24 = 0;
       __pyx_t_15 = -1;
       if (__pyx_t_23 < 0) {
         __pyx_t_23 += __pyx_v_self->poi_positions.shape[0];
@@ -9673,21 +9699,46 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_observations(struct __py
       } else if (unlikely(__pyx_t_24 >= __pyx_v_self->poi_positions.shape[1])) __pyx_t_15 = 1;
       if (unlikely(__pyx_t_15 != -1)) {
         __Pyx_RaiseBufferIndexError(__pyx_t_15);
-        __PYX_ERR(0, 561, __pyx_L1_error)
+        __PYX_ERR(0, 564, __pyx_L1_error)
       }
 
-      /* "rover_domain.pyx":559
- *             for poi_id in range(self.n_pois):
+      /* "rover_domain.pyx":565
+ *                 self.add_to_sensor(rover_id, 1,
+ *                     self.poi_positions[poi_id, 0],
+ *                     self.poi_positions[poi_id, 1], 1.)             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+      if (unlikely(!__pyx_v_self->poi_positions.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 565, __pyx_L1_error)}
+      __pyx_t_25 = __pyx_v_poi_id;
+      __pyx_t_26 = 1;
+      __pyx_t_15 = -1;
+      if (__pyx_t_25 < 0) {
+        __pyx_t_25 += __pyx_v_self->poi_positions.shape[0];
+        if (unlikely(__pyx_t_25 < 0)) __pyx_t_15 = 0;
+      } else if (unlikely(__pyx_t_25 >= __pyx_v_self->poi_positions.shape[0])) __pyx_t_15 = 0;
+      if (__pyx_t_26 < 0) {
+        __pyx_t_26 += __pyx_v_self->poi_positions.shape[1];
+        if (unlikely(__pyx_t_26 < 0)) __pyx_t_15 = 1;
+      } else if (unlikely(__pyx_t_26 >= __pyx_v_self->poi_positions.shape[1])) __pyx_t_15 = 1;
+      if (unlikely(__pyx_t_15 != -1)) {
+        __Pyx_RaiseBufferIndexError(__pyx_t_15);
+        __PYX_ERR(0, 565, __pyx_L1_error)
+      }
+
+      /* "rover_domain.pyx":563
+ *                 if self.poi_disappear and self.poi_status[poi_id] == False: continue
  * 
  *                 self.add_to_sensor(rover_id, 1,             # <<<<<<<<<<<<<<
  *                     self.poi_positions[poi_id, 0],
  *                     self.poi_positions[poi_id, 1], 1.)
  */
-      ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->add_to_sensor(__pyx_v_self, __pyx_v_rover_id, 1, (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->poi_positions.data + __pyx_t_21 * __pyx_v_self->poi_positions.strides[0]) ) + __pyx_t_22 * __pyx_v_self->poi_positions.strides[1]) ))), (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->poi_positions.data + __pyx_t_23 * __pyx_v_self->poi_positions.strides[0]) ) + __pyx_t_24 * __pyx_v_self->poi_positions.strides[1]) ))), 1., 0);
+      ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->add_to_sensor(__pyx_v_self, __pyx_v_rover_id, 1, (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->poi_positions.data + __pyx_t_23 * __pyx_v_self->poi_positions.strides[0]) ) + __pyx_t_24 * __pyx_v_self->poi_positions.strides[1]) ))), (*((double *) ( /* dim=1 */ (( /* dim=0 */ (__pyx_v_self->poi_positions.data + __pyx_t_25 * __pyx_v_self->poi_positions.strides[0]) ) + __pyx_t_26 * __pyx_v_self->poi_positions.strides[1]) ))), 1., 0);
+      __pyx_L14_continue:;
     }
   }
 
-  /* "rover_domain.pyx":531
+  /* "rover_domain.pyx":533
  *             self.rover_observations[rover_id,type_id,sec_id] += val/(dist*dist)
  * 
  *     cpdef void update_observations(self):             # <<<<<<<<<<<<<<
@@ -9726,7 +9777,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_24update_observations(str
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("update_observations", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_observations(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 531, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_observations(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 533, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9743,7 +9794,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_24update_observations(str
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":565
+/* "rover_domain.pyx":569
  * 
  * 
  *     cpdef void update_rewards_step_global_eval(self):             # <<<<<<<<<<<<<<
@@ -9769,7 +9820,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_global_eval
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_rewards_step_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 565, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_rewards_step_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_27update_rewards_step_global_eval)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -9785,7 +9836,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_global_eval
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 565, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 569, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -9805,7 +9856,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_global_eval
     #endif
   }
 
-  /* "rover_domain.pyx":568
+  /* "rover_domain.pyx":572
  *         cdef double global_eval
  *         cdef Py_ssize_t rover_id
  *         self.calc_step_global_eval()             # <<<<<<<<<<<<<<
@@ -9814,7 +9865,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_global_eval
  */
   (void)(((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_step_global_eval(__pyx_v_self, 0));
 
-  /* "rover_domain.pyx":565
+  /* "rover_domain.pyx":569
  * 
  * 
  *     cpdef void update_rewards_step_global_eval(self):             # <<<<<<<<<<<<<<
@@ -9853,7 +9904,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_26update_rewards_step_glo
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("update_rewards_step_global_eval", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_rewards_step_global_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 565, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_rewards_step_global_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 569, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -9870,7 +9921,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_26update_rewards_step_glo
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":571
+/* "rover_domain.pyx":575
  * 
  * 
  *     cpdef void update_rewards_step_diff_eval(self):             # <<<<<<<<<<<<<<
@@ -9904,7 +9955,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(s
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_rewards_step_diff_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 571, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_rewards_step_diff_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 575, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_29update_rewards_step_diff_eval)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -9920,7 +9971,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(s
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 571, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 575, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -9940,7 +9991,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(s
     #endif
   }
 
-  /* "rover_domain.pyx":575
+  /* "rover_domain.pyx":579
  *         cdef Py_ssize_t rover_id
  * 
  *         global_eval = self.calc_step_global_eval()             # <<<<<<<<<<<<<<
@@ -9949,7 +10000,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(s
  */
   __pyx_v_global_eval = ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_step_global_eval(__pyx_v_self, 0);
 
-  /* "rover_domain.pyx":576
+  /* "rover_domain.pyx":580
  * 
  *         global_eval = self.calc_step_global_eval()
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -9961,7 +10012,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(s
   for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
     __pyx_v_rover_id = __pyx_t_7;
 
-    /* "rover_domain.pyx":577
+    /* "rover_domain.pyx":581
  *         global_eval = self.calc_step_global_eval()
  *         for rover_id in range(self.n_rovers):
  *             cfact_global_eval = self.calc_step_cfact_global_eval(rover_id)             # <<<<<<<<<<<<<<
@@ -9970,14 +10021,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(s
  */
     __pyx_v_cfact_global_eval = ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_step_cfact_global_eval(__pyx_v_self, __pyx_v_rover_id, 0);
 
-    /* "rover_domain.pyx":578
+    /* "rover_domain.pyx":582
  *         for rover_id in range(self.n_rovers):
  *             cfact_global_eval = self.calc_step_cfact_global_eval(rover_id)
  *             self.rover_rewards[rover_id] = global_eval - cfact_global_eval             # <<<<<<<<<<<<<<
  * 
  *     cpdef void update_rewards_traj_global_eval(self):
  */
-    if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 578, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 582, __pyx_L1_error)}
     __pyx_t_8 = __pyx_v_rover_id;
     __pyx_t_9 = -1;
     if (__pyx_t_8 < 0) {
@@ -9986,12 +10037,12 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(s
     } else if (unlikely(__pyx_t_8 >= __pyx_v_self->rover_rewards.shape[0])) __pyx_t_9 = 0;
     if (unlikely(__pyx_t_9 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_9);
-      __PYX_ERR(0, 578, __pyx_L1_error)
+      __PYX_ERR(0, 582, __pyx_L1_error)
     }
     *((double *) ( /* dim=0 */ (__pyx_v_self->rover_rewards.data + __pyx_t_8 * __pyx_v_self->rover_rewards.strides[0]) )) = (__pyx_v_global_eval - __pyx_v_cfact_global_eval);
   }
 
-  /* "rover_domain.pyx":571
+  /* "rover_domain.pyx":575
  * 
  * 
  *     cpdef void update_rewards_step_diff_eval(self):             # <<<<<<<<<<<<<<
@@ -10030,7 +10081,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_28update_rewards_step_dif
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("update_rewards_step_diff_eval", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 571, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_rewards_step_diff_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 575, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10047,7 +10098,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_28update_rewards_step_dif
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":580
+/* "rover_domain.pyx":584
  *             self.rover_rewards[rover_id] = global_eval - cfact_global_eval
  * 
  *     cpdef void update_rewards_traj_global_eval(self):             # <<<<<<<<<<<<<<
@@ -10080,7 +10131,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_global_eval
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_rewards_traj_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 580, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_rewards_traj_global_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 584, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_31update_rewards_traj_global_eval)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -10096,7 +10147,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_global_eval
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 580, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 584, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10116,7 +10167,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_global_eval
     #endif
   }
 
-  /* "rover_domain.pyx":584
+  /* "rover_domain.pyx":588
  *         cdef Py_ssize_t rover_id
  * 
  *         global_eval = self.calc_traj_global_eval()             # <<<<<<<<<<<<<<
@@ -10125,7 +10176,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_global_eval
  */
   __pyx_v_global_eval = ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_traj_global_eval(__pyx_v_self, 0);
 
-  /* "rover_domain.pyx":585
+  /* "rover_domain.pyx":589
  * 
  *         global_eval = self.calc_traj_global_eval()
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -10137,14 +10188,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_global_eval
   for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
     __pyx_v_rover_id = __pyx_t_7;
 
-    /* "rover_domain.pyx":586
+    /* "rover_domain.pyx":590
  *         global_eval = self.calc_traj_global_eval()
  *         for rover_id in range(self.n_rovers):
  *             self.rover_rewards[rover_id] = global_eval             # <<<<<<<<<<<<<<
  * 
  *     cpdef void update_rewards_traj_diff_eval(self):
  */
-    if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 586, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 590, __pyx_L1_error)}
     __pyx_t_8 = __pyx_v_rover_id;
     __pyx_t_9 = -1;
     if (__pyx_t_8 < 0) {
@@ -10153,12 +10204,12 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_global_eval
     } else if (unlikely(__pyx_t_8 >= __pyx_v_self->rover_rewards.shape[0])) __pyx_t_9 = 0;
     if (unlikely(__pyx_t_9 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_9);
-      __PYX_ERR(0, 586, __pyx_L1_error)
+      __PYX_ERR(0, 590, __pyx_L1_error)
     }
     *((double *) ( /* dim=0 */ (__pyx_v_self->rover_rewards.data + __pyx_t_8 * __pyx_v_self->rover_rewards.strides[0]) )) = __pyx_v_global_eval;
   }
 
-  /* "rover_domain.pyx":580
+  /* "rover_domain.pyx":584
  *             self.rover_rewards[rover_id] = global_eval - cfact_global_eval
  * 
  *     cpdef void update_rewards_traj_global_eval(self):             # <<<<<<<<<<<<<<
@@ -10197,7 +10248,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_30update_rewards_traj_glo
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("update_rewards_traj_global_eval", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_global_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 580, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_global_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 584, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -10214,7 +10265,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_30update_rewards_traj_glo
   return __pyx_r;
 }
 
-/* "rover_domain.pyx":588
+/* "rover_domain.pyx":592
  *             self.rover_rewards[rover_id] = global_eval
  * 
  *     cpdef void update_rewards_traj_diff_eval(self):             # <<<<<<<<<<<<<<
@@ -10248,7 +10299,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(s
     else {
       PY_UINT64_T type_dict_guard = (likely(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict)) ? __PYX_GET_DICT_VERSION(Py_TYPE(((PyObject *)__pyx_v_self))->tp_dict) : 0;
       #endif
-      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_rewards_traj_diff_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L1_error)
+      __pyx_t_1 = __Pyx_PyObject_GetAttrStr(((PyObject *)__pyx_v_self), __pyx_n_s_update_rewards_traj_diff_eval); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 592, __pyx_L1_error)
       __Pyx_GOTREF(__pyx_t_1);
       if (!PyCFunction_Check(__pyx_t_1) || (PyCFunction_GET_FUNCTION(__pyx_t_1) != (PyCFunction)(void*)__pyx_pw_12rover_domain_11RoverDomain_33update_rewards_traj_diff_eval)) {
         __Pyx_INCREF(__pyx_t_1);
@@ -10264,7 +10315,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(s
         }
         __pyx_t_2 = (__pyx_t_4) ? __Pyx_PyObject_CallOneArg(__pyx_t_3, __pyx_t_4) : __Pyx_PyObject_CallNoArg(__pyx_t_3);
         __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
-        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 588, __pyx_L1_error)
+        if (unlikely(!__pyx_t_2)) __PYX_ERR(0, 592, __pyx_L1_error)
         __Pyx_GOTREF(__pyx_t_2);
         __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
         __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
@@ -10284,7 +10335,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(s
     #endif
   }
 
-  /* "rover_domain.pyx":592
+  /* "rover_domain.pyx":596
  *         cdef Py_ssize_t rover_id
  * 
  *         global_eval = self.calc_traj_global_eval()             # <<<<<<<<<<<<<<
@@ -10293,7 +10344,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(s
  */
   __pyx_v_global_eval = ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_traj_global_eval(__pyx_v_self, 0);
 
-  /* "rover_domain.pyx":593
+  /* "rover_domain.pyx":597
  * 
  *         global_eval = self.calc_traj_global_eval()
  *         for rover_id in range(self.n_rovers):             # <<<<<<<<<<<<<<
@@ -10305,7 +10356,7 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(s
   for (__pyx_t_7 = 0; __pyx_t_7 < __pyx_t_6; __pyx_t_7+=1) {
     __pyx_v_rover_id = __pyx_t_7;
 
-    /* "rover_domain.pyx":594
+    /* "rover_domain.pyx":598
  *         global_eval = self.calc_traj_global_eval()
  *         for rover_id in range(self.n_rovers):
  *             cfact_global_eval = self.calc_traj_cfact_global_eval(rover_id)             # <<<<<<<<<<<<<<
@@ -10314,14 +10365,14 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(s
  */
     __pyx_v_cfact_global_eval = ((struct __pyx_vtabstruct_12rover_domain_RoverDomain *)__pyx_v_self->__pyx_vtab)->calc_traj_cfact_global_eval(__pyx_v_self, __pyx_v_rover_id, 0);
 
-    /* "rover_domain.pyx":595
+    /* "rover_domain.pyx":599
  *         for rover_id in range(self.n_rovers):
  *             cfact_global_eval = self.calc_traj_cfact_global_eval(rover_id)
  *             self.rover_rewards[rover_id] = global_eval - cfact_global_eval             # <<<<<<<<<<<<<<
  * 
  * 
  */
-    if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 595, __pyx_L1_error)}
+    if (unlikely(!__pyx_v_self->rover_rewards.memview)) {PyErr_SetString(PyExc_AttributeError,"Memoryview is not initialized");__PYX_ERR(0, 599, __pyx_L1_error)}
     __pyx_t_8 = __pyx_v_rover_id;
     __pyx_t_9 = -1;
     if (__pyx_t_8 < 0) {
@@ -10330,12 +10381,12 @@ static void __pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(s
     } else if (unlikely(__pyx_t_8 >= __pyx_v_self->rover_rewards.shape[0])) __pyx_t_9 = 0;
     if (unlikely(__pyx_t_9 != -1)) {
       __Pyx_RaiseBufferIndexError(__pyx_t_9);
-      __PYX_ERR(0, 595, __pyx_L1_error)
+      __PYX_ERR(0, 599, __pyx_L1_error)
     }
     *((double *) ( /* dim=0 */ (__pyx_v_self->rover_rewards.data + __pyx_t_8 * __pyx_v_self->rover_rewards.strides[0]) )) = (__pyx_v_global_eval - __pyx_v_cfact_global_eval);
   }
 
-  /* "rover_domain.pyx":588
+  /* "rover_domain.pyx":592
  *             self.rover_rewards[rover_id] = global_eval
  * 
  *     cpdef void update_rewards_traj_diff_eval(self):             # <<<<<<<<<<<<<<
@@ -10374,7 +10425,7 @@ static PyObject *__pyx_pf_12rover_domain_11RoverDomain_32update_rewards_traj_dif
   PyObject *__pyx_t_1 = NULL;
   __Pyx_RefNannySetupContext("update_rewards_traj_diff_eval", 0);
   __Pyx_XDECREF(__pyx_r);
-  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 588, __pyx_L1_error)
+  __pyx_t_1 = __Pyx_void_to_None(__pyx_f_12rover_domain_11RoverDomain_update_rewards_traj_diff_eval(__pyx_v_self, 1)); if (unlikely(!__pyx_t_1)) __PYX_ERR(0, 592, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_t_1);
   __pyx_r = __pyx_t_1;
   __pyx_t_1 = 0;
@@ -12334,7 +12385,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain_11poi_turnoff_4__del__(struct _
  *     cdef public bool poi_turnoff
  *     cdef public double[:] poi_status             # <<<<<<<<<<<<<<
  *     cdef public double[:] rover_local_rewards
- * 
+ *     cdef public bool poi_disappear
  */
 
 /* Python wrapper */
@@ -12414,7 +12465,7 @@ static int __pyx_pf_12rover_domain_11RoverDomain_10poi_status_2__set__(struct __
  *     cdef public bool poi_turnoff
  *     cdef public double[:] poi_status
  *     cdef public double[:] rover_local_rewards             # <<<<<<<<<<<<<<
- * 
+ *     cdef public bool poi_disappear
  * 
  */
 
@@ -12487,6 +12538,111 @@ static int __pyx_pf_12rover_domain_11RoverDomain_19rover_local_rewards_2__set__(
   __Pyx_AddTraceback("rover_domain.RoverDomain.rover_local_rewards.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
   __pyx_r = -1;
   __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* "rover_domain.pyx":59
+ *     cdef public double[:] poi_status
+ *     cdef public double[:] rover_local_rewards
+ *     cdef public bool poi_disappear             # <<<<<<<<<<<<<<
+ * 
+ * 
+ */
+
+/* Python wrapper */
+static PyObject *__pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_1__get__(PyObject *__pyx_v_self); /*proto*/
+static PyObject *__pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_1__get__(PyObject *__pyx_v_self) {
+  PyObject *__pyx_r = 0;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_12rover_domain_11RoverDomain_13poi_disappear___get__(((struct __pyx_obj_12rover_domain_RoverDomain *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static PyObject *__pyx_pf_12rover_domain_11RoverDomain_13poi_disappear___get__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self) {
+  PyObject *__pyx_r = NULL;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__get__", 0);
+  __Pyx_XDECREF(__pyx_r);
+  __Pyx_INCREF(((PyObject *)__pyx_v_self->poi_disappear));
+  __pyx_r = ((PyObject *)__pyx_v_self->poi_disappear);
+  goto __pyx_L0;
+
+  /* function exit code */
+  __pyx_L0:;
+  __Pyx_XGIVEREF(__pyx_r);
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value); /*proto*/
+static int __pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_3__set__(PyObject *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__set__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_12rover_domain_11RoverDomain_13poi_disappear_2__set__(((struct __pyx_obj_12rover_domain_RoverDomain *)__pyx_v_self), ((PyObject *)__pyx_v_value));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_12rover_domain_11RoverDomain_13poi_disappear_2__set__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self, PyObject *__pyx_v_value) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  PyObject *__pyx_t_1 = NULL;
+  __Pyx_RefNannySetupContext("__set__", 0);
+  if (!(likely(((__pyx_v_value) == Py_None) || likely(__Pyx_TypeTest(__pyx_v_value, __pyx_ptype_7cpython_4bool_bool))))) __PYX_ERR(0, 59, __pyx_L1_error)
+  __pyx_t_1 = __pyx_v_value;
+  __Pyx_INCREF(__pyx_t_1);
+  __Pyx_GIVEREF(__pyx_t_1);
+  __Pyx_GOTREF(__pyx_v_self->poi_disappear);
+  __Pyx_DECREF(((PyObject *)__pyx_v_self->poi_disappear));
+  __pyx_v_self->poi_disappear = ((PyBoolObject *)__pyx_t_1);
+  __pyx_t_1 = 0;
+
+  /* function exit code */
+  __pyx_r = 0;
+  goto __pyx_L0;
+  __pyx_L1_error:;
+  __Pyx_XDECREF(__pyx_t_1);
+  __Pyx_AddTraceback("rover_domain.RoverDomain.poi_disappear.__set__", __pyx_clineno, __pyx_lineno, __pyx_filename);
+  __pyx_r = -1;
+  __pyx_L0:;
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+/* Python wrapper */
+static int __pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_5__del__(PyObject *__pyx_v_self); /*proto*/
+static int __pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_5__del__(PyObject *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__ (wrapper)", 0);
+  __pyx_r = __pyx_pf_12rover_domain_11RoverDomain_13poi_disappear_4__del__(((struct __pyx_obj_12rover_domain_RoverDomain *)__pyx_v_self));
+
+  /* function exit code */
+  __Pyx_RefNannyFinishContext();
+  return __pyx_r;
+}
+
+static int __pyx_pf_12rover_domain_11RoverDomain_13poi_disappear_4__del__(struct __pyx_obj_12rover_domain_RoverDomain *__pyx_v_self) {
+  int __pyx_r;
+  __Pyx_RefNannyDeclarations
+  __Pyx_RefNannySetupContext("__del__", 0);
+  __Pyx_INCREF(Py_None);
+  __Pyx_GIVEREF(Py_None);
+  __Pyx_GOTREF(__pyx_v_self->poi_disappear);
+  __Pyx_DECREF(((PyObject *)__pyx_v_self->poi_disappear));
+  __pyx_v_self->poi_disappear = ((PyBoolObject *)Py_None);
+
+  /* function exit code */
+  __pyx_r = 0;
   __Pyx_RefNannyFinishContext();
   return __pyx_r;
 }
@@ -25389,6 +25545,7 @@ static PyObject *__pyx_tp_new_12rover_domain_RoverDomain(PyTypeObject *t, CYTHON
   p->discounts_eval = ((PyBoolObject *)Py_None); Py_INCREF(Py_None);
   p->reward_structure = ((PyObject*)Py_None); Py_INCREF(Py_None);
   p->poi_turnoff = ((PyBoolObject *)Py_None); Py_INCREF(Py_None);
+  p->poi_disappear = ((PyBoolObject *)Py_None); Py_INCREF(Py_None);
   p->init_rover_positions.data = NULL;
   p->init_rover_positions.memview = NULL;
   p->init_rover_orientations.data = NULL;
@@ -25431,6 +25588,7 @@ static void __pyx_tp_dealloc_12rover_domain_RoverDomain(PyObject *o) {
   Py_CLEAR(p->discounts_eval);
   Py_CLEAR(p->reward_structure);
   Py_CLEAR(p->poi_turnoff);
+  Py_CLEAR(p->poi_disappear);
   __PYX_XDEC_MEMVIEW(&p->init_rover_positions, 1);
   __PYX_XDEC_MEMVIEW(&p->init_rover_orientations, 1);
   __PYX_XDEC_MEMVIEW(&p->rover_positions, 1);
@@ -25460,6 +25618,9 @@ static int __pyx_tp_traverse_12rover_domain_RoverDomain(PyObject *o, visitproc v
   if (p->poi_turnoff) {
     e = (*v)(((PyObject *)p->poi_turnoff), a); if (e) return e;
   }
+  if (p->poi_disappear) {
+    e = (*v)(((PyObject *)p->poi_disappear), a); if (e) return e;
+  }
   return 0;
 }
 
@@ -25477,6 +25638,9 @@ static int __pyx_tp_clear_12rover_domain_RoverDomain(PyObject *o) {
   Py_XDECREF(tmp);
   tmp = ((PyObject*)p->poi_turnoff);
   p->poi_turnoff = ((PyBoolObject *)Py_None); Py_INCREF(Py_None);
+  Py_XDECREF(tmp);
+  tmp = ((PyObject*)p->poi_disappear);
+  p->poi_disappear = ((PyBoolObject *)Py_None); Py_INCREF(Py_None);
   Py_XDECREF(tmp);
   return 0;
 }
@@ -25826,6 +25990,19 @@ static int __pyx_setprop_12rover_domain_11RoverDomain_rover_local_rewards(PyObje
   }
 }
 
+static PyObject *__pyx_getprop_12rover_domain_11RoverDomain_poi_disappear(PyObject *o, CYTHON_UNUSED void *x) {
+  return __pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_1__get__(o);
+}
+
+static int __pyx_setprop_12rover_domain_11RoverDomain_poi_disappear(PyObject *o, PyObject *v, CYTHON_UNUSED void *x) {
+  if (v) {
+    return __pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_3__set__(o, v);
+  }
+  else {
+    return __pyx_pw_12rover_domain_11RoverDomain_13poi_disappear_5__del__(o);
+  }
+}
+
 static PyMethodDef __pyx_methods_12rover_domain_RoverDomain[] = {
   {"reset", (PyCFunction)__pyx_pw_12rover_domain_11RoverDomain_3reset, METH_NOARGS, 0},
   {"stop_prematurely", (PyCFunction)__pyx_pw_12rover_domain_11RoverDomain_5stop_prematurely, METH_NOARGS, 0},
@@ -25874,6 +26051,7 @@ static struct PyGetSetDef __pyx_getsets_12rover_domain_RoverDomain[] = {
   {(char *)"poi_turnoff", __pyx_getprop_12rover_domain_11RoverDomain_poi_turnoff, __pyx_setprop_12rover_domain_11RoverDomain_poi_turnoff, (char *)0, 0},
   {(char *)"poi_status", __pyx_getprop_12rover_domain_11RoverDomain_poi_status, __pyx_setprop_12rover_domain_11RoverDomain_poi_status, (char *)0, 0},
   {(char *)"rover_local_rewards", __pyx_getprop_12rover_domain_11RoverDomain_rover_local_rewards, __pyx_setprop_12rover_domain_11RoverDomain_rover_local_rewards, (char *)0, 0},
+  {(char *)"poi_disappear", __pyx_getprop_12rover_domain_11RoverDomain_poi_disappear, __pyx_setprop_12rover_domain_11RoverDomain_poi_disappear, (char *)0, 0},
   {0, 0, 0, 0, 0}
 };
 
@@ -26784,8 +26962,8 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {0, 0, 0, 0, 0, 0, 0}
 };
 static CYTHON_SMALL_CODE int __Pyx_InitCachedBuiltins(void) {
-  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 126, __pyx_L1_error)
-  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 208, __pyx_L1_error)
+  __pyx_builtin_ValueError = __Pyx_GetBuiltinName(__pyx_n_s_ValueError); if (!__pyx_builtin_ValueError) __PYX_ERR(0, 128, __pyx_L1_error)
+  __pyx_builtin_range = __Pyx_GetBuiltinName(__pyx_n_s_range); if (!__pyx_builtin_range) __PYX_ERR(0, 210, __pyx_L1_error)
   __pyx_builtin_TypeError = __Pyx_GetBuiltinName(__pyx_n_s_TypeError); if (!__pyx_builtin_TypeError) __PYX_ERR(1, 2, __pyx_L1_error)
   __pyx_builtin_MemoryError = __Pyx_GetBuiltinName(__pyx_n_s_MemoryError); if (!__pyx_builtin_MemoryError) __PYX_ERR(1, 148, __pyx_L1_error)
   __pyx_builtin_enumerate = __Pyx_GetBuiltinName(__pyx_n_s_enumerate); if (!__pyx_builtin_enumerate) __PYX_ERR(1, 151, __pyx_L1_error)
@@ -26801,47 +26979,47 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("__Pyx_InitCachedConstants", 0);
 
-  /* "rover_domain.pyx":126
+  /* "rover_domain.pyx":128
  *         # match init_rover_positions.shape[0]), we need to raise an error
  *         if self.init_rover_positions.shape[0] != self.n_rovers:
  *             raise ValueError(             # <<<<<<<<<<<<<<
  *                 'Number of rovers does not match number of initial '
  *                 + 'rover positions')
  */
-  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_Number_of_rovers_does_not_match); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 126, __pyx_L1_error)
+  __pyx_tuple_ = PyTuple_Pack(1, __pyx_kp_u_Number_of_rovers_does_not_match); if (unlikely(!__pyx_tuple_)) __PYX_ERR(0, 128, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple_);
   __Pyx_GIVEREF(__pyx_tuple_);
 
-  /* "rover_domain.pyx":130
+  /* "rover_domain.pyx":132
  *                 + 'rover positions')
  *         if self.init_rover_orientations.shape[0] != self.n_rovers:
  *             raise ValueError(             # <<<<<<<<<<<<<<
  *                 'Number of rovers does not match number of initial '
  *                 + 'rover orientations')
  */
-  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_Number_of_rovers_does_not_match_2); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 130, __pyx_L1_error)
+  __pyx_tuple__2 = PyTuple_Pack(1, __pyx_kp_u_Number_of_rovers_does_not_match_2); if (unlikely(!__pyx_tuple__2)) __PYX_ERR(0, 132, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__2);
   __Pyx_GIVEREF(__pyx_tuple__2);
 
-  /* "rover_domain.pyx":134
+  /* "rover_domain.pyx":136
  *                 + 'rover orientations')
  *         if self.poi_values.shape[0] != self.n_pois:
  *             raise ValueError(             # <<<<<<<<<<<<<<
  *                 'Number of POIs does not match number of POI values')
  *         if self.poi_positions.shape[0] != self.n_pois:
  */
-  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_Number_of_POIs_does_not_match_nu); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 134, __pyx_L1_error)
+  __pyx_tuple__3 = PyTuple_Pack(1, __pyx_kp_u_Number_of_POIs_does_not_match_nu); if (unlikely(!__pyx_tuple__3)) __PYX_ERR(0, 136, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__3);
   __Pyx_GIVEREF(__pyx_tuple__3);
 
-  /* "rover_domain.pyx":137
+  /* "rover_domain.pyx":139
  *                 'Number of POIs does not match number of POI values')
  *         if self.poi_positions.shape[0] != self.n_pois:
  *             raise ValueError(             # <<<<<<<<<<<<<<
  *                 'Number of POIs does not match number of POI positions')
  * 
  */
-  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_Number_of_POIs_does_not_match_nu_2); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 137, __pyx_L1_error)
+  __pyx_tuple__4 = PyTuple_Pack(1, __pyx_kp_u_Number_of_POIs_does_not_match_nu_2); if (unlikely(!__pyx_tuple__4)) __PYX_ERR(0, 139, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__4);
   __Pyx_GIVEREF(__pyx_tuple__4);
 

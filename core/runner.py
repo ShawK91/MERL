@@ -65,8 +65,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
                     env.render()
 
                 #Push experiences to main
-                for agent_id, buffer in enumerate(data_bucket):
-                    for entry in rollout_trajectory[agent_id]: buffer.append(entry)
+                if store_transitions:
+                    for agent_id, buffer in enumerate(data_bucket):
+                        for entry in rollout_trajectory[agent_id]: buffer.append(entry)
 
                 break
 

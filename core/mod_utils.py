@@ -20,7 +20,7 @@ class Tracker(): #Tracker
         self.foldername = save_folder
         self.all_tracker = [[[],0.0,[]] for _ in vars_string] #[Id of var tracked][fitnesses, avg_fitness, csv_fitnesses]
         self.counter = 0
-        self.conv_size = 25
+        self.conv_size = 1
         if not os.path.exists(self.foldername):
             os.makedirs(self.foldername)
 
@@ -198,6 +198,20 @@ def pprint(l):
     else:
         if l == None: return None
         else: return '%.2f'%l
+
+def list_stat(l):
+    """compute avergae from a list
+
+    Parameters:
+        l (list): list
+
+    Returns:
+        mean (float): mean
+    """
+    if len(l) == 0: return None
+    else:
+        arr = np.array(l)
+        return '%.2f'%np.min(arr), '%.2f'%np.max(arr), '%.2f'%np.mean(arr), '%.2f'%np.std(arr)
 
 
 # def process_dict(state_desc):

@@ -1,9 +1,10 @@
-from core.agent import Agent
+from core.agent import Agent, TestAgent
 from core.mod_utils import list_mean, pprint, str2bool
 import numpy as np, os, time, random, torch
 from core import mod_utils as utils
 from core.runner import rollout_worker
 from torch.multiprocessing import Process, Pipe, Manager
+import core.mod_utils as mod
 import argparse
 import random
 import threading
@@ -12,16 +13,16 @@ import threading
 #ARGPARSE
 if True:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
-    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
-    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
+    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
+    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
-    parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
-    parser.add_argument('-agents', type=int,  help='#agents',  default=2)
-    parser.add_argument('-pois', type=int,  help='#POIs',  default=1)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=2)
-    parser.add_argument('-eplen', type=int,  help='eplen',  default=20)
+    parser.add_argument('-dim', type=int,  help='World dimension',  default=10)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=1)
+    parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
+    parser.add_argument('-eplen', type=int,  help='eplen',  default=30)
     parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=45)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
@@ -99,6 +100,7 @@ class Parameters:
         #Dependents
         self.state_dim = int(720 / self.angle_res)
         self.action_dim = 2
+        self.num_test = 10
 
         #Save Filenames
         self.save_foldername = 'R_MERL/'
@@ -137,12 +139,14 @@ class MERL:
 
         ######### Initialize the Multiagent Team of agents ########
         self.agents = [Agent(self.args, id) for id in range(self.args.num_agents)]
+        self.test_agent = TestAgent(self.args, 991)
 
 
         ###### Buffer and Model Bucket as references to the corresponding agent's attributes ####
         self.buffer_bucket = [ag.buffer.tuples for ag in self.agents]
         self.popn_bucket = [ag.popn for ag in self.agents]
         self.rollout_bucket = [ag.rollout_actor for ag in self.agents]
+        self.test_bucket = [self.test_agent.rollout_actor for _ in range(args.num_agents)]
 
 
         ######### EVOLUTIONARY WORKERS ############
@@ -160,6 +164,13 @@ class MERL:
                                                                    self.buffer_bucket, self.rollout_bucket, USE_PG)) for i in range(args.rollout_size)]
         for worker in self.pg_workers: worker.start()
 
+        ######### TEST WORKERS ############
+        self.test_task_pipes = [Pipe() for _ in range(args.num_test)]
+        self.test_result_pipes = [Pipe() for _ in range(args.num_test)]
+        self.test_workers = [Process(target=rollout_worker, args=(self.args, i, 'test', self.test_task_pipes[i][1], self.test_result_pipes[i][0],
+                                                                   None, self.test_bucket, False)) for i in range(args.num_test)]
+        for worker in self.test_workers: worker.start()
+
 
         #### STATS AND TRACKING WHICH ROLLOUT IS DONE ######
         self.best_score = -999; self.total_frames = 0; self.gen_frames = 0
@@ -174,7 +185,7 @@ class MERL:
         return teams
 
 
-    def train(self):
+    def train(self, gen, test_tracker):
         """Main training loop to do rollouts and run policy gradients
 
             Parameters:
@@ -184,13 +195,21 @@ class MERL:
                 None
         """
 
+
+        #Test Rollout
+        if gen % 5 == 0:
+            self.test_agent.make_champ_team(self.agents) #Sync the champ policies into the TestAgent
+            test_team = [0 for _ in range(self.args.num_agents)]
+            for pipe in self.test_task_pipes:
+                pipe[0].send(test_team)
+
+
         #Figure out teams for Coevolution
         teams = self.make_teams(args.num_agents, args.popn_size)
 
         ########## START EVO ROLLOUT ##########
         for pipe, team in zip(self.evo_task_pipes, teams):
             pipe[0].send(team)
-
 
 
         ########## START POLICY GRADIENT ROLLOUT ##########
@@ -225,10 +244,25 @@ class MERL:
 
 
         ####### JOIN PG ROLLOUTS ########
+        pg_fits = []
         if USE_PG:
             for pipe in self.pg_result_pipes:
-                _ = pipe[1].recv()
+                entry = pipe[1].recv()
+                pg_fits.append(entry[1][0])
 
+
+        ####### JOIN TEST ROLLOUTS ########
+        test_fits = []
+        if gen % 5 == 0:
+            for pipe in self.test_result_pipes:
+                entry = pipe[1].recv()
+                test_fits.append(entry[1][0])
+            test_tracker.update([mod.list_mean(test_fits)], gen)
+
+
+        #Evolution Step
+        for agent in self.agents:
+            agent.evolve()
 
         # #Save models periodically
         # if gen % 20 == 0:
@@ -237,7 +271,7 @@ class MERL:
         #         torch.save(self.agents[rover_id].actor.state_dict(), self.args.model_save + self.args.actor_fname + '_'+ str(rover_id))
         #     print("Models Saved")
 
-        return max(all_fits)
+        return all_fits, pg_fits, test_fits
 
 
 
@@ -245,7 +279,7 @@ class MERL:
 
 if __name__ == "__main__":
     args = Parameters()  # Create the Parameters class
-    gen_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
+    test_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
     torch.manual_seed(SEED); np.random.seed(SEED); random.seed(SEED)    #Seeds
 
     # INITIALIZE THE MAIN AGENT CLASS
@@ -257,22 +291,23 @@ if __name__ == "__main__":
     for gen in range(1, 1000000000): #RUN VIRTUALLY FOREVER
 
         #ONE EPOCH OF TRAINING
-        best_score = ai.train()
+        popn_fits, pg_fits, test_fits = ai.train(gen, test_tracker)
 
 
         #PRINT PROGRESS
-        print('Ep:', gen, 'Gen_best/Avg:', pprint(best_score), pprint(gen_tracker.all_tracker[0][1]) ,
-              'FPS:',pprint(ai.agents[0].buffer.total_frames/(time.time()-time_start)),
+        print('Ep:', gen, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:', mod.list_stat(pg_fits),
+              'Average:',pprint(test_tracker.all_tracker[0][1]), 'FPS:',pprint(ai.agents[0].buffer.total_frames/(time.time()-time_start)),
               '#Samples seen:', ai.agents[0].buffer.total_frames,
               )
 
-        if gen % 7 ==0:
+        if gen % 5 ==0:
             print()
+            print('Test_stat:', mod.list_stat(test_fits))
             print('SAVETAG:  ',SAVE_TAG)
             print()
 
 
-        gen_tracker.update([best_score], gen)
+
 
 
 
