@@ -115,7 +115,7 @@ class TestAgent:
 
 	def make_champ_team(self, agents):
 		for agent_id, agent in enumerate(agents):
-			if self.args.pop_size < 2: #Testing without Evo
+			if self.args.popn_size < 2: #Testing without Evo
 				agent.update_rollout_actor()
 				mod.hard_update(self.rollout_actor[agent_id], agent.rollout_actor[0])
 			else:
