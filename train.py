@@ -19,11 +19,11 @@ if True:
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
     parser.add_argument('-dim', type=int,  help='World dimension',  default=20)
-    parser.add_argument('-agents', type=int,  help='#agents',  default=2)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=10)
     parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
-    parser.add_argument('-eplen', type=int,  help='eplen',  default=30)
-    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=10)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=5)
+    parser.add_argument('-eplen', type=int,  help='eplen',  default=50)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=1)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
     parser.add_argument('-savetag', help='Saved tag',  default='')
@@ -43,6 +43,7 @@ if True:
     NUM_AGENTS = vars(parser.parse_args())['agents']
 
     CUDA = True
+    TEST_GAP = 5
     SAVE_TAG = SAVE_TAG + \
                '_pop' + str(POP_SIZE)+ \
                '_roll' + str(ROLLOUT_SIZE) + \
@@ -146,7 +147,7 @@ class MERL:
         self.buffer_bucket = [ag.buffer.tuples for ag in self.agents]
         self.popn_bucket = [ag.popn for ag in self.agents]
         self.rollout_bucket = [ag.rollout_actor for ag in self.agents]
-        self.test_bucket = [self.test_agent.rollout_actor for _ in range(args.num_agents)]
+        self.test_bucket = self.test_agent.rollout_actor
 
 
         ######### EVOLUTIONARY WORKERS ############
@@ -197,11 +198,11 @@ class MERL:
 
 
         #Test Rollout
-        if gen % 5 == 0:
+        if gen % TEST_GAP == 0:
             self.test_agent.make_champ_team(self.agents) #Sync the champ policies into the TestAgent
-            test_team = [0 for _ in range(self.args.num_agents)]
-            for pipe in self.test_task_pipes:
-                pipe[0].send(test_team)
+            #test_team = [0 for _ in range(self.args.num_agents)]
+            for i, pipe in enumerate(self.test_task_pipes):
+                pipe[0].send(None)
 
 
         #Figure out teams for Coevolution
@@ -255,7 +256,7 @@ class MERL:
 
         ####### JOIN TEST ROLLOUTS ########
         test_fits = []
-        if gen % 5 == 0:
+        if gen % TEST_GAP == 0:
             for pipe in self.test_result_pipes:
                 entry = pipe[1].recv()
                 test_fits.append(entry[1][0])

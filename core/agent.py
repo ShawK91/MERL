@@ -110,7 +110,7 @@ class TestAgent:
 		self.manager = Manager()
 		self.rollout_actor = self.manager.list()
 		for _ in range(args.num_agents):
-			self.rollout_actor.append(Actor(args.state_dim, args.action_dim))
+				self.rollout_actor.append(Actor(args.state_dim, args.action_dim))
 
 
 	def make_champ_team(self, agents):

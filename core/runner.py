@@ -28,9 +28,11 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
     while True:
         teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
 
-
         # Get the current team actors
-        team = [models_bucket[agent_id][popn_id] for agent_id, popn_id in enumerate(teams_blueprint)]
+        if type == 'test':
+            team = models_bucket
+        else:
+            team = [models_bucket[agent_id][popn_id] for agent_id, popn_id in enumerate(teams_blueprint)]
 
 
         fitness = 0.0; frame=0
