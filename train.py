@@ -16,6 +16,7 @@ if True:
     parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
     parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
     parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
+    parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
     parser.add_argument('-dim', type=int,  help='World dimension',  default=20)
@@ -28,50 +29,28 @@ if True:
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
     parser.add_argument('-savetag', help='Saved tag',  default='')
 
-    ROLLOUT_SIZE = vars(parser.parse_args())['rollsize']
     SEED = vars(parser.parse_args())['seed']
-    POP_SIZE = vars(parser.parse_args())['popsize']
-    SAVE_TAG = vars(parser.parse_args())['savetag']
     USE_PG = vars(parser.parse_args())['pg']
-    WORLD_DIM = vars(parser.parse_args())['dim']
-    NUM_POIS = vars(parser.parse_args())['pois']
-    COUPLING = vars(parser.parse_args())['coupling']
-    EPLEN = vars(parser.parse_args())['eplen']
-    ANGLE_RES = vars(parser.parse_args())['angle_res']
-    RAND_POI = vars(parser.parse_args())['randpoi']
-    SENSOR_MODEL = vars(parser.parse_args())['sensor_model']
-    NUM_AGENTS = vars(parser.parse_args())['agents']
-
     CUDA = True
     TEST_GAP = 5
-    SAVE_TAG = SAVE_TAG + \
-               '_pop' + str(POP_SIZE)+ \
-               '_roll' + str(ROLLOUT_SIZE) + \
-               '_dim' + str(WORLD_DIM) + \
-               '_anglr' + str(ANGLE_RES) + \
-               '_couple' + str(COUPLING) + \
-               '_eplen' + str(EPLEN) + \
-               '#pois' + str(NUM_POIS) + \
-               '_#agents' + str(NUM_AGENTS) + \
-               '_sensor' + str(SENSOR_MODEL) + \
-               '_poi_rand' + str(RAND_POI) + \
-               '_use_pg' + str(USE_PG) + \
-               '_seed' + str(SEED)
+
 
 class Parameters:
     def __init__(self):
 
         #Meta
-        self.rollout_size = ROLLOUT_SIZE
-        self.popn_size = POP_SIZE
+        self.rollout_size = vars(parser.parse_args())['rollsize']
+        self.popn_size = vars(parser.parse_args())['popsize']
         self.num_episodes = 100000
+        self.num_evals = vars(parser.parse_args())['evals']
 
 
         #Rover domain
-        self.dim_x = self.dim_y = WORLD_DIM; self.obs_radius = WORLD_DIM * 2; self.act_dist = 2; self.angle_res = ANGLE_RES
-        self.num_poi = NUM_POIS; self.num_agents = NUM_AGENTS; self.ep_len = EPLEN
-        self.poi_rand = RAND_POI; self.coupling = COUPLING; self.rover_speed = 1
-        self.sensor_model = SENSOR_MODEL  #Closest VS Density
+        self.dim_x = self.dim_y = vars(parser.parse_args())['dim']; self.obs_radius = self.dim_x * 2; self.act_dist = 2; self.angle_res = vars(parser.parse_args())['angle_res']
+        self.num_poi = vars(parser.parse_args())['pois']; self.num_agents = vars(parser.parse_args())['agents']; self.ep_len = vars(parser.parse_args())['eplen']
+        self.poi_rand = vars(parser.parse_args())['randpoi']; self.coupling = vars(parser.parse_args())['coupling']; self.rover_speed = 1
+        self.sensor_model = vars(parser.parse_args())['sensor_model']  #Closest VS Density
+
 
         #TD3 params
         self.algo_name = 'TD3'
@@ -104,6 +83,21 @@ class Parameters:
         self.num_test = 10
 
         #Save Filenames
+        self.savetag = vars(parser.parse_args())['savetag'] + \
+                   '_pop' + str(self.popn_size) + \
+                   '_roll' + str(self.rollout_size) + \
+                   '_dim' + str(self.dim_x) + \
+                   '_anglr' + str(self.angle_res) + \
+                   '_couple' + str(self.coupling) + \
+                   '_eplen' + str(self.ep_len) + \
+                   '#pois' + str(self.num_poi) + \
+                   '_#agents' + str(self.num_agents) + \
+                   '_sensor' + str(self.sensor_model) + \
+                   '_poi_rand' + str(self.poi_rand) + \
+                   '_use_pg' + str(USE_PG) + \
+                   '_seed' + str(SEED)
+
+
         self.save_foldername = 'R_MERL/'
         if not os.path.exists(self.save_foldername): os.makedirs(self.save_foldername)
         self.metric_save = self.save_foldername + 'metrics/'
@@ -114,15 +108,19 @@ class Parameters:
         if not os.path.exists(self.model_save): os.makedirs(self.model_save)
         if not os.path.exists(self.aux_save): os.makedirs(self.aux_save)
 
-        self.critic_fname = 'critic_' +SAVE_TAG
-        self.actor_fname = 'actor_'+ SAVE_TAG
-        self.log_fname = 'reward_'+  SAVE_TAG
-        self.best_fname = 'best_'+ SAVE_TAG
+
+
+        self.critic_fname = 'critic_' +self.savetag
+        self.actor_fname = 'actor_'+ self.savetag
+        self.log_fname = 'reward_'+  self.savetag
+        self.best_fname = 'best_'+ self.savetag
 
         #Unit tests (Simply changes the rover/poi init locations)
         self.unit_test = 0 #0: None
                            #1: Single Agent
                            #2: Multiagent 2-coupled
+
+
 
 
 class MERL:
@@ -306,7 +304,7 @@ if __name__ == "__main__":
         if gen % 5 ==0:
             print()
             print('Test_stat:', mod.list_stat(test_fits))
-            print('SAVETAG:  ',SAVE_TAG)
+            print('SAVETAG:  ',args.savetag)
             print()
 
 
