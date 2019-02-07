@@ -1,4 +1,4 @@
-
+import numpy as np
 
 
 class RoverDomainCython:
@@ -9,7 +9,7 @@ class RoverDomainCython:
 
 
 	"""
-	def __init__(self, args):
+	def __init__(self, args, num_envs):
 		"""
 		A base template for all environment wrappers.
 		"""
@@ -17,14 +17,18 @@ class RoverDomainCython:
 		self.args = args
 
 		from envs.rover_domain_cython import rover_domain_w_setup as r
-		self.env = r.RoverDomain()
-		self.env.n_rovers = args.num_agents
-		self.env.n_pois = args.num_poi
-		self.env.interaction_dist = args.act_dist
-		self.env.n_obs_sections = int(360/args.angle_res)
-		self.env.n_req = args.coupling
-		self.env.n_steps = args.ep_len
-		self.env.setup_size = args.dim_x
+
+		self.universe = [] #Universe - collection of all envs running in parallel
+		for _ in range(num_envs):
+			env = r.RoverDomain()
+			env.n_rovers = args.num_agents
+			env.n_pois = args.num_poi
+			env.interaction_dist = args.act_dist
+			env.n_obs_sections = int(360/args.angle_res)
+			env.n_req = args.coupling
+			env.n_steps = args.ep_len
+			env.setup_size = args.dim_x
+			self.universe.append(env)
 
 
 		#Action Space
@@ -40,9 +44,16 @@ class RoverDomainCython:
 			Returns:
 				next_obs (list): Next state
 		"""
-		self.env.reset()
-		next_state = self.env.rover_observations.base
-		next_state = next_state.reshape(next_state.shape[0], -1)
+		joint_obs = []
+		for env in self.universe:
+			env.reset()
+			next_state = env.rover_observations.base
+			next_state = next_state.reshape(next_state.shape[0], -1)
+			joint_obs.append(next_state)
+
+		next_state = np.stack(joint_obs, axis=1)
+		#returns [agent_id, universe_id, obs]
+
 		return next_state
 
 
@@ -63,9 +74,18 @@ class RoverDomainCython:
 		#action = self.action_low + action * (self.action_high - self.action_low)
 		#action = [ac*0 for ac in action]
 
-		next_state, reward, done, info = self.env.step(action)
-		next_state = next_state.base; reward = reward.base
-		next_state = next_state.reshape(next_state.shape[0], -1)
+
+		joint_obs = []; joint_reward = []; joint_done = []
+		for universe_id, env in enumerate(self.universe):
+			next_state, reward, done, info = env.step(action[:,universe_id,:])
+			next_state = next_state.base; reward = reward.base
+			next_state = next_state.reshape(next_state.shape[0], -1)
+			joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
+
+		joint_obs = np.stack(joint_obs, axis=1)
+		joint_reward = np.stack(joint_reward, axis=1)
+
+
 
 		#print(self.env.rover_positions.base, self.env.poi_positions.base, action, reward)
 		# import numpy as np
@@ -75,16 +95,17 @@ class RoverDomainCython:
 		#print(self.env.rover_positions.base, self.env.poi_positions.base, reward)
 		##None
 
-		return next_state, reward, done, info
+		return joint_obs, joint_reward, joint_done, None
 
 	def render(self):
 
 		# Visualize
 		grid = [['-' for _ in range(self.args.dim_x)] for _ in range(self.args.dim_y)]
 
+		rand_univ = np.random.randint(0, len(self.universe))
 
 		# Draw in rover path
-		for time_step, joint_pos in enumerate(self.env.rover_position_histories.base):
+		for time_step, joint_pos in enumerate(self.universe[rand_univ].rover_position_histories.base):
 			for rover_id, rover_pos in enumerate(joint_pos):
 				x = int(rover_pos[0]);
 				y = int(rover_pos[1])
@@ -93,7 +114,7 @@ class RoverDomainCython:
 				except: None
 
 		# Draw in food
-		for poi_pos, poi_status in zip(self.env.poi_positions.base, self.env.poi_status.base):
+		for poi_pos, poi_status in zip(self.universe[rand_univ].poi_positions.base, self.universe[rand_univ].poi_status.base):
 			x = int(poi_pos[0]);
 			y = int(poi_pos[1])
 			marker = '#' if poi_status else '$'

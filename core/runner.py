@@ -22,7 +22,10 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
             None
     """
 
-    env = RoverDomainCython(args)
+    if type == 'test': NUM_EVALS = args.num_test
+    else: NUM_EVALS = args.num_evals
+
+    env = RoverDomainCython(args, NUM_EVALS)
     np.random.seed(id); random.seed(id)
 
     while True:
@@ -41,30 +44,39 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         while True: #unless done
 
             joint_action = [team[i].forward(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
+            #JOINT ACTION [agent_id, universe_id, action]
             if type == 'pg':
-                for action in joint_action: action += np.random.normal(0, 0.3, size=args.action_dim).clip(-1, 1)
+                for action in joint_action: action += np.random.normal(0, 0.3, (NUM_EVALS, args.action_dim)).clip(-1, 1)
 
 
             next_state, reward, done, info = env.step(np.array(joint_action, dtype = 'double'))  # Simulate one step in environment
+            #State --> [agent_id, universe_id, obs]
+            #reward --> [agent_id, universe_id]
+            #done --> [universe_id]
+            #info --> [universe_id]
+
 
 
             next_state = utils.to_tensor(np.array(next_state))
-            fitness += sum(reward)/args.coupling
+            fitness += np.sum(reward)/(args.coupling*NUM_EVALS)
             #print(reward)
 
 
             #Push experiences to memory
             if store_transitions:
-                for i in range(args.num_agents):
-                    rollout_trajectory[i].append([np.expand_dims(utils.to_numpy(joint_state)[i,:], 0), np.expand_dims(utils.to_numpy(next_state)[i, :], 0),
-                                                  np.expand_dims(np.array(joint_action)[i,:], 0), np.expand_dims(np.array([reward[i]], dtype="float32"), 0),
-                                                  np.expand_dims(np.array([done], dtype="float32"), 0)])
+                for agent_id in range(args.num_agents):
+                    for universe_id in range(NUM_EVALS):
+                        rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(joint_state)[agent_id,universe_id, :], 0),
+                                                      np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
+                                                      np.expand_dims(np.array(joint_action)[agent_id,universe_id, :], 0),
+                                                      np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
+                                                      np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0)])
 
             joint_state = next_state
-            frame+=1
+            frame+=NUM_EVALS
 
             #DONE FLAG IS Received
-            if done:
+            if done[0]:
                 if random.random() < 0.0:
                     env.render()
 
@@ -82,7 +94,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
         if random.random() < 0.01:
             env.render()
-            print (type, id, 'Fit of rendered', fitness)
+            print (type, id, 'Fit of rendered', '%.2f'%fitness)
 
         #Send back id, fitness, total length and shaped fitness using the result pipe
         result_pipe.send([teams_blueprint, [fitness], frame])
