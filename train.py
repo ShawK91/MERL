@@ -9,9 +9,29 @@ import argparse
 import random
 import threading
 
+DEBUG = True
+
 
 #ARGPARSE
-if True:
+if DEBUG:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
+    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
+    parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
+
+    parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
+    parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=2)
+    parser.add_argument('-pois', type=int,  help='#POIs',  default=6)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
+    parser.add_argument('-eplen', type=int,  help='eplen',  default=20)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=30)
+    parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
+    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
+    parser.add_argument('-savetag', help='Saved tag',  default='')
+
+else:
     parser = argparse.ArgumentParser()
     parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
     parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
@@ -30,11 +50,12 @@ if True:
     parser.add_argument('-savetag', help='Saved tag',  default='')
 
 
-    SEED = vars(parser.parse_args())['seed']
-    USE_PG = vars(parser.parse_args())['pg']
-    CUDA = True
-    TEST_GAP = 5
 
+
+SEED = vars(parser.parse_args())['seed']
+USE_PG = vars(parser.parse_args())['pg']
+CUDA = True
+TEST_GAP = 5
 
 class Parameters:
     def __init__(self):

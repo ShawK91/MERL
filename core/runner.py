@@ -1,4 +1,4 @@
-from core.env_wrapper import RoverDomainCython, RoverDomainPython
+from envs.rover_domain.env_wrapper import RoverDomainPython
 from core import mod_utils as utils
 import numpy as np, random
 
@@ -25,7 +25,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
     if type == 'test': NUM_EVALS = args.num_test
     else: NUM_EVALS = args.num_evals
 
-    env = RoverDomainCython(args, NUM_EVALS)
+    env = RoverDomainPython(args, NUM_EVALS)
     np.random.seed(id); random.seed(id)
 
     while True:
@@ -49,7 +49,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
                 for action in joint_action: action += np.random.normal(0, 0.3, (NUM_EVALS, args.action_dim)).clip(-1, 1)
 
 
-            next_state, reward, done, info = env.step(np.array(joint_action, dtype = 'double'))  # Simulate one step in environment
+            next_state, reward, done, info = env.step(np.array(joint_action))  # Simulate one step in environment
             #State --> [agent_id, universe_id, obs]
             #reward --> [agent_id, universe_id]
             #done --> [universe_id]
