@@ -154,6 +154,7 @@ class RoverDomain:
                 if dist > self.args.obs_radius: continue #Observability radius
 
                 bracket = int(angle / self.args.angle_res)
+                if dist == 0: dist = 0.001
                 temp_poi_dist_list[bracket].append((value/(dist*dist)))
 
             # Log all distance into brackets for other drones
@@ -163,6 +164,7 @@ class RoverDomain:
                 angle, dist = self.get_angle_dist(self_x, self_y, loc[0], loc[1])
                 if dist > self.args.obs_radius: continue #Observability radius
 
+                if dist == 0: dist = 0.001
                 bracket = int(angle / self.args.angle_res)
                 temp_rover_dist_list[bracket].append((1/(dist*dist)))
 
