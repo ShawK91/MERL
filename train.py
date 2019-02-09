@@ -28,7 +28,7 @@ if DEBUG:
     parser.add_argument('-eplen', type=int,  help='eplen',  default=20)
     parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=30)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
-    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
+    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='density')
     parser.add_argument('-savetag', help='Saved tag',  default='')
 
 else:
@@ -36,17 +36,17 @@ else:
     parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
     parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
     parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
-    parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
+    parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
     parser.add_argument('-dim', type=int,  help='World dimension',  default=20)
-    parser.add_argument('-agents', type=int,  help='#agents',  default=10)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=8)
     parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=5)
-    parser.add_argument('-eplen', type=int,  help='eplen',  default=50)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=4)
+    parser.add_argument('-eplen', type=int,  help='eplen',  default=40)
     parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=1)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
-    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
+    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='density')
     parser.add_argument('-savetag', help='Saved tag',  default='')
 
 
@@ -108,16 +108,18 @@ class Parameters:
         self.savetag = vars(parser.parse_args())['savetag'] + \
                    '_pop' + str(self.popn_size) + \
                    '_roll' + str(self.rollout_size) + \
-                   '_dim' + str(self.dim_x) + \
+                   '_evals' + str(self.num_evals) + \
+                    '_poi_rand' + str(self.poi_rand) + \
+                    '_dim' + str(self.dim_x) + \
                    '_anglr' + str(self.angle_res) + \
                    '_couple' + str(self.coupling) + \
                    '_eplen' + str(self.ep_len) + \
                    '#pois' + str(self.num_poi) + \
                    '_#agents' + str(self.num_agents) + \
                    '_sensor' + str(self.sensor_model) + \
-                   '_poi_rand' + str(self.poi_rand) + \
                    '_use_pg' + str(USE_PG) + \
                    '_seed' + str(SEED)
+
 
 
         self.save_foldername = 'R_MERL/'
