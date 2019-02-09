@@ -9,7 +9,7 @@ import argparse
 import random
 import threading
 
-DEBUG = True
+DEBUG = False
 
 
 #ARGPARSE
@@ -83,7 +83,7 @@ class Parameters:
         self.gradperstep = 1.0
         self.gamma = 0.99
         self.batch_size = 128
-        self.buffer_size = 500000
+        self.buffer_size = 100000
         self.updates_per_step = 1
         self.action_loss = False
         self.policy_ups_freq = 2
