@@ -36,15 +36,15 @@ else:
     parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
     parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
     parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
-    parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
+    parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=3)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
     parser.add_argument('-dim', type=int,  help='World dimension',  default=20)
-    parser.add_argument('-agents', type=int,  help='#agents',  default=8)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=6)
     parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=4)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=3)
     parser.add_argument('-eplen', type=int,  help='eplen',  default=40)
-    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=1)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=5)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='density')
     parser.add_argument('-savetag', help='Saved tag',  default='')
@@ -81,14 +81,14 @@ class Parameters:
         self.tau = 5e-3
         self.init_w = True
         self.gradperstep = 1.0
-        self.gamma = 0.99
+        self.gamma = 0.997
         self.batch_size = 128
         self.buffer_size = 100000
         self.updates_per_step = 1
         self.action_loss = False
         self.policy_ups_freq = 2
         self.policy_noise = True
-        self.policy_noise_clip = 0.2
+        self.policy_noise_clip = 0.4
 
         # NeuroEvolution stuff
         self.elite_fraction = 0.2

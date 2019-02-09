@@ -46,7 +46,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
             joint_action = [team[i].forward(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
             #JOINT ACTION [agent_id, universe_id, action]
             if type == 'pg':
-                for action in joint_action: action += np.random.normal(0, 0.3, (NUM_EVALS, args.action_dim)).clip(-1, 1)
+                for action in joint_action: action += np.random.normal(0, 0.4, (NUM_EVALS, args.action_dim)).clip(-1, 1)
 
 
             next_state, reward, done, info = env.step(np.array(joint_action))  # Simulate one step in environment

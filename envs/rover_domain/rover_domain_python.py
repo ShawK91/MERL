@@ -51,7 +51,7 @@ class RoverDomain:
             self.rover_path[rover_id].append((self.rover_pos[rover_id][0], self.rover_pos[rover_id][1]))
 
         #Compute done
-        done = int(self.istep >= self.args.ep_len)
+        done = int(self.istep >= self.args.ep_len or sum(self.poi_status) == len(self.poi_status))
 
         #info
         global_reward = None

@@ -16,7 +16,7 @@ class Actor(nn.Module):
         super(Actor, self).__init__()
 
         #self.wwid = torch.Tensor([wwid])
-        l1 = 200; l2 = 100
+        l1 = 400; l2 = 300
 
         # Construct Hidden Layer 1
         self.f1 = nn.Linear(state_dim, l1)
@@ -63,7 +63,7 @@ class Critic(nn.Module):
 
     def __init__(self, state_dim, action_dim):
         super(Critic, self).__init__()
-        l1 = 300; l2 = 200
+        l1 = 400; l2 = 300
 
         ######################## Q1 Head ##################
         # Construct Hidden Layer 1 with state
