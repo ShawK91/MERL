@@ -42,11 +42,11 @@ else:
     parser.add_argument('-dim', type=int,  help='World dimension',  default=20)
     parser.add_argument('-agents', type=int,  help='#agents',  default=6)
     parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=3)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=2)
     parser.add_argument('-eplen', type=int,  help='eplen',  default=40)
-    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=5)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=10)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
-    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='density')
+    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
     parser.add_argument('-savetag', help='Saved tag',  default='')
 
 
@@ -282,7 +282,7 @@ class MERL:
             for pipe in self.test_result_pipes:
                 entry = pipe[1].recv()
                 test_fits.append(entry[1][0])
-            test_tracker.update([mod.list_mean(test_fits)], gen)
+            test_tracker.update([mod.list_mean(test_fits)], self.total_frames)
 
 
         #Evolution Step
