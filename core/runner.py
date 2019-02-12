@@ -78,9 +78,6 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
             #DONE FLAG IS Received
             if done[0]:
-                if random.random() < 0.01:
-                    env.render()
-
                 #Push experiences to main
                 if store_transitions:
                     for agent_id, buffer in enumerate(data_bucket):
@@ -93,7 +90,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         for i in range(args.num_poi): max_score += (i+1)
         fitness = fitness/float(max_score)
 
-        if random.random() < 0.1:
+        if random.random() < 0.01:
             env.render()
             print (type, id, 'Fit of rendered', '%.2f'%fitness)
 
