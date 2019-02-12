@@ -15,9 +15,9 @@ DEBUG = False
 #ARGPARSE
 if DEBUG:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
-    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
-    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
+    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=5)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
+    parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
     parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
@@ -30,23 +30,25 @@ if DEBUG:
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='density')
     parser.add_argument('-savetag', help='Saved tag',  default='')
+    parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
 
 else:
     parser = argparse.ArgumentParser()
     parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
     parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
     parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
-    parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=3)
+    parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
     parser.add_argument('-dim', type=int,  help='World dimension',  default=20)
     parser.add_argument('-agents', type=int,  help='#agents',  default=6)
     parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=2)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=3)
     parser.add_argument('-eplen', type=int,  help='eplen',  default=40)
-    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=10)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=1)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
+    parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
     parser.add_argument('-savetag', help='Saved tag',  default='')
 
 
@@ -75,7 +77,7 @@ class Parameters:
 
 
         #TD3 params
-        self.algo_name = 'TD3'
+        self.algo_name = vars(parser.parse_args())['algo']
         self.actor_lr = 1e-3
         self.critic_lr = 1e-3
         self.tau = 5e-3
@@ -109,7 +111,8 @@ class Parameters:
                    '_pop' + str(self.popn_size) + \
                    '_roll' + str(self.rollout_size) + \
                    '_evals' + str(self.num_evals) + \
-                    '_poi_rand' + str(self.poi_rand) + \
+                       '_algo' + str(self.algo_name) + \
+                       '_poi_rand' + str(self.poi_rand) + \
                     '_dim' + str(self.dim_x) + \
                    '_anglr' + str(self.angle_res) + \
                    '_couple' + str(self.coupling) + \

@@ -1,13 +1,13 @@
-import torch
+import torch, os
 import torch.nn as nn
 from torch.optim import Adam
 import torch.nn.functional as F
 import numpy as np
 from core import mod_utils as utils
-from core.models import Actor, Critic, GaussianPolicy, QNetwork, ValueNetwork, DeterministicPolicy
+from core.models import Actor, QNetwork, ValueNetwork
 
 
-class Off_Policy_Algo(object):
+class TD3(object):
     """Classes implementing TD3 and DDPG off-policy learners
 
          Parameters:
@@ -20,22 +20,22 @@ class Off_Policy_Algo(object):
         self.algo_name = algo_name; self.gamma = gamma; self.tau = tau
 
         #Initialize actors
-        self.actor = Actor(state_dim, action_dim)
-        if init_w: self.actor.apply(utils.init_weights)
-        self.actor_target = Actor(state_dim, action_dim)
-        utils.hard_update(self.actor_target, self.actor)
-        self.actor_optim = Adam(self.actor.parameters(), actor_lr)
+        self.policy = Actor(state_dim, action_dim, hidden_size=400, policy_type='DeterministicPolicy')
+        if init_w: self.policy.apply(utils.init_weights)
+        self.policy_target = Actor(state_dim, action_dim, hidden_size=400, policy_type='DeterministicPolicy')
+        utils.hard_update(self.policy_target, self.policy)
+        self.policy_optim = Adam(self.policy.parameters(), actor_lr)
 
 
-        self.critic = Critic(state_dim, action_dim)
+        self.critic = QNetwork(state_dim, action_dim,hidden_size=400)
         if init_w: self.critic.apply(utils.init_weights)
-        self.critic_target = Critic(state_dim, action_dim)
+        self.critic_target = QNetwork(state_dim, action_dim, hidden_size=400)
         utils.hard_update(self.critic_target, self.critic)
         self.critic_optim = Adam(self.critic.parameters(), critic_lr)
 
         self.loss = nn.MSELoss()
 
-        self.actor_target.cuda(); self.critic_target.cuda(); self.actor.cuda(); self.critic.cuda()
+        self.policy_target.cuda(); self.critic_target.cuda(); self.policy.cuda(); self.critic.cuda()
         self.num_critic_updates = 0
 
         #Statistics Tracker
@@ -90,14 +90,14 @@ class Off_Policy_Algo(object):
                 policy_noise = torch.clamp(torch.Tensor(policy_noise), -kwargs['policy_noise_clip'], kwargs['policy_noise_clip'])
 
                 #Compute next action_bacth
-                next_action_batch = self.actor_target.forward(next_state_batch) + policy_noise.cuda()
-                next_action_batch = torch.clamp(next_action_batch, -1,1)
+                next_action_batch = self.policy_target.clean_action(next_state_batch, return_only_action=True) + policy_noise.cuda()
+                next_action_batch = torch.clamp(next_action_batch, -1, 1)
 
                 #Compute Q-val and value of next state masking by done
-                q1, q2, next_val = self.critic_target.forward(next_state_batch, next_action_batch)
+                q1, q2 = self.critic_target.forward(next_state_batch, next_action_batch)
                 q1 = (1 - done_batch) * q1
                 q2 = (1 - done_batch) * q2
-                next_val = (1 - done_batch) * next_val
+                #next_val = (1 - done_batch) * next_val
 
                 #Select which q to use as next-q (depends on algo)
                 if self.algo_name == 'TD3' or self.algo_name == 'TD3_actor_min': next_q = torch.min(q1, q2)
@@ -110,7 +110,7 @@ class Off_Policy_Algo(object):
 
 
             self.critic_optim.zero_grad()
-            current_q1, current_q2, current_val = self.critic.forward((state_batch), (action_batch))
+            current_q1, current_q2 = self.critic.forward((state_batch), (action_batch))
             self.compute_stats(current_q1, self.q)
 
             dt = self.loss(current_q1, target_q)
@@ -133,7 +133,7 @@ class Off_Policy_Algo(object):
             #Delayed Actor Update
             if self.num_critic_updates % kwargs['policy_ups_freq'] == 0:
 
-                actor_actions = self.actor.forward(state_batch)
+                actor_actions = self.policy.clean_action(state_batch, return_only_action=False)
 
                 # # Trust Region constraint
                 # if self.args.trust_region_actor:
@@ -141,7 +141,7 @@ class Off_Policy_Algo(object):
                 #     actor_actions = action_batch - old_actor_actions
 
 
-                Q1, Q2, val = self.critic.forward(state_batch, actor_actions)
+                Q1, Q2 = self.critic.forward(state_batch, actor_actions)
 
                 # if self.args.use_advantage: policy_loss = -(Q1 - val)
                 policy_loss = -Q1
@@ -150,7 +150,7 @@ class Off_Policy_Algo(object):
                 policy_loss = policy_loss.mean()
 
 
-                self.actor_optim.zero_grad()
+                self.policy_optim.zero_grad()
 
 
 
@@ -162,7 +162,7 @@ class Off_Policy_Algo(object):
                 #     action_loss = action_loss.mean() * self.args.action_loss_w
                 #     action_loss.backward()
                 #     #if self.action_loss[-1] > self.policy_loss[-1]: self.args.action_loss_w *= 0.9 #Decay action_w loss if action loss is larger than policy gradient loss
-                self.actor_optim.step()
+                self.policy_optim.step()
 
 
             # if self.args.hard_update:
@@ -171,14 +171,13 @@ class Off_Policy_Algo(object):
             #         self.hard_update(self.critic_target, self.critic)
 
 
-            if self.num_critic_updates % kwargs['policy_ups_freq'] == 0: utils.soft_update(self.actor_target, self.actor, self.tau)
+            if self.num_critic_updates % kwargs['policy_ups_freq'] == 0: utils.soft_update(self.policy_target, self.policy, self.tau)
             utils.soft_update(self.critic_target, self.critic, self.tau)
 
 
 
-
 class SAC(object):
-    def __init__(self, num_inputs, action_dim, gamma, wwid):
+    def __init__(self, num_inputs, action_dim, gamma):
 
         self.num_inputs = num_inputs
         self.action_space = action_dim
@@ -193,7 +192,7 @@ class SAC(object):
         self.soft_q_criterion = nn.MSELoss()
 
         if self.policy_type == "Gaussian":
-            self.policy = GaussianPolicy(self.num_inputs, self.action_space, 256, wwid)
+            self.policy = Actor(self.num_inputs, self.action_space, hidden_size=400, policy_type='GaussianPolicy')
             self.policy_optim = Adam(self.policy.parameters(), lr=3e-4)
 
             self.value = ValueNetwork(self.num_inputs, 256)
@@ -202,7 +201,7 @@ class SAC(object):
             utils.hard_update(self.value_target, self.value)
             self.value_criterion = nn.MSELoss()
         else:
-            self.policy = DeterministicPolicy(self.num_inputs, self.action_space, 256)
+            self.policy = Actor(self.num_inputs, self.action_space, hidden_size=400, policy_type='DeterministicPolicy')
             self.policy_optim = Adam(self.policy.parameters(), lr=3e-4)
 
             self.critic_target = QNetwork(self.num_inputs, self.action_space, 256)
@@ -215,18 +214,18 @@ class SAC(object):
 
 
 
-    def select_action(self, state, eval=False):
-        state = torch.FloatTensor(state).unsqueeze(0)
-        if eval == False:
-            self.policy.train()
-            action, _, _, _, _ = self.policy.evaluate(state)
-        else:
-            self.policy.eval()
-            _, _, _, action, _ = self.policy.evaluate(state)
-
-        # action = torch.tanh(action)
-        action = action.detach().cpu().numpy()
-        return action[0]
+    # def select_action(self, state, eval=False):
+    #     state = torch.FloatTensor(state).unsqueeze(0)
+    #     if eval == False:
+    #         self.policy.train()
+    #         action, _, _, _, _ = self.policy.evaluate(state)
+    #     else:
+    #         self.policy.eval()
+    #         _, _, _, action, _ = self.policy.evaluate(state)
+    #
+    #     # action = torch.tanh(action)
+    #     action = action.detach().cpu().numpy()
+    #     return action[0]
 
     def update_parameters(self, state_batch, next_state_batch, action_batch, reward_batch, mask_batch, updates, **ignore):
         # state_batch = torch.FloatTensor(state_batch)
@@ -244,7 +243,7 @@ class SAC(object):
         up training, especially on harder task.
         """
         expected_q1_value, expected_q2_value = self.critic(state_batch, action_batch)
-        new_action, log_prob, _, mean, log_std = self.policy.evaluate(state_batch)
+        new_action, log_prob, _, mean, log_std = self.policy.noisy_action(state_batch, return_only_action=False)
 
         if self.policy_type == "Gaussian":
             """
@@ -258,7 +257,7 @@ class SAC(object):
             There is no need in principle to include a separate function approximator for the state value.
             We use a target critic network for deterministic policy and eradicate the value value network completely.
             """
-            next_state_action, _, _, _, _, = self.policy.evaluate(next_state_batch)
+            next_state_action, _, _, _, _, = self.policy.noisy_action(next_state_batch, return_only_action=False)
             target_critic_1, target_critic_2 = self.critic_target(next_state_batch, next_state_action)
             target_critic = torch.min(target_critic_1, target_critic_2)
             next_q_value = reward_batch + mask_batch * self.gamma * target_critic  # Reward Scale * r(st,at) - γQ(target)(st+1)

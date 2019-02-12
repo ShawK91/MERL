@@ -41,6 +41,8 @@ class RoverDomain:
     def step(self, joint_action):
         self.istep += 1
 
+        joint_action = joint_action.clip(-1,1)
+
         for rover_id in range(self.args.num_agents):
             action = joint_action[rover_id]
             self.rover_pos[rover_id] = [self.rover_pos[rover_id][0]+action[0], self.rover_pos[rover_id][1]+action[1]]  # Execute action

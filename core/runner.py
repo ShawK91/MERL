@@ -43,11 +43,12 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         joint_state = utils.to_tensor(np.array(joint_state))
         while True: #unless done
 
-            joint_action = [team[i].forward(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
-            #JOINT ACTION [agent_id, universe_id, action]
-            if type == 'pg':
-                for action in joint_action: action += np.random.normal(0, 0.4, (NUM_EVALS, args.action_dim)).clip(-1, 1)
 
+            if type == 'pg':
+                joint_action = [team[i].noisy_action(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
+            else:
+                joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.num_agents)]
+            #JOINT ACTION [agent_id, universe_id, action]
 
             next_state, reward, done, info = env.step(np.array(joint_action))  # Simulate one step in environment
             #State --> [agent_id, universe_id, obs]
@@ -77,7 +78,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
             #DONE FLAG IS Received
             if done[0]:
-                if random.random() < 0.0:
+                if random.random() < 0.01:
                     env.render()
 
                 #Push experiences to main
@@ -92,7 +93,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         for i in range(args.num_poi): max_score += (i+1)
         fitness = fitness/float(max_score)
 
-        if random.random() < 0.01:
+        if random.random() < 0.1:
             env.render()
             print (type, id, 'Fit of rendered', '%.2f'%fitness)
 

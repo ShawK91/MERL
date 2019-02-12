@@ -1,6 +1,6 @@
-from core.off_policy_algo import Off_Policy_Algo, SAC
+from core.off_policy_algo import TD3, SAC
 from torch.multiprocessing import Process, Pipe, Manager
-from core.models import Actor, GaussianPolicy
+from core.models import Actor
 from core.buffer import Buffer
 from core.neuroevolution import SSNE
 import core.mod_utils as mod
@@ -33,16 +33,23 @@ class Agent:
 		self.manager = Manager()
 		self.popn = self.manager.list()
 		for _ in range(args.popn_size):
-			self.popn.append(Actor(args.state_dim, args.action_dim))
+			if args.algo_name == 'TD3':
+				self.popn.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='DeterministicPolicy'))
+			else: self.popn.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='GaussianPolicy'))
 			self.popn[-1].eval()
 
 		#### INITIALIZE PG ALGO #####
-		self.algo = Off_Policy_Algo(args.algo_name, args.state_dim, args.action_dim, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.init_w)
+		if args.algo_name == 'TD3':
+			self.algo = TD3(args.algo_name, args.state_dim, args.action_dim, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.init_w)
+		else:
+			self.algo = SAC(args.state_dim, args.action_dim, args.gamma)
 
 		#### Rollout Actor is a template used for MP #####
 		self.rollout_actor = self.manager.list()
 		for _ in range(args.rollout_size):
-			self.rollout_actor.append(Actor(args.state_dim, args.action_dim))
+			if args.algo_name == 'TD3':
+				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='DeterministicPolicy'))
+			else: self.rollout_actor.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='GaussianPolicy'))
 
 		#Initalize buffer
 		self.buffer = Buffer(args.buffer_size, buffer_gpu=False)
@@ -80,9 +87,9 @@ class Agent:
 
 	def update_rollout_actor(self):
 		for actor in self.rollout_actor:
-			self.algo.actor.cpu()
-			mod.hard_update(actor, self.algo.actor)
-			self.algo.actor.cuda()
+			self.algo.policy.cpu()
+			mod.hard_update(actor, self.algo.policy)
+			self.algo.policy.cuda()
 
 
 
@@ -110,7 +117,10 @@ class TestAgent:
 		self.manager = Manager()
 		self.rollout_actor = self.manager.list()
 		for _ in range(args.num_agents):
-				self.rollout_actor.append(Actor(args.state_dim, args.action_dim))
+			if args.algo_name == 'TD3':
+				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='DeterministicPolicy'))
+			else:
+				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='GaussianPolicy'))
 
 
 	def make_champ_team(self, agents):
