@@ -33,23 +33,21 @@ class Agent:
 		self.manager = Manager()
 		self.popn = self.manager.list()
 		for _ in range(args.popn_size):
-			if args.algo_name == 'TD3':
-				self.popn.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='DeterministicPolicy'))
-			else: self.popn.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='GaussianPolicy'))
+			if args.algo_name == 'TD3': self.popn.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='DeterministicPolicy'))
+			else: self.popn.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
 			self.popn[-1].eval()
 
 		#### INITIALIZE PG ALGO #####
 		if args.algo_name == 'TD3':
-			self.algo = TD3(args.algo_name, args.state_dim, args.action_dim, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.init_w)
+			self.algo = TD3(args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.init_w)
 		else:
-			self.algo = SAC(args.state_dim, args.action_dim, args.gamma)
+			self.algo = SAC(args.state_dim, args.action_dim, args.hidden_size, args.gamma)
 
 		#### Rollout Actor is a template used for MP #####
 		self.rollout_actor = self.manager.list()
 		for _ in range(args.rollout_size):
-			if args.algo_name == 'TD3':
-				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='DeterministicPolicy'))
-			else: self.rollout_actor.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='GaussianPolicy'))
+			if args.algo_name == 'TD3': self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='DeterministicPolicy'))
+			else: self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
 
 		#Initalize buffer
 		self.buffer = Buffer(args.buffer_size, buffer_gpu=False)
@@ -118,9 +116,9 @@ class TestAgent:
 		self.rollout_actor = self.manager.list()
 		for _ in range(args.num_agents):
 			if args.algo_name == 'TD3':
-				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='DeterministicPolicy'))
+				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='DeterministicPolicy'))
 			else:
-				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, hidden_size=400, policy_type='GaussianPolicy'))
+				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
 
 
 	def make_champ_team(self, agents):

@@ -9,28 +9,30 @@ import argparse
 import random
 import threading
 
-DEBUG = False
+DEBUG = True
+RANDOM_BASELINE = False
+
 
 
 #ARGPARSE
 if DEBUG:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=5)
-    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
+    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
     parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
     parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
-    parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
+    parser.add_argument('-dim', type=int,  help='World dimension',  default=10)
     parser.add_argument('-agents', type=int,  help='#agents',  default=2)
-    parser.add_argument('-pois', type=int,  help='#POIs',  default=6)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
-    parser.add_argument('-eplen', type=int,  help='eplen',  default=20)
-    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=30)
+    parser.add_argument('-pois', type=int,  help='#POIs',  default=3)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=2)
+    parser.add_argument('-eplen', type=int,  help='eplen',  default=50)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=15)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
-    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='density')
+    parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
     parser.add_argument('-savetag', help='Saved tag',  default='')
-    parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
+    parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
 
 else:
     parser = argparse.ArgumentParser()
@@ -40,18 +42,16 @@ else:
     parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
-    parser.add_argument('-dim', type=int,  help='World dimension',  default=20)
-    parser.add_argument('-agents', type=int,  help='#agents',  default=6)
+    parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
+    parser.add_argument('-agents', type=int,  help='#agents',  default=1)
     parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=3)
-    parser.add_argument('-eplen', type=int,  help='eplen',  default=40)
-    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=1)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
+    parser.add_argument('-eplen', type=int,  help='eplen',  default=30)
+    parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=30)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
     parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
     parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
     parser.add_argument('-savetag', help='Saved tag',  default='')
-
-
 
 
 SEED = vars(parser.parse_args())['seed']
@@ -59,14 +59,36 @@ USE_PG = vars(parser.parse_args())['pg']
 CUDA = True
 TEST_GAP = 5
 
+
+
+class WorldSettings:
+	def __init__(self, roverdomainid):
+
+		if roverdomainid == 1:
+			# Rover domain
+			self.dim_x = self.dim_y = 10
+			self.obs_radius = self.dim_x * 10;
+			self.act_dist = 2;
+			self.angle_res = 20
+			self.num_poi = 3
+			self.num_agents = 1
+			self.ep_len = 40
+			self.poi_rand = 1
+			self.coupling = 1
+			self.rover_speed = 1
+			self.sensor_model = 'closest'
+
+
+
+
 class Parameters:
     def __init__(self):
 
         #Meta
         self.rollout_size = vars(parser.parse_args())['rollsize']
         self.popn_size = vars(parser.parse_args())['popsize']
-        self.num_episodes = 100000
         self.num_evals = vars(parser.parse_args())['evals']
+        self.frames_bound = 100000000
 
 
         #Rover domain
@@ -77,6 +99,7 @@ class Parameters:
 
 
         #TD3 params
+        self.hidden_size = 100
         self.algo_name = vars(parser.parse_args())['algo']
         self.actor_lr = 1e-3
         self.critic_lr = 1e-3
@@ -103,7 +126,7 @@ class Parameters:
 
         #Dependents
         self.state_dim = int(720 / self.angle_res)
-        self.action_dim = 2
+        self.action_dim = 3
         self.num_test = 10
 
         #Save Filenames
@@ -111,10 +134,10 @@ class Parameters:
                    '_pop' + str(self.popn_size) + \
                    '_roll' + str(self.rollout_size) + \
                    '_evals' + str(self.num_evals) + \
-                       '_algo' + str(self.algo_name) + \
-                       '_poi_rand' + str(self.poi_rand) + \
+                    '_algo' + str(self.algo_name) + \
+                    '_poi_rand' + str(self.poi_rand) + \
                     '_dim' + str(self.dim_x) + \
-                   '_anglr' + str(self.angle_res) + \
+                   '_angle' + str(self.angle_res) + \
                    '_couple' + str(self.coupling) + \
                    '_eplen' + str(self.ep_len) + \
                    '#pois' + str(self.num_poi) + \
@@ -149,7 +172,6 @@ class Parameters:
 
 
 
-
 class MERL:
     """Policy Gradient Algorithm main object which carries out off-policy learning using policy gradient
        Encodes all functionalities for 1. TD3 2. DDPG 3.Trust-region TD3/DDPG 4. Advantage TD3/DDPG
@@ -179,7 +201,7 @@ class MERL:
         self.evo_task_pipes = [Pipe() for _ in range(args.popn_size)]
         self.evo_result_pipes = [Pipe() for _ in range(args.popn_size)]
         self.evo_workers = [Process(target=rollout_worker, args=(self.args, i, 'evo', self.evo_task_pipes[i][1], self.evo_result_pipes[i][0],
-                                                                   self.buffer_bucket, self.popn_bucket, USE_PG)) for i in range(args.popn_size)]
+                                                                   self.buffer_bucket, self.popn_bucket, USE_PG, RANDOM_BASELINE)) for i in range(args.popn_size)]
         for worker in self.evo_workers: worker.start()
 
 
@@ -187,14 +209,14 @@ class MERL:
         self.pg_task_pipes = [Pipe() for _ in range(args.rollout_size)]
         self.pg_result_pipes = [Pipe() for _ in range(args.rollout_size)]
         self.pg_workers = [Process(target=rollout_worker, args=(self.args, i, 'pg', self.pg_task_pipes[i][1], self.pg_result_pipes[i][0],
-                                                                   self.buffer_bucket, self.rollout_bucket, USE_PG)) for i in range(args.rollout_size)]
+                                                                   self.buffer_bucket, self.rollout_bucket, USE_PG, RANDOM_BASELINE)) for i in range(args.rollout_size)]
         for worker in self.pg_workers: worker.start()
 
         ######### TEST WORKERS ############
         self.test_task_pipes = [Pipe() for _ in range(args.num_test)]
         self.test_result_pipes = [Pipe() for _ in range(args.num_test)]
         self.test_workers = [Process(target=rollout_worker, args=(self.args, i, 'test', self.test_task_pipes[i][1], self.test_result_pipes[i][0],
-                                                                   None, self.test_bucket, False)) for i in range(args.num_test)]
+                                                                   None, self.test_bucket, False, RANDOM_BASELINE)) for i in range(args.num_test)]
         for worker in self.test_workers: worker.start()
 
 
@@ -239,7 +261,7 @@ class MERL:
 
 
         ########## START POLICY GRADIENT ROLLOUT ##########
-        if USE_PG:
+        if USE_PG and not RANDOM_BASELINE:
             #Synch pg_actors to its corresponding rollout_bucket
             for agent in self.agents: agent.update_rollout_actor()
 
@@ -272,7 +294,7 @@ class MERL:
 
         ####### JOIN PG ROLLOUTS ########
         pg_fits = []
-        if USE_PG:
+        if USE_PG and not RANDOM_BASELINE:
             for pipe in self.pg_result_pipes:
                 entry = pipe[1].recv()
                 pg_fits.append(entry[1][0])
@@ -316,16 +338,15 @@ if __name__ == "__main__":
     time_start = time.time()
 
     ###### TRAINING LOOP ########
-    for gen in range(1, 1000000000): #RUN VIRTUALLY FOREVER
+    for gen in range(1, args.frames_bound): #RUN VIRTUALLY FOREVER
 
         #ONE EPOCH OF TRAINING
         popn_fits, pg_fits, test_fits = ai.train(gen, test_tracker)
 
 
         #PRINT PROGRESS
-        print('Ep:', gen, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:', mod.list_stat(pg_fits),
-              'Average:',pprint(test_tracker.all_tracker[0][1]), 'FPS:',pprint(ai.total_frames/(time.time()-time_start)),
-              '#Samples seen:', ai.total_frames,
+        print('Ep:/Frames', gen, '/', ai.total_frames, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:', mod.list_stat(pg_fits),
+              'Average:',pprint(test_tracker.all_tracker[0][1]), 'FPS:',pprint(ai.total_frames/(time.time()-time_start))
               )
 
         if gen % 5 ==0:

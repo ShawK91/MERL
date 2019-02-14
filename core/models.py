@@ -4,8 +4,8 @@ import torch.nn.functional as F
 from torch.distributions import Normal
 
 
-LOG_SIG_MAX = 2
-LOG_SIG_MIN = -20
+LOG_SIG_MAX = 5
+LOG_SIG_MIN = -5
 epsilon = 1e-6
 
 class Actor(nn.Module):
@@ -57,7 +57,7 @@ class Actor(nn.Module):
             x = F.relu(self.linear1(state))
             x = F.relu(self.linear2(x))
             mean = self.mean_linear(x)
-            if return_only_action: return mean
+            if return_only_action: return torch.tanh(mean)
 
             log_std = self.log_std_linear(x)
             log_std = torch.clamp(log_std, min=LOG_SIG_MIN, max=LOG_SIG_MAX)
@@ -161,3 +161,64 @@ def weights_init_value_fn(m):
         torch.nn.init.xavier_uniform_(m.weight, gain=1)
         torch.nn.init.constant_(m.bias, 0)
 
+
+class Conv_model(nn.Module):
+    def __init__(self, z_dim):
+        super(Conv_model, self).__init__()
+        self.hw = 5 #Intermediate computation to track the HW dimension
+
+        ## Encoder
+        self.conv1 = nn.Conv2d(in_channels=18, out_channels=32, kernel_size=3, stride=1)
+        self.conv2 = nn.Conv2d(32, 48, 3, stride=1)
+        self.conv3 = nn.Conv2d(48, 64, 3, stride=1)
+        self.fc_encoder = nn.Linear(64 * self.hw * self.hw, z_dim)
+
+        #Policy Net
+        self.policy_fc1 = nn.Linear(z_dim, 200)
+        self.policy_lnorm1 = torch.LayerNorm(200)
+        self.policy_fc2 = nn.Linear(200, 6)
+
+        #Value Net
+        self.value_fc1 = nn.Linear(z_dim, 200)
+        self.value_lnorm1 = LayerNorm(200)
+        self.value_fc2 = nn.Linear(200, 1)
+
+
+    def encode(self, x):
+        h = F.elu(self.conv1(x)); #print(h.shape)
+        h = F.elu(self.conv2(h)) ; #print(h.shape)
+        h = F.elu(self.conv3(h)); #print(h.shape)
+        h = h.view(-1, 64 * self.hw * self.hw); #print(h.shape)
+        h = F.elu(self.fc_encoder(h))
+        return h
+
+
+    def policy_value_net(self, z):
+        #Compute policy head
+        p = F.elu(self.policy_fc1(z))
+        p = self.policy_lnorm1(p)
+        p = F.softmax(self.policy_fc2(p))
+
+        #Compute value head
+        v = F.elu(self.value_fc1(z))
+        v = self.value_lnorm1(v)
+        v = F.tanh(self.value_fc2(v))
+        return p, v
+
+
+    def forward(self, x):
+        z = self.encode(x)
+        p, v = self.policy_value_net(z)
+        return p, v
+
+    #API FOR MCTS
+    def predict(self,x):
+        x = torch.Tensor(x).permute([0,3,1,2]).cuda()
+        p, v = self.forward(x)
+        return utils.to_numpy(p.cpu()), utils.to_numpy(v.cpu())
+
+    def loss_fn(self, p, p_target, v, v_target):
+        p_loss = torch.sum(torch.nn.functional.cross_entropy(p, p_target))
+        v_loss = torch.sum(torch.nn.functional.mse_loss(v.squeeze(), v_target))
+        total_loss = p_loss + v_loss
+        return total_loss, p_loss.item(), v_loss.item()

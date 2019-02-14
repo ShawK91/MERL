@@ -15,21 +15,21 @@ class TD3(object):
 
 
      """
-    def __init__(self, algo_name, state_dim, action_dim, actor_lr, critic_lr, gamma, tau, init_w = True):
+    def __init__(self, algo_name, state_dim, action_dim, hidden_size, actor_lr, critic_lr, gamma, tau, init_w = True):
 
         self.algo_name = algo_name; self.gamma = gamma; self.tau = tau
 
         #Initialize actors
-        self.policy = Actor(state_dim, action_dim, hidden_size=400, policy_type='DeterministicPolicy')
+        self.policy = Actor(state_dim, action_dim, hidden_size, policy_type='DeterministicPolicy')
         if init_w: self.policy.apply(utils.init_weights)
-        self.policy_target = Actor(state_dim, action_dim, hidden_size=400, policy_type='DeterministicPolicy')
+        self.policy_target = Actor(state_dim, action_dim, hidden_size, policy_type='DeterministicPolicy')
         utils.hard_update(self.policy_target, self.policy)
         self.policy_optim = Adam(self.policy.parameters(), actor_lr)
 
 
-        self.critic = QNetwork(state_dim, action_dim,hidden_size=400)
+        self.critic = QNetwork(state_dim, action_dim,hidden_size)
         if init_w: self.critic.apply(utils.init_weights)
-        self.critic_target = QNetwork(state_dim, action_dim, hidden_size=400)
+        self.critic_target = QNetwork(state_dim, action_dim, hidden_size)
         utils.hard_update(self.critic_target, self.critic)
         self.critic_optim = Adam(self.critic.parameters(), critic_lr)
 
@@ -177,7 +177,7 @@ class TD3(object):
 
 
 class SAC(object):
-    def __init__(self, num_inputs, action_dim, gamma):
+    def __init__(self, num_inputs, action_dim, hidden_size, gamma):
 
         self.num_inputs = num_inputs
         self.action_space = action_dim
@@ -192,7 +192,7 @@ class SAC(object):
         self.soft_q_criterion = nn.MSELoss()
 
         if self.policy_type == "Gaussian":
-            self.policy = Actor(self.num_inputs, self.action_space, hidden_size=400, policy_type='GaussianPolicy')
+            self.policy = Actor(self.num_inputs, self.action_space, hidden_size, policy_type='GaussianPolicy')
             self.policy_optim = Adam(self.policy.parameters(), lr=3e-4)
 
             self.value = ValueNetwork(self.num_inputs, 256)
@@ -201,7 +201,7 @@ class SAC(object):
             utils.hard_update(self.value_target, self.value)
             self.value_criterion = nn.MSELoss()
         else:
-            self.policy = Actor(self.num_inputs, self.action_space, hidden_size=400, policy_type='DeterministicPolicy')
+            self.policy = Actor(self.num_inputs, self.action_space, hidden_size, policy_type='DeterministicPolicy')
             self.policy_optim = Adam(self.policy.parameters(), lr=3e-4)
 
             self.critic_target = QNetwork(self.num_inputs, self.action_space, 256)
@@ -244,6 +244,13 @@ class SAC(object):
         """
         expected_q1_value, expected_q2_value = self.critic(state_batch, action_batch)
         new_action, log_prob, _, mean, log_std = self.policy.noisy_action(state_batch, return_only_action=False)
+
+        import random
+        if random.random()< 0.002:
+            print()
+            print(torch.mean(mean, dim=0))
+            print(torch.mean(log_std, dim=0))
+            print()
 
         if self.policy_type == "Gaussian":
             """

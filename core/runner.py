@@ -4,7 +4,7 @@ import numpy as np, random
 
 
 #Rollout evaluate an agent in a complete game
-def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_bucket, store_transitions):
+def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_bucket, store_transitions, random_baseline):
     """Rollout Worker runs a simulation in the environment to generate experiences and fitness values
 
         Parameters:
@@ -43,8 +43,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         joint_state = utils.to_tensor(np.array(joint_state))
         while True: #unless done
 
-
-            if type == 'pg':
+            if random_baseline:
+                joint_action = [np.random.random((NUM_EVALS, args.state_dim))for _ in range(args.num_agents)]
+            elif type == 'pg':
                 joint_action = [team[i].noisy_action(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
             else:
                 joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.num_agents)]
@@ -90,7 +91,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         for i in range(args.num_poi): max_score += (i+1)
         fitness = fitness/float(max_score)
 
-        if random.random() < 0.01:
+        if random.random() < 0.0:
             env.render()
             print (type, id, 'Fit of rendered', '%.2f'%fitness)
 
