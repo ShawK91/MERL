@@ -17,16 +17,16 @@ RANDOM_BASELINE = False
 #ARGPARSE
 if DEBUG:
     parser = argparse.ArgumentParser()
-    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
-    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
+    parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=5)
+    parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
     parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
     parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
 
     parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
-    parser.add_argument('-dim', type=int,  help='World dimension',  default=10)
+    parser.add_argument('-dim', type=int,  help='World dimension',  default=7)
     parser.add_argument('-agents', type=int,  help='#agents',  default=2)
     parser.add_argument('-pois', type=int,  help='#POIs',  default=3)
-    parser.add_argument('-coupling', type=int,  help='Coupling',  default=2)
+    parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
     parser.add_argument('-eplen', type=int,  help='eplen',  default=50)
     parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=15)
     parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
@@ -80,7 +80,6 @@ class WorldSettings:
 
 
 
-
 class Parameters:
     def __init__(self):
 
@@ -126,7 +125,7 @@ class Parameters:
 
         #Dependents
         self.state_dim = int(720 / self.angle_res)
-        self.action_dim = 3
+        self.action_dim = 2
         self.num_test = 10
 
         #Save Filenames
@@ -206,17 +205,17 @@ class MERL:
 
 
         ######### POLICY GRADIENT WORKERS ############
-        self.pg_task_pipes = [Pipe() for _ in range(args.rollout_size)]
-        self.pg_result_pipes = [Pipe() for _ in range(args.rollout_size)]
-        self.pg_workers = [Process(target=rollout_worker, args=(self.args, i, 'pg', self.pg_task_pipes[i][1], self.pg_result_pipes[i][0],
-                                                                   self.buffer_bucket, self.rollout_bucket, USE_PG, RANDOM_BASELINE)) for i in range(args.rollout_size)]
+        self.pg_task_pipes = Pipe()
+        self.pg_result_pipes = Pipe()
+        self.pg_workers = [Process(target=rollout_worker, args=(self.args, 0, 'pg', self.pg_task_pipes[1], self.pg_result_pipes[0],
+                                                                   self.buffer_bucket, self.rollout_bucket, USE_PG, RANDOM_BASELINE))]
         for worker in self.pg_workers: worker.start()
 
         ######### TEST WORKERS ############
-        self.test_task_pipes = [Pipe() for _ in range(args.num_test)]
-        self.test_result_pipes = [Pipe() for _ in range(args.num_test)]
-        self.test_workers = [Process(target=rollout_worker, args=(self.args, i, 'test', self.test_task_pipes[i][1], self.test_result_pipes[i][0],
-                                                                   None, self.test_bucket, False, RANDOM_BASELINE)) for i in range(args.num_test)]
+        self.test_task_pipes = Pipe()
+        self.test_result_pipes = Pipe()
+        self.test_workers = [Process(target=rollout_worker, args=(self.args, 0, 'test', self.test_task_pipes[1], self.test_result_pipes[0],
+                                                                   None, self.test_bucket, False, RANDOM_BASELINE))]
         for worker in self.test_workers: worker.start()
 
 
@@ -247,9 +246,7 @@ class MERL:
         #Test Rollout
         if gen % TEST_GAP == 0:
             self.test_agent.make_champ_team(self.agents) #Sync the champ policies into the TestAgent
-            #test_team = [0 for _ in range(self.args.num_agents)]
-            for i, pipe in enumerate(self.test_task_pipes):
-                pipe[0].send(None)
+            self.test_task_pipes[0].send("START")
 
 
         #Figure out teams for Coevolution
@@ -266,8 +263,7 @@ class MERL:
             for agent in self.agents: agent.update_rollout_actor()
 
             #Start rollouts using the rollout actors
-            for id, pipe in enumerate(self.pg_task_pipes):
-                pipe[0].send([id for _ in range(self.args.num_agents)]) #Index 0 for the Rollout bucket
+            self.pg_task_pipes[0].send('START') #Index 0 for the Rollout bucket
 
 
             ############ POLICY GRADIENT UPDATES #########
@@ -293,20 +289,17 @@ class MERL:
 
 
         ####### JOIN PG ROLLOUTS ########
-        pg_fits = []
         if USE_PG and not RANDOM_BASELINE:
-            for pipe in self.pg_result_pipes:
-                entry = pipe[1].recv()
-                pg_fits.append(entry[1][0])
-                self.total_frames += entry[2]
+            entry = self.pg_result_pipes[1].recv()
+            pg_fits = entry[1][0]
+            self.total_frames += entry[2]
 
 
         ####### JOIN TEST ROLLOUTS ########
         test_fits = []
         if gen % TEST_GAP == 0:
-            for pipe in self.test_result_pipes:
-                entry = pipe[1].recv()
-                test_fits.append(entry[1][0])
+            entry = self.test_result_pipes[1].recv()
+            test_fits = entry[1][0]
             test_tracker.update([mod.list_mean(test_fits)], self.total_frames)
 
 

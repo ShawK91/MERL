@@ -245,12 +245,6 @@ class SAC(object):
         expected_q1_value, expected_q2_value = self.critic(state_batch, action_batch)
         new_action, log_prob, _, mean, log_std = self.policy.noisy_action(state_batch, return_only_action=False)
 
-        import random
-        if random.random()< 0.002:
-            print()
-            print(torch.mean(mean, dim=0))
-            print(torch.mean(log_std, dim=0))
-            print()
 
         if self.policy_type == "Gaussian":
             """

@@ -1,6 +1,6 @@
 from envs.rover_domain.env_wrapper import RoverDomainPython
 from core import mod_utils as utils
-import numpy as np, random
+import numpy as np, random, sys
 
 
 #Rollout evaluate an agent in a complete game
@@ -23,7 +23,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
     """
 
     if type == 'test': NUM_EVALS = args.num_test
-    else: NUM_EVALS = args.num_evals
+    elif type == 'pg': NUM_EVALS = args.rollout_size
+    elif type == 'evo': NUM_EVALS = args.num_evals
+    else: sys.exit('Incorrect type')
 
     env = RoverDomainPython(args, NUM_EVALS)
     np.random.seed(id); random.seed(id)
@@ -32,13 +34,11 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
 
         # Get the current team actors
-        if type == 'test':
-            team = models_bucket
-        else:
-            team = [models_bucket[agent_id][popn_id] for agent_id, popn_id in enumerate(teams_blueprint)]
+        if type == 'test' or type == 'pg': team = models_bucket
+        else: team = [models_bucket[agent_id][popn_id] for agent_id, popn_id in enumerate(teams_blueprint)]
 
 
-        fitness = 0.0; frame=0
+        fitness = [0.0 for _ in range(NUM_EVALS)]; frame=0
         joint_state = env.reset(); rollout_trajectory = [[] for _ in range(args.num_agents)]
         joint_state = utils.to_tensor(np.array(joint_state))
         while True: #unless done
@@ -46,7 +46,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
             if random_baseline:
                 joint_action = [np.random.random((NUM_EVALS, args.state_dim))for _ in range(args.num_agents)]
             elif type == 'pg':
-                joint_action = [team[i].noisy_action(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
+                joint_action = [team[i][0].noisy_action(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
             else:
                 joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.num_agents)]
             #JOINT ACTION [agent_id, universe_id, action]
@@ -60,8 +60,8 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 
             next_state = utils.to_tensor(np.array(next_state))
-            fitness += np.sum(reward)/(args.coupling*NUM_EVALS)
-            #print(reward)
+            for i, rew in enumerate(np.sum(reward, axis=0)):
+                fitness[i] += rew/args.coupling
 
 
             #Push experiences to memory
@@ -89,11 +89,11 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         #Normalize fitness to be (0,1)
         max_score = 0.0
         for i in range(args.num_poi): max_score += (i+1)
-        fitness = fitness/float(max_score)
+        fitness = [fit/max_score for fit in fitness]
 
-        if random.random() < 0.0:
+        if random.random() < 0.01:
             env.render()
-            print (type, id, 'Fit of rendered', '%.2f'%fitness)
+            print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
 
         #Send back id, fitness, total length and shaped fitness using the result pipe
         result_pipe.send([teams_blueprint, [fitness], frame])
