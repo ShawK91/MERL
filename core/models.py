@@ -54,8 +54,8 @@ class Actor(nn.Module):
 
         """
         if self.policy_type == 'GaussianPolicy':
-            x = F.relu(self.linear1(state))
-            x = F.relu(self.linear2(x))
+            x = F.elu(self.linear1(state))
+            x = F.elu(self.linear2(x))
             mean = self.mean_linear(x)
             if return_only_action: return torch.tanh(mean)
 
@@ -64,8 +64,8 @@ class Actor(nn.Module):
             return mean, log_std
 
         elif self.policy_type == 'DeterministicPolicy':
-            x = F.relu(self.linear1(state))
-            x = F.relu(self.linear2(x))
+            x = F.elu(self.linear1(state))
+            x = F.elu(self.linear2(x))
             mean = torch.tanh(self.mean(x))
             return mean
 
@@ -109,8 +109,8 @@ class ValueNetwork(nn.Module):
         self.apply(weights_init_value_fn)
 
     def forward(self, state):
-        x = F.relu(self.linear1(state))
-        x = F.relu(self.linear2(x))
+        x = F.elu(self.linear1(state))
+        x = F.elu(self.linear2(x))
         x = self.linear3(x)
         return x
 
@@ -134,13 +134,13 @@ class QNetwork(nn.Module):
 
     def forward(self, state, action):
         x1 = torch.cat([state, action], 1)
-        x1 = F.relu(self.linear1(x1))
-        x1 = F.relu(self.linear2(x1))
+        x1 = F.elu(self.linear1(x1))
+        x1 = F.elu(self.linear2(x1))
         x1 = self.linear3(x1)
 
         x2 = torch.cat([state, action], 1)
-        x2 = F.relu(self.linear4(x2))
-        x2 = F.relu(self.linear5(x2))
+        x2 = F.elu(self.linear4(x2))
+        x2 = F.elu(self.linear5(x2))
         x2 = self.linear6(x2)
 
         return x1, x2
