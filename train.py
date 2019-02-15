@@ -21,18 +21,12 @@ if DEBUG:
 	parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
 	parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
 	parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
-
 	parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
-	parser.add_argument('-dim', type=int,  help='World dimension',  default=7)
-	parser.add_argument('-agents', type=int,  help='#agents',  default=2)
-	parser.add_argument('-pois', type=int,  help='#POIs',  default=3)
-	parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
-	parser.add_argument('-eplen', type=int,  help='eplen',  default=50)
-	parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=15)
-	parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
-	parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
 	parser.add_argument('-savetag', help='Saved tag',  default='')
+	parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
 	parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
+	parser.add_argument('-config', type=str,  help='SAC Vs. TD3?', default='two_test')
+
 
 else:
 	parser = argparse.ArgumentParser()
@@ -53,7 +47,6 @@ else:
 	parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
 	parser.add_argument('-savetag', help='Saved tag',  default='')
 
-
 SEED = vars(parser.parse_args())['seed']
 USE_PG = vars(parser.parse_args())['pg']
 CUDA = True
@@ -61,10 +54,12 @@ TEST_GAP = 5
 
 
 
-class WorldSettings:
-	def __init__(self, roverdomainid):
+class ConfigSettings:
+	def __init__(self):
 
-		if roverdomainid == 1:
+		config = vars(parser.parse_args())['config']
+		self.config = config
+		if config == 'single_test':
 			# Rover domain
 			self.dim_x = self.dim_y = 10
 			self.obs_radius = self.dim_x * 10;
@@ -75,6 +70,76 @@ class WorldSettings:
 			self.ep_len = 40
 			self.poi_rand = 1
 			self.coupling = 1
+			self.rover_speed = 1
+			self.sensor_model = 'closest'
+
+		if config == 'two_test':
+			# Rover domain
+			self.dim_x = self.dim_y = 10
+			self.obs_radius = self.dim_x * 10;
+			self.act_dist = 2;
+			self.angle_res = 20
+			self.num_poi = 3
+			self.num_agents = 2
+			self.ep_len = 50
+			self.poi_rand = 1
+			self.coupling = 2
+			self.rover_speed = 1
+			self.sensor_model = 'closest'
+
+		if config == '15_1':
+			# Rover domain
+			self.dim_x = self.dim_y = 15
+			self.obs_radius = self.dim_x * 10;
+			self.act_dist = 2
+			self.angle_res = 15
+			self.num_poi = 6
+			self.num_agents = 6
+			self.ep_len = 50
+			self.poi_rand = 1
+			self.coupling = 3
+			self.rover_speed = 1
+			self.sensor_model = 'closest'
+
+		if config == '15_2':
+			# Rover domain
+			self.dim_x = self.dim_y = 15
+			self.obs_radius = self.dim_x * 10;
+			self.act_dist = 2
+			self.angle_res = 15
+			self.num_poi = 6
+			self.num_agents = 8
+			self.ep_len = 50
+			self.poi_rand = 1
+			self.coupling = 4
+			self.rover_speed = 1
+			self.sensor_model = 'closest'
+
+		if config == '20_1':
+			# Rover domain
+			self.dim_x = self.dim_y = 20
+			self.obs_radius = self.dim_x * 10;
+			self.act_dist = 2
+			self.angle_res = 15
+			self.num_poi = 6
+			self.num_agents = 6
+			self.ep_len = 100
+			self.poi_rand = 1
+			self.coupling = 3
+			self.rover_speed = 1
+			self.sensor_model = 'closest'
+
+		if config == '20_2':
+			# Rover domain
+			self.dim_x = self.dim_y = 15
+			self.obs_radius = self.dim_x * 10;
+			self.act_dist = 2
+			self.angle_res = 15
+			self.num_poi = 6
+			self.num_agents = 8
+			self.ep_len = 100
+			self.poi_rand = 1
+			self.coupling = 4
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
@@ -89,13 +154,8 @@ class Parameters:
 		self.num_evals = vars(parser.parse_args())['evals']
 		self.frames_bound = 100000000
 
-
 		#Rover domain
-		self.dim_x = self.dim_y = vars(parser.parse_args())['dim']; self.obs_radius = self.dim_x * 2; self.act_dist = 2; self.angle_res = vars(parser.parse_args())['angle_res']
-		self.num_poi = vars(parser.parse_args())['pois']; self.num_agents = vars(parser.parse_args())['agents']; self.ep_len = vars(parser.parse_args())['eplen']
-		self.poi_rand = vars(parser.parse_args())['randpoi']; self.coupling = vars(parser.parse_args())['coupling']; self.rover_speed = 1
-		self.sensor_model = vars(parser.parse_args())['sensor_model']  #Closest VS Density
-
+		self.config = ConfigSettings()
 
 		#TD3 params
 		self.hidden_size = 100
@@ -104,7 +164,7 @@ class Parameters:
 		self.critic_lr = 1e-3
 		self.tau = 5e-3
 		self.init_w = True
-		self.gradperstep = 1.0
+		self.gradperstep = vars(parser.parse_args())['gradperstep']
 		self.gamma = 0.997
 		self.batch_size = 128
 		self.buffer_size = 100000
@@ -124,24 +184,17 @@ class Parameters:
 		self.mut_distribution = 1  # 1-Gaussian, 2-Laplace, 3-Uniform
 
 		#Dependents
-		self.state_dim = int(720 / self.angle_res)
+		self.state_dim = int(720 / self.config.angle_res)
 		self.action_dim = 2
 		self.num_test = 10
 
 		#Save Filenames
 		self.savetag = vars(parser.parse_args())['savetag'] + \
-				   '_pop' + str(self.popn_size) + \
+				   'pop' + str(self.popn_size) + \
 				   '_roll' + str(self.rollout_size) + \
 				   '_evals' + str(self.num_evals) + \
-					'_algo' + str(self.algo_name) + \
-					'_poi_rand' + str(self.poi_rand) + \
-					'_dim' + str(self.dim_x) + \
-				   '_angle' + str(self.angle_res) + \
-				   '_couple' + str(self.coupling) + \
-				   '_eplen' + str(self.ep_len) + \
-				   '#pois' + str(self.num_poi) + \
-				   '_#agents' + str(self.num_agents) + \
-				   '_sensor' + str(self.sensor_model) + \
+				   '_algo' + str(self.algo_name) + \
+				   '_config' + str(self.config.config) +\
 				   '_use_pg' + str(USE_PG) + \
 				   '_seed' + str(SEED)
 
@@ -164,10 +217,6 @@ class Parameters:
 		self.log_fname = 'reward_'+  self.savetag
 		self.best_fname = 'best_'+ self.savetag
 
-		#Unit tests (Simply changes the rover/poi init locations)
-		self.unit_test = 0 #0: None
-						   #1: Single Agent
-						   #2: Multiagent 2-coupled
 
 
 
@@ -185,7 +234,7 @@ class MERL:
 
 
 		######### Initialize the Multiagent Team of agents ########
-		self.agents = [Agent(self.args, id) for id in range(self.args.num_agents)]
+		self.agents = [Agent(self.args, id) for id in range(self.args.config.num_agents)]
 		self.test_agent = TestAgent(self.args, 991)
 
 
@@ -220,7 +269,7 @@ class MERL:
 
 
 		#### STATS AND TRACKING WHICH ROLLOUT IS DONE ######
-		self.best_score = -999; self.total_frames = 0; self.gen_frames = 0
+		self.best_score = -999; self.total_frames = 0; self.gen_frames = 0; self.test_trace = []
 
 
 	def make_teams(self, num_agents, popn_size, num_evals):
@@ -259,7 +308,7 @@ class MERL:
 
 
 		#Figure out teams for Coevolution
-		teams = self.make_teams(args.num_agents, args.popn_size, args.num_evals)
+		teams = self.make_teams(args.config.num_agents, args.popn_size, args.num_evals)
 
 		########## START EVO ROLLOUT ##########
 		for pipe, team in zip(self.evo_task_pipes, teams):
@@ -310,6 +359,7 @@ class MERL:
 			entry = self.test_result_pipes[1].recv()
 			test_fits = entry[1][0]
 			test_tracker.update([mod.list_mean(test_fits)], self.total_frames)
+			self.test_trace.append(mod.list_mean(test_fits))
 
 
 		#Evolution Step
@@ -348,7 +398,7 @@ if __name__ == "__main__":
 
 		#PRINT PROGRESS
 		print('Ep:/Frames', gen, '/', ai.total_frames, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:', mod.list_stat(pg_fits),
-			  'Average:',pprint(test_tracker.all_tracker[0][1]), 'FPS:',pprint(ai.total_frames/(time.time()-time_start))
+			  'Test_trace:',[pprint(i) for i in ai.test_trace[-5:]], 'FPS:',pprint(ai.total_frames/(time.time()-time_start))
 			  )
 
 		if gen % 5 ==0:

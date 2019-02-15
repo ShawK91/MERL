@@ -19,7 +19,7 @@ class RoverDomainPython:
 
 		self.universe = [] #Universe - collection of all envs running in parallel
 		for _ in range(num_envs):
-			env = RoverDomain(args)
+			env = RoverDomain(args.config)
 			self.universe.append(env)
 
 		#Action Space

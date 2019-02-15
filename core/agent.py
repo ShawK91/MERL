@@ -115,7 +115,7 @@ class TestAgent:
 		#### Rollout Actor is a template used for MP #####
 		self.manager = Manager()
 		self.rollout_actor = self.manager.list()
-		for _ in range(args.num_agents):
+		for _ in range(args.config.num_agents):
 			if args.algo_name == 'TD3':
 				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='DeterministicPolicy'))
 			else:

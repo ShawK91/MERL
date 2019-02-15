@@ -39,16 +39,16 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 
         fitness = [0.0 for _ in range(NUM_EVALS)]; frame=0
-        joint_state = env.reset(); rollout_trajectory = [[] for _ in range(args.num_agents)]
+        joint_state = env.reset(); rollout_trajectory = [[] for _ in range(args.config.num_agents)]
         joint_state = utils.to_tensor(np.array(joint_state))
         while True: #unless done
 
             if random_baseline:
-                joint_action = [np.random.random((NUM_EVALS, args.state_dim))for _ in range(args.num_agents)]
+                joint_action = [np.random.random((NUM_EVALS, args.state_dim))for _ in range(args.config.num_agents)]
             elif type == 'pg':
-                joint_action = [team[i][0].noisy_action(joint_state[i,:]).detach().numpy() for i in range(args.num_agents)]
+                joint_action = [team[i][0].noisy_action(joint_state[i,:]).detach().numpy() for i in range(args.config.num_agents)]
             else:
-                joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.num_agents)]
+                joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.config.num_agents)]
             #JOINT ACTION [agent_id, universe_id, action]
 
             next_state, reward, done, info = env.step(np.array(joint_action))  # Simulate one step in environment
@@ -61,12 +61,12 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
             next_state = utils.to_tensor(np.array(next_state))
             for i, rew in enumerate(np.sum(reward, axis=0)):
-                fitness[i] += rew/args.coupling
+                fitness[i] += rew/args.config.coupling
 
 
             #Push experiences to memory
             if store_transitions:
-                for agent_id in range(args.num_agents):
+                for agent_id in range(args.config.num_agents):
                     for universe_id in range(NUM_EVALS):
                         rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(joint_state)[agent_id,universe_id, :], 0),
                                                       np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
@@ -88,7 +88,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
         #Normalize fitness to be (0,1)
         max_score = 0.0
-        for i in range(args.num_poi): max_score += (i+1)
+        for i in range(args.config.num_poi): max_score += (i+1)
         fitness = [fit/max_score for fit in fitness]
 
         if random.random() < 0.01:

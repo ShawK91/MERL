@@ -11,7 +11,7 @@ class RoverDomain:
 
         #Gym compatible attributes
         self.observation_space = np.zeros((1, int(2*360 / self.args.angle_res)))
-        self.action_space = np.zeros((1, self.args.action_dim))
+        self.action_space = np.zeros((1, 2))
 
         self.istep = 0 #Current Step counter
 
@@ -25,7 +25,7 @@ class RoverDomain:
 
         #Rover path trace for trajectory-wide global reward computation and vizualization purposes
         self.rover_path = [[(loc[0], loc[1])] for loc in self.rover_pos] # FORMAT: [rover_id][timestep][x, y]
-        self.action_seq = [[0.0 for _ in range(self.args.action_dim)] for _ in range(self.args.num_agents)] # FORMAT: [timestep][rover_id][action]
+        self.action_seq = [[0.0 for _ in range(2)] for _ in range(self.args.num_agents)] # FORMAT: [timestep][rover_id][action]
 
     def reset(self):
         self.reset_poi_pos()
@@ -33,7 +33,7 @@ class RoverDomain:
         self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
         self.poi_status = [False for _ in range(self.args.num_poi)]
         self.rover_path = [[(loc[0], loc[1])] for loc in self.rover_pos]
-        self.action_seq = [[0.0 for _ in range(self.args.action_dim)] for _ in range(self.args.num_agents)]
+        self.action_seq = [[0.0 for _ in range(2)] for _ in range(self.args.num_agents)]
         self.istep = 0
         return self.get_joint_state()
 
@@ -63,15 +63,6 @@ class RoverDomain:
 
 
     def reset_poi_pos(self):
-
-        if self.args.unit_test == 1: #Unit_test
-            self.poi_pos[0] = [0,1]
-            return
-
-        if self.args.unit_test == 2: #Unit_test
-            if random.random()<0.5: self.poi_pos[0] = [4,0]
-            else: self.poi_pos[0] = [4,9]
-            return
 
         start = 0.0;
         end = self.args.dim_x - 1.0
@@ -117,9 +108,6 @@ class RoverDomain:
         rad = int(self.args.dim_x / math.sqrt(3) / 2.0)
         center = int((start + end) / 2.0)
 
-        if self.args.unit_test == 1: #Unit test
-            self.rover_pos[0] = [end,0];
-            return
 
         for rover_id in range(self.args.num_agents):
                 quadrant = rover_id % 4
