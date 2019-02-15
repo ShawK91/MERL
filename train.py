@@ -39,7 +39,7 @@ class ConfigSettings:
 			self.dim_x = self.dim_y = 10
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2;
-			self.angle_res = 20
+			self.angle_res = 15
 			self.num_poi = 3
 			self.num_agents = 1
 			self.ep_len = 40
@@ -53,7 +53,7 @@ class ConfigSettings:
 			self.dim_x = self.dim_y = 10
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2;
-			self.angle_res = 20
+			self.angle_res = 15
 			self.num_poi = 3
 			self.num_agents = 2
 			self.ep_len = 50
@@ -322,6 +322,7 @@ class MERL:
 
 
 		####### JOIN PG ROLLOUTS ########
+		pg_fits = []
 		if USE_PG and not RANDOM_BASELINE:
 			entry = self.pg_result_pipes[1].recv()
 			pg_fits = entry[1][0]
