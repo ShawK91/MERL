@@ -1,56 +1,31 @@
 from core.agent import Agent, TestAgent
-from core.mod_utils import list_mean, pprint, str2bool
-import numpy as np, os, time, random, torch
+from core.mod_utils import pprint, str2bool
+import numpy as np, os, time, torch
 from core import mod_utils as utils
 from core.runner import rollout_worker
-from torch.multiprocessing import Process, Pipe, Manager
+from torch.multiprocessing import Process, Pipe
 import core.mod_utils as mod
 import argparse
 import random
 import threading
 
-DEBUG = True
-RANDOM_BASELINE = False
 
-
-
-#ARGPARSE
-if DEBUG:
-	parser = argparse.ArgumentParser()
-	parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=5)
-	parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=5)
-	parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
-	parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
-	parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
-	parser.add_argument('-savetag', help='Saved tag',  default='')
-	parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-	parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
-	parser.add_argument('-config', type=str,  help='SAC Vs. TD3?', default='two_test')
-
-
-else:
-	parser = argparse.ArgumentParser()
-	parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
-	parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
-	parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
-	parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
-
-	parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
-	parser.add_argument('-dim', type=int,  help='World dimension',  default=15)
-	parser.add_argument('-agents', type=int,  help='#agents',  default=1)
-	parser.add_argument('-pois', type=int,  help='#POIs',  default=4)
-	parser.add_argument('-coupling', type=int,  help='Coupling',  default=1)
-	parser.add_argument('-eplen', type=int,  help='eplen',  default=30)
-	parser.add_argument('-angle_res', type=int,  help='angle resolution',  default=30)
-	parser.add_argument('-randpoi', type=str2bool,  help='#Ranodmize POI initialization?',  default=1)
-	parser.add_argument('-sensor_model', type=str,  help='Sensor model: closest vs density?',  default='closest')
-	parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
-	parser.add_argument('-savetag', help='Saved tag',  default='')
+parser = argparse.ArgumentParser()
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
+parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
+parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
+parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
+parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
+parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
+parser.add_argument('-savetag', help='Saved tag',  default='')
+parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
+parser.add_argument('-config', type=str,  help='SAC Vs. TD3?', default='two_test')
 
 SEED = vars(parser.parse_args())['seed']
 USE_PG = vars(parser.parse_args())['pg']
 CUDA = True
 TEST_GAP = 5
+RANDOM_BASELINE = False
 
 
 
