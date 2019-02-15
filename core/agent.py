@@ -53,7 +53,7 @@ class Agent:
 		self.buffer = Buffer(args.buffer_size, buffer_gpu=False)
 
 		#Agent metrics
-		self.fitnesses = [None for _ in range(args.popn_size)]
+		self.fitnesses = [[] for _ in range(args.popn_size)]
 
 		###Best Policy HOF####
 		self.champ_ind = 0
@@ -78,10 +78,11 @@ class Agent:
 
 		## One gen of evolution ###
 		if self.args.popn_size > 1:
+
 			self.champ_ind = self.evolver.evolve(self.popn, self.fitnesses, [self.rollout_actor[0]])
 
 		#Reset fitness metrics
-		self.fitnesses = [None for _ in range(self.args.popn_size)]
+		self.fitnesses = [[] for _ in range(self.args.popn_size)]
 
 	def update_rollout_actor(self):
 		for actor in self.rollout_actor:
