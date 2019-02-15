@@ -119,11 +119,10 @@ class ConfigSettings:
 			self.sensor_model = 'closest'
 
 
-
 class Parameters:
 	def __init__(self):
 
-		#Meta
+		#Transitive Algo Params
 		self.rollout_size = vars(parser.parse_args())['rollsize']
 		self.popn_size = vars(parser.parse_args())['popsize']
 		self.num_evals = vars(parser.parse_args())['evals']
@@ -132,7 +131,7 @@ class Parameters:
 		#Rover domain
 		self.config = ConfigSettings()
 
-		#TD3 params
+		#Fairly Stable Algo params
 		self.hidden_size = 100
 		self.algo_name = vars(parser.parse_args())['algo']
 		self.actor_lr = 1e-3
@@ -186,13 +185,10 @@ class Parameters:
 		if not os.path.exists(self.aux_save): os.makedirs(self.aux_save)
 
 
-
 		self.critic_fname = 'critic_' +self.savetag
 		self.actor_fname = 'actor_'+ self.savetag
 		self.log_fname = 'reward_'+  self.savetag
 		self.best_fname = 'best_'+ self.savetag
-
-
 
 
 class MERL:

@@ -91,7 +91,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         for i in range(args.config.num_poi): max_score += (i+1)
         fitness = [fit/max_score for fit in fitness]
 
-        if random.random() < 0.01:
+        if random.random() < 0.02:
             env.render()
             print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
 
