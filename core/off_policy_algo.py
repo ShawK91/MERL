@@ -45,22 +45,6 @@ class TD3(object):
         self.q = {'min':[], 'max': [], 'mean':[], 'std':[]}
         self.val = {'min':[], 'max': [], 'mean':[], 'std':[]}
 
-    def compute_stats(self, tensor, tracker):
-        """Computes stats from intermediate tensors
-
-             Parameters:
-                   tensor (tensor): tensor
-                   tracker (object): logger
-
-             Returns:
-                   None
-
-
-         """
-        tracker['min'].append(torch.min(tensor).item())
-        tracker['max'].append(torch.max(tensor).item())
-        tracker['mean'].append(torch.mean(tensor).item())
-        tracker['mean'].append(torch.mean(tensor).item())
 
     def update_parameters(self, state_batch, next_state_batch, action_batch, reward_batch, done_batch, num_epoch=1, **kwargs):
         """Runs a step of Bellman upodate and policy gradient using a batch of experiences
@@ -111,12 +95,12 @@ class TD3(object):
 
             self.critic_optim.zero_grad()
             current_q1, current_q2 = self.critic.forward((state_batch), (action_batch))
-            self.compute_stats(current_q1, self.q)
+            utils.compute_stats(current_q1, self.q)
 
             dt = self.loss(current_q1, target_q)
             # if self.args.use_advantage:
             #     dt = dt + self.loss(current_val, target_val)
-            #     self.compute_stats(current_val, self.val)
+            #     utils.compute_stats(current_val, self.val)
 
             if self.algo_name == 'TD3' or self.algo_name == 'TD3_max': dt = dt + self.loss(current_q2, target_q)
             self.critic_loss['mean'].append(dt.item())
@@ -158,7 +142,7 @@ class TD3(object):
                 #nn.utils.clip_grad_norm_(self.actor.parameters(), 10)
                 # if self.args.action_loss:
                 #     action_loss = torch.abs(actor_actions-0.5)
-                #     self.compute_stats(action_loss, self.action_loss)
+                #     utils.compute_stats(action_loss, self.action_loss)
                 #     action_loss = action_loss.mean() * self.args.action_loss_w
                 #     action_loss.backward()
                 #     #if self.action_loss[-1] > self.policy_loss[-1]: self.args.action_loss_w *= 0.9 #Decay action_w loss if action loss is larger than policy gradient loss
@@ -177,7 +161,7 @@ class TD3(object):
 
 
 class SAC(object):
-    def __init__(self, num_inputs, action_dim, hidden_size, gamma):
+    def __init__(self, num_inputs, action_dim, hidden_size, gamma, critic_lr, actor_lr, tau, alpha, target_update_interval):
 
         self.num_inputs = num_inputs
         self.action_space = action_dim
@@ -187,30 +171,39 @@ class SAC(object):
         self.policy_type = "Gaussian"
         self.target_update_interval = 1
 
-        self.critic = QNetwork(self.num_inputs, self.action_space, 256)
-        self.critic_optim = Adam(self.critic.parameters(), lr=3e-4)
+        self.critic = QNetwork(self.num_inputs, self.action_space, hidden_size)
+        self.critic_optim = Adam(self.critic.parameters(), lr=critic_lr)
         self.soft_q_criterion = nn.MSELoss()
 
         if self.policy_type == "Gaussian":
             self.policy = Actor(self.num_inputs, self.action_space, hidden_size, policy_type='GaussianPolicy')
-            self.policy_optim = Adam(self.policy.parameters(), lr=3e-4)
+            self.policy_optim = Adam(self.policy.parameters(), lr=actor_lr)
 
-            self.value = ValueNetwork(self.num_inputs, 256)
-            self.value_target = ValueNetwork(self.num_inputs, 256)
-            self.value_optim = Adam(self.value.parameters(), lr=3e-4)
+            self.value = ValueNetwork(self.num_inputs, hidden_size)
+            self.value_target = ValueNetwork(self.num_inputs, hidden_size)
+            self.value_optim = Adam(self.value.parameters(), lr=critic_lr)
             utils.hard_update(self.value_target, self.value)
             self.value_criterion = nn.MSELoss()
         else:
             self.policy = Actor(self.num_inputs, self.action_space, hidden_size, policy_type='DeterministicPolicy')
-            self.policy_optim = Adam(self.policy.parameters(), lr=3e-4)
+            self.policy_optim = Adam(self.policy.parameters(), lr=actor_lr)
 
-            self.critic_target = QNetwork(self.num_inputs, self.action_space, 256)
+            self.critic_target = QNetwork(self.num_inputs, self.action_space, hidden_size)
             utils.hard_update(self.critic_target, self.critic)
 
         self.policy.cuda()
         self.value.cuda()
         self.value_target.cuda()
         self.critic.cuda()
+
+        #Statistics Tracker
+        self.q = {'min':[], 'max': [], 'mean':[], 'std':[]}
+        self.val = {'min':[], 'max': [], 'mean':[], 'std':[]}
+        self.value_loss = {'mean':[]}
+        self.policy_loss = {'min':[], 'max': [], 'mean':[], 'std':[]}
+        self.mean_loss = {'min':[], 'max': [], 'mean':[], 'std':[]}
+        self.std_loss = {'min':[], 'max': [], 'mean':[], 'std':[]}
+        self.q_loss = {'mean':[]}
 
 
 
@@ -244,6 +237,7 @@ class SAC(object):
         """
         expected_q1_value, expected_q2_value = self.critic(state_batch, action_batch)
         new_action, log_prob, _, mean, log_std = self.policy.noisy_action(state_batch, return_only_action=False)
+        utils.compute_stats(expected_q1_value, self.q)
 
 
         if self.policy_type == "Gaussian":
@@ -251,6 +245,7 @@ class SAC(object):
             Including a separate function approximator for the soft value can stabilize training.
             """
             expected_value = self.value(state_batch)
+            utils.compute_stats(expected_value, self.val)
             target_value = self.value_target(next_state_batch)
             next_q_value = reward_batch + mask_batch * self.gamma * target_value  # Reward Scale * r(st,at) - γV(target)(st+1))
         else:
@@ -270,6 +265,7 @@ class SAC(object):
         """
         q1_value_loss = self.soft_q_criterion(expected_q1_value, next_q_value.detach())
         q2_value_loss = self.soft_q_criterion(expected_q2_value, next_q_value.detach())
+        utils.compute_stats(q1_value_loss, self.q_loss)
         q1_new, q2_new = self.critic(state_batch, new_action)
         expected_new_q_value = torch.min(q1_new, q2_new)
 
@@ -283,6 +279,7 @@ class SAC(object):
             """
             next_value = expected_new_q_value - (self.alpha * log_prob)
             value_loss = self.value_criterion(expected_value, next_value.detach())
+            utils.compute_stats(value_loss, self.value_loss)
         else:
             pass
 
@@ -293,11 +290,18 @@ class SAC(object):
         Jπ = 𝔼st∼D,εt∼N[logπ(f(εt;st)|st)−Q(st,f(εt;st))]
         ∇Jπ =∇log π + ([∇at log π(at|st) − ∇at Q(st,at)])∇f(εt;st)
         """
-        policy_loss = ((self.alpha * log_prob) - expected_new_q_value).mean()
+        policy_loss = ((self.alpha * log_prob) - expected_new_q_value)
+        utils.compute_stats(policy_loss, self.policy_loss)
+        policy_loss = policy_loss.mean()
 
         # Regularization Loss
-        mean_loss = 0.001 * mean.pow(2).mean()
-        std_loss = 0.001 * log_std.pow(2).mean()
+        mean_loss = 0.001 * mean.pow(2)
+        std_loss = 0.001 * log_std.pow(2)
+        utils.compute_stats(mean_loss, self.mean_loss)
+        utils.compute_stats(std_loss, self.std_loss)
+        mean_loss = mean_loss.mean()
+        std_loss = std_loss.mean()
+
 
         policy_loss += mean_loss + std_loss
 
@@ -356,7 +360,6 @@ class SAC(object):
             self.critic.load_state_dict(torch.load(critic_path))
         if value_path is not None:
             self.value.load_state_dict(torch.load(value_path))
-
 
 
 

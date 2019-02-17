@@ -58,6 +58,26 @@ class Tracker(): #Tracker
                 np.savetxt(filename, np.array(var[2]), fmt='%.3f', delimiter=',')
 
 
+
+def compute_stats(tensor, tracker):
+    """Computes stats from intermediate tensors
+
+         Parameters:
+               tensor (tensor): tensor
+               tracker (object): logger
+
+         Returns:
+               None
+
+
+     """
+    tracker['min'] = torch.min(tensor).item()
+    tracker['max'] = torch.max(tensor).item()
+    tracker['mean'] = torch.mean(tensor).item()
+    tracker['std'] = torch.std(tensor).item()
+
+
+
 def str2bool(v):
     if v.lower() in ('yes', 'true', 't', 'y', '1'):
         return True

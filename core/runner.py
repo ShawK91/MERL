@@ -57,7 +57,11 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
             #done --> [universe_id]
             #info --> [universe_id]
 
-
+            # if type == "test" and random.random() < 0.1:
+            #     print()
+            #     print('Test', list(joint_action[0][0]))
+            # if type == "pg" and random.random() < 0.1:
+            #     print('PG', list(joint_action[0][0]))
 
             next_state = utils.to_tensor(np.array(next_state))
             for i, rew in enumerate(np.sum(reward, axis=0)):
@@ -91,9 +95,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         for i in range(args.config.num_poi): max_score += (i+1)
         fitness = [fit/max_score for fit in fitness]
 
-        if random.random() < 0.02:
+        if type == "test" and random.random() < 0.1:
             env.render()
-            print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
+            #print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
 
         #Send back id, fitness, total length and shaped fitness using the result pipe
         result_pipe.send([teams_blueprint, [fitness], frame])

@@ -41,7 +41,7 @@ class Agent:
 		if args.algo_name == 'TD3':
 			self.algo = TD3(args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.init_w)
 		else:
-			self.algo = SAC(args.state_dim, args.action_dim, args.hidden_size, args.gamma)
+			self.algo = SAC(args.state_dim, args.action_dim, args.hidden_size, args.gamma, args.critic_lr, args.actor_lr, args.tau, args.alpha, args.target_update_interval)
 
 		#### Rollout Actor is a template used for MP #####
 		self.rollout_actor = self.manager.list()

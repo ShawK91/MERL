@@ -11,7 +11,7 @@ import threading
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
 parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
 parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
@@ -40,7 +40,7 @@ class ConfigSettings:
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2;
 			self.angle_res = 15
-			self.num_poi = 3
+			self.num_poi = 6
 			self.num_agents = 1
 			self.ep_len = 40
 			self.poi_rand = 1
@@ -54,7 +54,7 @@ class ConfigSettings:
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2;
 			self.angle_res = 15
-			self.num_poi = 3
+			self.num_poi = 6
 			self.num_agents = 2
 			self.ep_len = 50
 			self.poi_rand = 1
@@ -147,6 +147,10 @@ class Parameters:
 		self.policy_ups_freq = 2
 		self.policy_noise = True
 		self.policy_noise_clip = 0.4
+
+		#SAC
+		self.alpha = 0.2
+		self.target_update_interval = 1
 
 		# NeuroEvolution stuff
 		self.elite_fraction = 0.2
@@ -378,6 +382,18 @@ if __name__ == "__main__":
 			print('Test_stat:', mod.list_stat(test_fits))
 			print('SAVETAG:  ',args.savetag)
 			print()
+
+		if gen % 10 ==0:
+			print('#################################')
+			print('Q', ai.agents[0].algo.q)
+			print('Val', ai.agents[0].algo.val)
+			print('Val_loss', ai.agents[0].algo.value_loss)
+			print('Policy_loss', ai.agents[0].algo.policy_loss)
+			print('Mean_loss', ai.agents[0].algo.mean_loss)
+			print('Std_loss', ai.agents[0].algo.std_loss)
+			print('Q_loss', ai.agents[0].algo.q_loss)
+			print('#################################')
+
 
 
 
