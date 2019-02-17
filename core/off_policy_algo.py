@@ -130,7 +130,7 @@ class TD3(object):
                 # if self.args.use_advantage: policy_loss = -(Q1 - val)
                 policy_loss = -Q1
 
-                self.compute_stats(policy_loss,self.policy_loss)
+                utils.compute_stats(policy_loss,self.policy_loss)
                 policy_loss = policy_loss.mean()
 
 
