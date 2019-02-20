@@ -15,12 +15,13 @@ class Tracker(): #Tracker
         None
     """
 
-    def __init__(self, save_folder, vars_string, project_string):
+    def __init__(self, save_folder, vars_string, project_string, save_iteration=1, conv_size=1):
         self.vars_string = vars_string; self.project_string = project_string
         self.foldername = save_folder
         self.all_tracker = [[[],0.0,[]] for _ in vars_string] #[Id of var tracked][fitnesses, avg_fitness, csv_fitnesses]
         self.counter = 0
-        self.conv_size = 1
+        self.conv_size = conv_size
+        self.save_iteration = save_iteration
         if not os.path.exists(self.foldername):
             os.makedirs(self.foldername)
 
@@ -50,7 +51,7 @@ class Tracker(): #Tracker
             if len(var[0]) == 0: continue
             var[1] = sum(var[0])/float(len(var[0]))
 
-        if self.counter % 1 == 0:  # Save to csv file
+        if self.counter % self.save_iteration == 0:  # Save to csv file
             for i, var in enumerate(self.all_tracker):
                 if len(var[0]) == 0: continue
                 var[2].append(np.array([generation, var[1]]))
@@ -215,9 +216,12 @@ def pprint(l):
 
     if isinstance(l, list):
         if len(l) == 0: return None
+    elif isinstance(l, dict):
+        return l
     else:
         if l == None: return None
         else: return '%.2f'%l
+
 
 def list_stat(l):
     """compute avergae from a list

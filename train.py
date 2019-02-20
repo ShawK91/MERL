@@ -11,7 +11,7 @@ import threading
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
 parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
 parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
@@ -19,12 +19,12 @@ parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-parser.add_argument('-config', type=str,  help='SAC Vs. TD3?', default='two_test')
+parser.add_argument('-config', type=str,  help='SAC Vs. TD3?', default='single_test')
 
 SEED = vars(parser.parse_args())['seed']
 USE_PG = vars(parser.parse_args())['pg']
 CUDA = True
-TEST_GAP = 5
+TEST_GAP = 10
 RANDOM_BASELINE = False
 
 
@@ -193,6 +193,8 @@ class Parameters:
 		self.actor_fname = 'actor_'+ self.savetag
 		self.log_fname = 'reward_'+  self.savetag
 		self.best_fname = 'best_'+ self.savetag
+
+
 
 
 class MERL:
@@ -384,15 +386,18 @@ if __name__ == "__main__":
 			print()
 
 		if gen % 10 ==0:
-			print('#################################')
-			print('Q', ai.agents[0].algo.q)
-			print('Val', ai.agents[0].algo.val)
-			print('Val_loss', ai.agents[0].algo.value_loss)
-			print('Policy_loss', ai.agents[0].algo.policy_loss)
-			print('Mean_loss', ai.agents[0].algo.mean_loss)
-			print('Std_loss', ai.agents[0].algo.std_loss)
-			print('Q_loss', ai.agents[0].algo.q_loss)
-			print('#################################')
+			print()
+			print('Q', pprint(ai.agents[0].algo.q))
+			print('Q_loss', pprint(ai.agents[0].algo.q_loss))
+			print('Policy_loss', pprint(ai.agents[0].algo.policy_loss))
+
+			if args.algo_name == 'SAC':
+				print('Val', pprint(ai.agents[0].algo.val))
+				print('Val_loss', pprint(ai.agents[0].algo.value_loss))
+				print('Mean_loss', pprint(ai.agents[0].algo.mean_loss))
+				print('Std_loss', pprint(ai.agents[0].algo.std_loss))
+
+			print('########################################################################')
 
 
 

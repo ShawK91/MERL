@@ -39,9 +39,9 @@ class Agent:
 
 		#### INITIALIZE PG ALGO #####
 		if args.algo_name == 'TD3':
-			self.algo = TD3(args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.init_w)
+			self.algo = TD3(args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.init_w)
 		else:
-			self.algo = SAC(args.state_dim, args.action_dim, args.hidden_size, args.gamma, args.critic_lr, args.actor_lr, args.tau, args.alpha, args.target_update_interval)
+			self.algo = SAC(args.state_dim, args.action_dim, args.hidden_size, args.gamma, args.critic_lr, args.actor_lr, args.tau, args.alpha, args.target_update_interval, args.savetag, args.aux_save)
 
 		#### Rollout Actor is a template used for MP #####
 		self.rollout_actor = self.manager.list()
