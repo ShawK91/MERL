@@ -19,7 +19,7 @@ parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-parser.add_argument('-config', type=str,  help='SAC Vs. TD3?', default='single_test')
+parser.add_argument('-config', type=str,  help='SAC Vs. TD3?', default='two_test')
 
 SEED = vars(parser.parse_args())['seed']
 USE_PG = vars(parser.parse_args())['pg']

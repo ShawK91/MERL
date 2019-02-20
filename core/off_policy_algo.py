@@ -14,9 +14,9 @@ class TD3(object):
 
 
 	 """
-	def __init__(self, algo_name, state_dim, action_dim, hidden_size, actor_lr, critic_lr, gamma, tau, savetag, foldername, init_w = True):
+	def __init__(self, id, algo_name, state_dim, action_dim, hidden_size, actor_lr, critic_lr, gamma, tau, savetag, foldername, init_w = True):
 
-		self.algo_name = algo_name; self.gamma = gamma; self.tau = tau; self.total_update = 0
+		self.algo_name = algo_name; self.gamma = gamma; self.tau = tau; self.total_update = 0; self.agent_id = id
 		self.tracker = utils.Tracker(foldername, ['q_'+savetag, 'qloss_'+savetag, 'policy_loss_'+savetag], '.csv', save_iteration=1000, conv_size=1000)
 
 		#Initialize actors
@@ -160,12 +160,13 @@ class TD3(object):
 			utils.soft_update(self.critic_target, self.critic, self.tau)
 
 			self.total_update += 1
-			self.tracker.update([self.q['mean'], self.q_loss['mean'], self.policy_loss['mean']], self.total_update)
+			if self.agent_id == 0:
+				self.tracker.update([self.q['mean'], self.q_loss['mean'], self.policy_loss['mean']], self.total_update)
 
 
 
 class SAC(object):
-	def __init__(self, num_inputs, action_dim, hidden_size, gamma, critic_lr, actor_lr, tau, alpha, target_update_interval, savetag, foldername):
+	def __init__(self, id, num_inputs, action_dim, hidden_size, gamma, critic_lr, actor_lr, tau, alpha, target_update_interval, savetag, foldername):
 
 		self.num_inputs = num_inputs
 		self.action_space = action_dim
@@ -176,6 +177,7 @@ class SAC(object):
 		self.target_update_interval = 1
 		self.tracker = utils.Tracker(foldername, ['q_'+savetag, 'qloss_'+savetag, 'value_'+savetag, 'value_loss_'+savetag, 'policy_loss_'+savetag, 'mean_loss_'+savetag, 'std_loss_'+savetag], '.csv',save_iteration=1000, conv_size=1000)
 		self.total_update = 0
+		self.agent_id = id
 
 		self.critic = QNetwork(self.num_inputs, self.action_space, hidden_size)
 		self.critic_optim = Adam(self.critic.parameters(), lr=critic_lr)
@@ -331,7 +333,8 @@ class SAC(object):
 		self.policy_optim.step()
 
 		self.total_update += 1
-		self.tracker.update([self.q['mean'], self.q_loss['mean'], self.val['mean'], self.value_loss['mean']
+		if self.agent_id == 0:
+			self.tracker.update([self.q['mean'], self.q_loss['mean'], self.val['mean'], self.value_loss['mean']
 								, self.policy_loss['mean'], self.mean_loss['mean'], self.std_loss['mean']], self.total_update)
 
 		"""
