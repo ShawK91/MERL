@@ -68,7 +68,7 @@ class ConfigSettings:
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2
 			self.angle_res = 15
-			self.num_poi = 6
+			self.num_poi = 9
 			self.num_agents = 6
 			self.ep_len = 50
 			self.poi_rand = 1
@@ -82,7 +82,7 @@ class ConfigSettings:
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2
 			self.angle_res = 15
-			self.num_poi = 6
+			self.num_poi = 9
 			self.num_agents = 8
 			self.ep_len = 50
 			self.poi_rand = 1
@@ -96,7 +96,7 @@ class ConfigSettings:
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2
 			self.angle_res = 15
-			self.num_poi = 6
+			self.num_poi = 9
 			self.num_agents = 6
 			self.ep_len = 100
 			self.poi_rand = 1
@@ -110,7 +110,7 @@ class ConfigSettings:
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2
 			self.angle_res = 15
-			self.num_poi = 6
+			self.num_poi = 9
 			self.num_agents = 8
 			self.ep_len = 100
 			self.poi_rand = 1
