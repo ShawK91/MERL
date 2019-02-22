@@ -222,8 +222,8 @@ class SSNE:
 
 		if isinstance(fitness_evals[0], list):
 			for i in range(len(fitness_evals)):
-				#fitness_evals[i] = sum(fitness_evals[i]/len(fitness_evals[i])) #Avergae
-				fitness_evals[i] = max(fitness_evals[i]) #Leniency
+				fitness_evals[i] = sum(fitness_evals[i])/len(fitness_evals[i]) #Avergae
+				#fitness_evals[i] = max(fitness_evals[i]) #Leniency
 
 		self.gen+= 1; num_elitists = int(self.args.elite_fraction * len(fitness_evals))
 		if num_elitists < 2: num_elitists = 2
