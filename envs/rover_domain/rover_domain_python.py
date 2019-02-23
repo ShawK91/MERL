@@ -8,6 +8,7 @@ class RoverDomain:
 	def __init__(self, args):
 
 		self.args = args
+		self.task_type = args.env_choice
 
 		#Gym compatible attributes
 		self.observation_space = np.zeros((1, int(2*360 / self.args.angle_res)))
@@ -19,6 +20,7 @@ class RoverDomain:
 		self.poi_pos = [[None, None] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][x, y] coordinate
 		self.poi_status = [False for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][status] --> [T/F] is observed?
 		self.poi_value = [float(i+1) for i in range(self.args.num_poi)]  # FORMAT: [poi_id][value]?
+		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 
 		# Initialize rover pose container
 		self.rover_pos = [[0.0, 0.0, 0.0] for _ in range(self.args.num_agents)]  # FORMAT: [rover_id][x, y, orientation] coordinate with pose info
@@ -28,11 +30,13 @@ class RoverDomain:
 		self.rover_path = [[] for _ in range(self.args.num_agents)] # FORMAT: [rover_id][timestep][x, y]
 		self.action_seq = [[0.0 for _ in range(2)] for _ in range(self.args.num_agents)] # FORMAT: [timestep][rover_id][action]
 
+
 	def reset(self):
 		self.reset_poi_pos()
 		self.reset_rover_pos()
 		self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
 		self.poi_status = [False for _ in range(self.args.num_poi)]
+		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 		self.rover_path = [[] for _ in range(self.args.num_agents)]
 		self.action_seq = [[0.0 for _ in range(2)] for _ in range(self.args.num_agents)]
 		self.istep = 0
@@ -243,8 +247,8 @@ class RoverDomain:
 		for poi_id, rovers in enumerate(poi_visitors):
 			if len(rovers) >= self.args.coupling:
 				self.poi_status[poi_id] = True
-				lucky_rovers = random.sample(rovers, self.args.coupling)
-				for rover_id in lucky_rovers:
+				self.poi_visitor_list[poi_id] = rovers[:]
+				for rover_id in rovers:
 					rewards[rover_id] += self.poi_value[poi_id]
 
 
@@ -255,7 +259,23 @@ class RoverDomain:
 	def get_global_reward(self):
 		#use
 		#self.rover_path and self.poi_pos and self.poi_value to compute TRAJECTORY_WIDE REWARD
-		pass
+		if self.task_type == 'rover_loose':
+			global_rew = 0.0; max_reward = 0.0
+			for value, visitors in zip(self.poi_value, self.poi_visitor_list):
+				global_rew += value * len(visitors)
+				max_reward += self.args.num_agents * value
+
+
+		if self.task_type == 'rover_tight':
+			global_rew = 0.0; max_reward = 0.0
+			for value, status in zip(self.poi_value, self.poi_status):
+				global_rew += status * value
+				max_reward += value
+
+
+		return global_rew/max_reward
+
+
 
 
 
