@@ -65,6 +65,8 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			#     print('PG', list(joint_action[0][0]))
 
 			next_state = utils.to_tensor(np.array(next_state))
+
+			#Grab global reward as fitnesses
 			for i, grew in enumerate(global_reward):
 				if grew != None: fitness[i] = grew
 
@@ -73,17 +75,18 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			if store_transitions:
 				for agent_id in range(args.config.num_agents):
 					for universe_id in range(NUM_EVALS):
-						rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(joint_state)[agent_id,universe_id, :], 0),
-													  np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
-													  np.expand_dims(np.array(joint_action)[agent_id,universe_id, :], 0),
-													  np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
-													  np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0)])
+						if not done[universe_id]:
+							rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(joint_state)[agent_id,universe_id, :], 0),
+														  np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
+														  np.expand_dims(np.array(joint_action)[agent_id,universe_id, :], 0),
+														  np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
+														  np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0)])
 
 			joint_state = next_state
 			frame+=NUM_EVALS
 
 			#DONE FLAG IS Received
-			if done[0]:
+			if sum(done)==len(done):
 				#Push experiences to main
 				if store_transitions:
 					for agent_id, buffer in enumerate(data_bucket):
@@ -95,10 +98,12 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 		if type == "test" and random.random() < 0.9:
 			env.render()
+			print([len(world.rover_path[0]) for world in env.universe])
 
 			#print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
 
 		#Send back id, fitness, total length and shaped fitness using the result pipe
+
 		result_pipe.send([teams_blueprint, [fitness], frame])
 
 

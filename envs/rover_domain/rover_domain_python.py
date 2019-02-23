@@ -15,6 +15,7 @@ class RoverDomain:
 		self.action_space = np.zeros((1, 2))
 
 		self.istep = 0 #Current Step counter
+		self.done = False
 
 		# Initialize POI containers tha track POI position and status
 		self.poi_pos = [[None, None] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][x, y] coordinate
@@ -32,6 +33,7 @@ class RoverDomain:
 
 
 	def reset(self):
+		self.done = False
 		self.reset_poi_pos()
 		self.reset_rover_pos()
 		self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
@@ -44,8 +46,14 @@ class RoverDomain:
 
 
 	def step(self, joint_action):
-		self.istep += 1
 
+		#If done send back dummy trasnsition
+		if self.done:
+			dummy_state, dummy_reward, done, info = self.dummy_transition()
+			return dummy_state, dummy_reward, done, info
+
+
+		self.istep += 1
 		joint_action = joint_action.clip(-1.0, 1.0)
 
 
@@ -73,13 +81,13 @@ class RoverDomain:
 
 
 		#Compute done
-		done = int(self.istep >= self.args.ep_len or sum(self.poi_status) == len(self.poi_status))
+		self.done = int(self.istep >= self.args.ep_len or sum(self.poi_status) == len(self.poi_status))
 
 		#info
 		global_reward = None
-		if done: global_reward = self.get_global_reward()
+		if self.done: global_reward = self.get_global_reward()
 
-		return self.get_joint_state(), self.get_local_reward(), done, global_reward
+		return self.get_joint_state(), self.get_local_reward(), self.done, global_reward
 
 
 	def reset_poi_pos(self):
@@ -253,6 +261,13 @@ class RoverDomain:
 
 
 		return rewards
+
+
+	def dummy_transition(self):
+		joint_state = [[0.0 for _ in range(int(720 / self.args.angle_res))] for _ in range(self.args.num_agents)]
+		rewards = [0.0 for _ in range(self.args.num_agents)]
+
+		return joint_state, rewards, True, None
 
 
 	#TODO

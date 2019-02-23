@@ -183,7 +183,7 @@ class Parameters:
 		#Dependents
 		self.state_dim = int(720 / self.config.angle_res)
 		self.action_dim = 2
-		self.num_test = 1
+		self.num_test = 25
 
 		#Save Filenames
 		self.savetag = vars(parser.parse_args())['savetag'] + \
