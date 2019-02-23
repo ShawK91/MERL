@@ -4,8 +4,8 @@ import torch.nn.functional as F
 from torch.distributions import Normal
 
 
-LOG_SIG_MAX = 20
-LOG_SIG_MIN = -20
+LOG_SIG_MAX = 5
+LOG_SIG_MIN = -10
 epsilon = 1e-6
 
 class Actor(nn.Module):
@@ -93,7 +93,7 @@ class Actor(nn.Module):
 
         elif self.policy_type == 'DeterministicPolicy':
             mean = self.clean_action(state)
-            action = mean + self.noise.normal_(0., std=0.2)
+            action = mean + self.noise.normal_(0., std=0.4)
 
             if return_only_action: return action
             else: return action, torch.tensor(0.), torch.tensor(0.), mean, torch.tensor(0.)

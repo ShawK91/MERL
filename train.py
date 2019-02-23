@@ -18,7 +18,7 @@ parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  de
 parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='SAC')
 parser.add_argument('-savetag', help='Saved tag',  default='')
-parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=0.1)
+parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
 parser.add_argument('-config', type=str,  help='World Setting?', default='ssd')
 
 SEED = vars(parser.parse_args())['seed']
@@ -40,7 +40,7 @@ class ConfigSettings:
 			self.dim_x = self.dim_y = 10
 			self.obs_radius = self.dim_x * 10;
 			self.act_dist = 2;
-			self.angle_res = 1
+			self.angle_res = 20
 			self.num_poi = 3
 			self.num_agents = 3
 			self.ep_len = 10
