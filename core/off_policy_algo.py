@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.optim import Adam
 import numpy as np
 from core import mod_utils as utils
-from core.models import Actor, QNetwork, ValueNetwork
+from core.models import Actor, QNetwork, ValueNetwork, ActualizationNetwork
 
 
 class TD3(object):
@@ -14,10 +14,10 @@ class TD3(object):
 
 
 	 """
-	def __init__(self, id, algo_name, state_dim, action_dim, hidden_size, actor_lr, critic_lr, gamma, tau, savetag, foldername, init_w = True):
+	def __init__(self, id, algo_name, state_dim, action_dim, hidden_size, actor_lr, critic_lr, gamma, tau, savetag, foldername, actualize, init_w = True):
 
-		self.algo_name = algo_name; self.gamma = gamma; self.tau = tau; self.total_update = 0; self.agent_id = id
-		self.tracker = utils.Tracker(foldername, ['q_'+savetag, 'qloss_'+savetag, 'policy_loss_'+savetag], '.csv', save_iteration=1000, conv_size=1000)
+		self.algo_name = algo_name; self.gamma = gamma; self.tau = tau; self.total_update = 0; self.agent_id = id;	self.actualize = actualize
+		self.tracker = utils.Tracker(foldername, ['q_'+savetag, 'qloss_'+savetag, 'policy_loss_'+savetag, 'alz_score'+savetag,'alz_policy'+savetag], '.csv', save_iteration=1000, conv_size=1000)
 
 		#Initialize actors
 		self.policy = Actor(state_dim, action_dim, hidden_size, policy_type='DeterministicPolicy')
@@ -33,6 +33,13 @@ class TD3(object):
 		utils.hard_update(self.critic_target, self.critic)
 		self.critic_optim = Adam(self.critic.parameters(), critic_lr)
 
+		if actualize:
+			self.ANetwork = ActualizationNetwork(state_dim, action_dim, hidden_size)
+			if init_w: self.ANetwork.apply(utils.init_weights)
+			self.actualize_optim = Adam(self.ANetwork.parameters(), critic_lr)
+			self.actualize_lr = 0.2
+			self.ANetwork.cuda()
+
 		self.loss = nn.MSELoss()
 
 		self.policy_target.cuda(); self.critic_target.cuda(); self.policy.cuda(); self.critic.cuda()
@@ -43,11 +50,13 @@ class TD3(object):
 		self.policy_loss = {'min':None, 'max': None, 'mean':None, 'std':None}
 		self.q_loss = {'min':None, 'max': None, 'mean':None, 'std':None}
 		self.q = {'min':None, 'max': None, 'mean':None, 'std':None}
+		self.alz_score = {'min':None, 'max': None, 'mean':None, 'std':None}
+		self.alz_policy = {'min':None, 'max': None, 'mean':None, 'std':None}
 		#self.val = {'min':None, 'max': None, 'mean':None, 'std':None}
 		#self.value_loss = {'min':None, 'max': None, 'mean':None, 'std':None}
 
 
-	def update_parameters(self, state_batch, next_state_batch, action_batch, reward_batch, done_batch, num_epoch=1, **kwargs):
+	def update_parameters(self, state_batch, next_state_batch, action_batch, reward_batch, done_batch, global_reward, num_epoch=1, **kwargs):
 		"""Runs a step of Bellman upodate and policy gradient using a batch of experiences
 
 			 Parameters:
@@ -63,7 +72,7 @@ class TD3(object):
 
 		 """
 
-		if isinstance(state_batch, list): state_batch = torch.cat(state_batch); next_state_batch = torch.cat(next_state_batch); action_batch = torch.cat(action_batch); reward_batch = torch.cat(reward_batch). done_batch = torch.cat(done_batch)
+		if isinstance(state_batch, list): state_batch = torch.cat(state_batch); next_state_batch = torch.cat(next_state_batch); action_batch = torch.cat(action_batch); reward_batch = torch.cat(reward_batch). done_batch = torch.cat(done_batch); global_reward = torch.cat(global_reward)
 
 		for _ in range(num_epoch):
 			########### CRITIC UPDATE ####################
@@ -93,6 +102,14 @@ class TD3(object):
 				target_q = reward_batch + (self.gamma * next_q)
 				#if self.args.use_advantage: target_val = reward_batch + (self.gamma * next_val)
 
+			if self.actualize:
+				##########Actualization Network Update
+				current_Ascore = self.ANetwork.forward(state_batch, action_batch)
+				utils.compute_stats(current_Ascore, self.alz_score)
+				target_Ascore = (self.actualize_lr) * (global_reward * 10.0) + (1 - self.actualize_lr) * current_Ascore.detach()
+				actualize_loss = self.loss(target_Ascore, current_Ascore).mean()
+
+
 
 			self.critic_optim.zero_grad()
 			current_q1, current_q2 = self.critic.forward((state_batch), (action_batch))
@@ -114,6 +131,11 @@ class TD3(object):
 			self.critic_optim.step()
 			self.num_critic_updates += 1
 
+			if self.actualize:
+				self.actualize_optim.zero_grad()
+				actualize_loss.backward()
+				self.actualize_optim.step()
+
 
 			#Delayed Actor Update
 			if self.num_critic_updates % kwargs['policy_ups_freq'] == 0:
@@ -131,8 +153,15 @@ class TD3(object):
 				# if self.args.use_advantage: policy_loss = -(Q1 - val)
 				policy_loss = -Q1
 
-				utils.compute_stats(policy_loss,self.policy_loss)
+				utils.compute_stats(-policy_loss,self.policy_loss)
 				policy_loss = policy_loss.mean()
+
+				###Actualzie Policy Update
+				if self.actualize:
+					A1 = self.ANetwork.forward(state_batch, actor_actions)
+					utils.compute_stats(A1, self.alz_policy)
+					policy_loss += -A1.mean()
+
 
 
 				self.policy_optim.zero_grad()
@@ -161,12 +190,12 @@ class TD3(object):
 
 			self.total_update += 1
 			if self.agent_id == 0:
-				self.tracker.update([self.q['mean'], self.q_loss['mean'], self.policy_loss['mean']], self.total_update)
+				self.tracker.update([self.q['mean'], self.q_loss['mean'], self.policy_loss['mean'],self.alz_score['mean'], self.alz_policy['mean']] ,self.total_update)
 
 
 
 class SAC(object):
-	def __init__(self, id, num_inputs, action_dim, hidden_size, gamma, critic_lr, actor_lr, tau, alpha, target_update_interval, savetag, foldername):
+	def __init__(self, id, num_inputs, action_dim, hidden_size, gamma, critic_lr, actor_lr, tau, alpha, target_update_interval, savetag, foldername, actualize):
 
 		self.num_inputs = num_inputs
 		self.action_space = action_dim
@@ -178,6 +207,7 @@ class SAC(object):
 		self.tracker = utils.Tracker(foldername, ['q_'+savetag, 'qloss_'+savetag, 'value_'+savetag, 'value_loss_'+savetag, 'policy_loss_'+savetag, 'mean_loss_'+savetag, 'std_loss_'+savetag], '.csv',save_iteration=1000, conv_size=1000)
 		self.total_update = 0
 		self.agent_id = id
+		self.actualize = actualize
 
 		self.critic = QNetwork(self.num_inputs, self.action_space, hidden_size)
 		self.critic_optim = Adam(self.critic.parameters(), lr=critic_lr)

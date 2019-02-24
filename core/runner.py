@@ -1,4 +1,4 @@
-from envs.env_wrapper import SSDDomainWait, RoverDomainPython
+from envs.env_wrapper import RoverDomainPython
 from core import mod_utils as utils
 import numpy as np, random, sys
 
@@ -80,7 +80,8 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 														  np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
 														  np.expand_dims(np.array(joint_action)[agent_id,universe_id, :], 0),
 														  np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
-														  np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0)])
+														  np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
+														  universe_id])
 
 			joint_state = next_state
 			frame+=NUM_EVALS
@@ -90,7 +91,10 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 				#Push experiences to main
 				if store_transitions:
 					for agent_id, buffer in enumerate(data_bucket):
-						for entry in rollout_trajectory[agent_id]: buffer.append(entry)
+						for entry in rollout_trajectory[agent_id]:
+							temp_global_reward = fitness[entry[-1]]
+							entry[-1] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
+							buffer.append(entry)
 
 				break
 

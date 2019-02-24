@@ -39,9 +39,9 @@ class Agent:
 
 		#### INITIALIZE PG ALGO #####
 		if args.algo_name == 'TD3':
-			self.algo = TD3(id, args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.init_w)
+			self.algo = TD3(id, args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr, args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.actualize, args.init_w)
 		else:
-			self.algo = SAC(id, args.state_dim, args.action_dim, args.hidden_size, args.gamma, args.critic_lr, args.actor_lr, args.tau, args.alpha, args.target_update_interval, args.savetag, args.aux_save)
+			self.algo = SAC(id, args.state_dim, args.action_dim, args.hidden_size, args.gamma, args.critic_lr, args.actor_lr, args.tau, args.alpha, args.target_update_interval, args.savetag, args.aux_save, args.actualize)
 
 		#### Rollout Actor is a template used for MP #####
 		self.rollout_actor = self.manager.list()
@@ -68,9 +68,9 @@ class Agent:
 		td3args = {'policy_noise': 0.2, 'policy_noise_clip': 0.5, 'policy_ups_freq': 2, 'action_low': -1.0, 'action_high': 1.0}
 
 		for _ in range(int(self.args.gradperstep * self.buffer.pg_frames)):
-			s, ns, a, r, done = self.buffer.sample(self.args.batch_size)
-			s = s.cuda(); ns = ns.cuda(); a = a.cuda(); r = r.cuda(); done = done.cuda()
-			self.algo.update_parameters(s, ns, a, r, done, 1, **td3args)
+			s, ns, a, r, done, global_reward = self.buffer.sample(self.args.batch_size)
+			s = s.cuda(); ns = ns.cuda(); a = a.cuda(); r = r.cuda(); done = done.cuda(); global_reward = global_reward.cuda()
+			self.algo.update_parameters(s, ns, a, r, done, global_reward, 1, **td3args)
 
 		self.buffer.pg_frames = 0 #Reset new frame counter to 0
 

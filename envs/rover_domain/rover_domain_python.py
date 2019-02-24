@@ -253,11 +253,11 @@ class RoverDomain:
 		#Compute reward
 		rewards = [0.0 for _ in range(self.args.num_agents)]
 		for poi_id, rovers in enumerate(poi_visitors):
-			if len(rovers) >= self.args.coupling:
-				self.poi_status[poi_id] = True
-				self.poi_visitor_list[poi_id] = rovers[:]
-				for rover_id in rovers:
-					rewards[rover_id] += self.poi_value[poi_id]
+				if self.task_type == 'rover_tight' and len(rovers) >= self.args.coupling or self.task_type == 'rover_loose' and len(rovers) >= 1:
+					self.poi_status[poi_id] = True
+					self.poi_visitor_list[poi_id] = rovers[:]
+					for rover_id in rovers:
+						rewards[rover_id] += self.poi_value[poi_id]
 
 
 		return rewards
