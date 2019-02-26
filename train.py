@@ -11,16 +11,16 @@ import threading
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=1)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
 parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
 parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
-parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=5)
+parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=3)
 parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-parser.add_argument('-config', type=str,  help='World Setting?', default='ssd')
-parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_loose')
+parser.add_argument('-config', type=str,  help='World Setting?', default='20_2')
+parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_tight')
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=False)
 
 SEED = vars(parser.parse_args())['seed']
@@ -116,7 +116,7 @@ class ConfigSettings:
 			self.angle_res = 15
 			self.num_poi = 9
 			self.num_agents = 6
-			self.ep_len = 100
+			self.ep_len = 50
 			self.poi_rand = 1
 			self.coupling = 3
 			self.rover_speed = 1
@@ -130,7 +130,7 @@ class ConfigSettings:
 			self.angle_res = 15
 			self.num_poi = 9
 			self.num_agents = 8
-			self.ep_len = 100
+			self.ep_len = 50
 			self.poi_rand = 1
 			self.coupling = 4
 			self.rover_speed = 1
