@@ -2,6 +2,7 @@ import numpy as np
 import random
 import torch
 from torch.multiprocessing import Manager
+from core.mod_utils import compute_stats
 
 
 class Buffer():
@@ -24,6 +25,10 @@ class Buffer():
 		#Priority indices
 		self.top_r = None
 		self.top_g = None
+
+		#Stats
+		self.rstats = {'min': None, 'max': None, 'mean': None, 'std': None}
+		self.gstats = {'min': None, 'max': None, 'mean': None, 'std': None}
 
 
 	def referesh(self):
@@ -104,5 +109,7 @@ class Buffer():
 		self.top_r = list(np.argsort(np.vstack(self.r), axis=0)[-int(len(self.s)/10):])
 		self.top_g = list(np.argsort(np.vstack(self.global_reward), axis=0)[-int(len(self.s) / 10):])
 
-
+		#Update Stats
+		compute_stats(self.rT, self.rstats)
+		compute_stats(self.global_rewardT, self.gstats)
 

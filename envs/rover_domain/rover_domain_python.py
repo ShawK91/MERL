@@ -316,7 +316,7 @@ class RoverDomain:
 		for row in grid:
 			print(row)
 		#print(self.rover_path)
-		for i, temp in enumerate(self.action_seq):
+		for i, temp in enumerate(self.action_seq[0:10]):
 			print('Action Sequence Rover ', str(i), temp)
 		print()
 

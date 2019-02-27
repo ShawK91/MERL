@@ -425,6 +425,10 @@ if __name__ == "__main__":
 				print('Mean_loss', pprint(ai.agents[0].algo.mean_loss))
 				print('Std_loss', pprint(ai.agents[0].algo.std_loss))
 
+			#Buffer Stats
+			print('R_mean:', [agent.buffer.rstats['mean'] for agent in ai.agents])
+			print('G_mean:', [agent.buffer.gstats['mean'] for agent in ai.agents])
+
 			print('########################################################################')
 
 
