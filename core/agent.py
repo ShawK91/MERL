@@ -68,7 +68,7 @@ class Agent:
 		td3args = {'policy_noise': 0.2, 'policy_noise_clip': 0.5, 'policy_ups_freq': 2, 'action_low': -1.0, 'action_high': 1.0}
 
 		for _ in range(int(self.args.gradperstep * self.buffer.pg_frames)):
-			s, ns, a, r, done, global_reward = self.buffer.sample(self.args.batch_size)
+			s, ns, a, r, done, global_reward = self.buffer.sample(self.args.batch_size, pr_rew=self.args.priority_rate, pr_global=self.args.priority_rate)
 			s = s.cuda(); ns = ns.cuda(); a = a.cuda(); r = r.cuda(); done = done.cuda(); global_reward = global_reward.cuda()
 			self.algo.update_parameters(s, ns, a, r, done, global_reward, 1, **td3args)
 

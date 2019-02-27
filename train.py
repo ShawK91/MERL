@@ -22,6 +22,8 @@ parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',
 parser.add_argument('-config', type=str,  help='World Setting?', default='20_2')
 parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_tight')
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=False)
+parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
+
 
 SEED = vars(parser.parse_args())['seed']
 USE_PG = vars(parser.parse_args())['pg']
@@ -148,6 +150,7 @@ class Parameters:
 		self.num_evals = vars(parser.parse_args())['evals']
 		self.frames_bound = 100000000
 		self.actualize = vars(parser.parse_args())['alz']
+		self.priority_rate = vars(parser.parse_args())['pr']
 
 		#Rover domain
 		self.config = ConfigSettings()
@@ -196,7 +199,8 @@ class Parameters:
 				   '_config' + str(self.config.config) + \
 				   '_alz' + str(self.actualize) + \
 		           '_use_pg' + str(USE_PG) + \
-		           '_env' + str(self.config.env_choice)
+		           '_env' + str(self.config.env_choice) +\
+			       '_pr' + str(self.priority_rate)
 			#'_seed' + str(SEED)
 
 
