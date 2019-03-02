@@ -7,11 +7,11 @@ from torch.multiprocessing import Process, Pipe
 import core.mod_utils as mod
 import argparse
 import random
-import threading
+import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=20)
 parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
 parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=3)
@@ -19,7 +19,7 @@ parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-parser.add_argument('-config', type=str,  help='World Setting?', default='20_2')
+parser.add_argument('-config', type=str,  help='World Setting?', default='15_3')
 parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_tight')
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=False)
 parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
@@ -54,7 +54,7 @@ class ConfigSettings:
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
-		if config == 'single_test':
+		elif config == 'single_test':
 			# Rover domain
 			self.dim_x = self.dim_y = 10
 			self.obs_radius = self.dim_x * 10;
@@ -68,7 +68,7 @@ class ConfigSettings:
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
-		if config == 'two_test':
+		elif config == 'two_test':
 			# Rover domain
 			self.dim_x = self.dim_y = 10
 			self.obs_radius = self.dim_x * 10;
@@ -82,11 +82,11 @@ class ConfigSettings:
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
-		if config == '15_1':
+		elif config == '15_3':
 			# Rover domain
 			self.dim_x = self.dim_y = 15
 			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 2
+			self.act_dist = 3
 			self.angle_res = 15
 			self.num_poi = 9
 			self.num_agents = 6
@@ -96,11 +96,11 @@ class ConfigSettings:
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
-		if config == '15_2':
+		elif config == '15_4':
 			# Rover domain
 			self.dim_x = self.dim_y = 15
 			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 2
+			self.act_dist = 3
 			self.angle_res = 15
 			self.num_poi = 9
 			self.num_agents = 8
@@ -110,11 +110,11 @@ class ConfigSettings:
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
-		if config == '20_1':
+		elif config == '20_3':
 			# Rover domain
 			self.dim_x = self.dim_y = 20
 			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 2
+			self.act_dist = 3
 			self.angle_res = 15
 			self.num_poi = 9
 			self.num_agents = 6
@@ -124,11 +124,11 @@ class ConfigSettings:
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
-		if config == '20_2':
+		elif config == '20_4':
 			# Rover domain
-			self.dim_x = self.dim_y = 15
+			self.dim_x = self.dim_y = 20
 			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 2
+			self.act_dist = 3
 			self.angle_res = 15
 			self.num_poi = 9
 			self.num_agents = 8
@@ -137,6 +137,9 @@ class ConfigSettings:
 			self.coupling = 4
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
+
+		else:
+			sys.exit('Unknown Config')
 
 
 class Parameters:

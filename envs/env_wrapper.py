@@ -203,58 +203,41 @@ class RoverDomainCython:
 		print('------------------------------------------------------------------------')
 
 
-class SSDDomainWait:
-	"""Wrapper around the Environment to expose a cleaner interface for RL
 
+
+
+class EnvironmentWrapper:
+	"""Wrapper around the Environment to expose a cleaner interface for RL
 		Parameters:
 			env_name (str): Env name
-
-
 	"""
-	def __init__(self, args, num_envs):
+	def __init__(self, env_name, ALGO):
 		"""
 		A base template for all environment wrappers.
 		"""
-		#Initialize world with requiste params
-		self.args = args
+		import gym
+		self.env = gym.make(env_name)
+		self.action_low = float(self.env.action_space.low[0])
+		self.action_high = float(self.env.action_space.high[0])
+		self.ALGO = ALGO
 
-		from envs.ssd_wait import SSD_Wait
 
-		self.universe = [] #Universe - collection of all envs running in parallel
-		for _ in range(num_envs):
-			env = SSD_Wait(args.config)
-			self.universe.append(env)
-
-		#Action Space
-		self.action_low = -1.0
-		self.action_high = 1.0
 
 
 	def reset(self):
 		"""Method overloads reset
 			Parameters:
 				None
-
 			Returns:
 				next_obs (list): Next state
 		"""
-		joint_obs = []
-		for env in self.universe:
-			obs = env.reset()
-			joint_obs.append(obs)
-
-		joint_obs = np.stack(joint_obs, axis=1)
-		#returns [agent_id, universe_id, obs]
-
-		return joint_obs
+		return self.env.reset()
 
 
-	def step(self, action): #Expects a numpy action
+	def step(self, action: object): #Expects a numpy action
 		"""Take an action to forward the simulation
-
 			Parameters:
 				action (ndarray): action to take in the env
-
 			Returns:
 				next_obs (list): Next state
 				reward (float): Reward for this step
@@ -262,20 +245,12 @@ class SSDDomainWait:
 				info (None): Template from OpenAi gym (doesnt have anything)
 		"""
 
-		joint_obs = []; joint_reward = []; joint_done = []; joint_info = []
-		for universe_id, env in enumerate(self.universe):
-			next_state, reward, done, info = env.step(action[:,universe_id,:])
-			joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done); joint_info.append(info)
+		if self.ALGO == "SAC": action = (action + 1.0) / 2.0  # [-1, 1] => [0, 1]
 
-		joint_obs = np.stack(joint_obs, axis=1)
-		joint_reward = np.stack(joint_reward, axis=1)
-
-		return joint_obs, joint_reward, joint_done, joint_info
-
-
+		action = self.action_low + action * (self.action_high - self.action_low)
+		return self.env.step(action)
 
 	def render(self):
+		self.env.render()
 
-		rand_univ = np.random.randint(0, len(self.universe))
-		self.universe[rand_univ].render()
 
