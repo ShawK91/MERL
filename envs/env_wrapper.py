@@ -204,9 +204,7 @@ class RoverDomainCython:
 
 
 
-
-
-class EnvironmentWrapper:
+class DM_Soccer:
 	"""Wrapper around the Environment to expose a cleaner interface for RL
 		Parameters:
 			env_name (str): Env name
@@ -215,10 +213,11 @@ class EnvironmentWrapper:
 		"""
 		A base template for all environment wrappers.
 		"""
+		from dm_control.locomotion import soccer as dm_soccer
+
 		import gym
-		self.env = gym.make(env_name)
-		self.action_low = float(self.env.action_space.low[0])
-		self.action_high = float(self.env.action_space.high[0])
+		self.env = dm_soccer.load(team_size=2, time_limit=10.)
+		self.action_specs = env.action_spec()
 		self.ALGO = ALGO
 
 
