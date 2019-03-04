@@ -31,6 +31,8 @@ class Buffer():
 		self.gstats = {'min': None, 'max': None, 'mean': None, 'std': None}
 
 
+
+
 	def referesh(self):
 		"""Housekeeping
 			Parameters:
@@ -42,14 +44,18 @@ class Buffer():
 		# Add ALL EXPERIENCE COLLECTED TO MEMORY concurrently
 		for _ in range(len(self.tuples)):
 			exp = self.tuples.pop()
-			self.s.append(exp[0])
-			self.ns.append(exp[1])
-			self.a.append(exp[2])
-			self.r.append(exp[3])
-			self.done.append(exp[4])
-			self.global_reward.append(exp[5])
-			self.pg_frames += 1
-			self.total_frames += 1
+
+			#Only save if [gstats is unknown] OR [exp from evo and global reward is > than (mean_g + max_g)/2] OR [exp from pg]
+			if self.gstats['mean'] == None or exp[6] == 'evo' and exp[5] >= (self.gstats['mean'] + self.gstats['max'])/2.0 or exp[6] == 'pg':
+
+				self.s.append(exp[0])
+				self.ns.append(exp[1])
+				self.a.append(exp[2])
+				self.r.append(exp[3])
+				self.done.append(exp[4])
+				self.global_reward.append(exp[5])
+				self.pg_frames += 1
+				self.total_frames += 1
 
 
 		#Trim to make the buffer size < capacity

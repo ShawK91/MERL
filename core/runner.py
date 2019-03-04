@@ -24,7 +24,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 	if type == 'test': NUM_EVALS = args.num_test
 	elif type == 'pg': NUM_EVALS = args.rollout_size
-	elif type == 'evo': NUM_EVALS = 1
+	elif type == 'evo': NUM_EVALS = 10
 	else: sys.exit('Incorrect type')
 
 	if args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose': env = RoverDomainPython(args, NUM_EVALS)
@@ -81,7 +81,8 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 														  np.expand_dims(np.array(joint_action)[agent_id,universe_id, :], 0),
 														  np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
 														  np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
-														  universe_id])
+														  universe_id,
+							                              type])
 
 			joint_state = next_state
 			frame+=NUM_EVALS
@@ -92,8 +93,8 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 				if store_transitions:
 					for agent_id, buffer in enumerate(data_bucket):
 						for entry in rollout_trajectory[agent_id]:
-							temp_global_reward = fitness[entry[-1]]
-							entry[-1] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
+							temp_global_reward = fitness[entry[5]]
+							entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
 							buffer.append(entry)
 
 				break

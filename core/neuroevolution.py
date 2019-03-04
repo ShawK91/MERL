@@ -301,8 +301,8 @@ class SSNE:
 				#wwid1 = genealogy.crossover(int(pop[i].wwid.item()), int(pop[j].wwid.item()), gen)
 				#wwid2 = genealogy.crossover(int(pop[i].wwid.item()), int(pop[j].wwid.item()), gen)
 				#pop[i].wwid[0] = wwid1; pop[j].wwid[0] = wwid2
-				self.lineage[i] = (self.lineage[off_i]+self.lineage[off_j])/2
-				self.lineage[j] = (self.lineage[off_i] + self.lineage[off_j]) / 2
+				self.lineage[i] = (self.lineage[i]+self.lineage[j])/2
+				self.lineage[j] = (self.lineage[i] + self.lineage[j]) / 2
 
 
 		# Mutate all genes in the population except the new elitists
