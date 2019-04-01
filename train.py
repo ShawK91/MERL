@@ -11,17 +11,17 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=20)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
 parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
 parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
-parser.add_argument('-seed', type=float,  help='#Seed',  default=2019)
+parser.add_argument('-seed', type=float,  help='#Seed',  default=1)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-parser.add_argument('-config', type=str,  help='World Setting?', default='15_3')
-parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_tight')
-parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=False)
+parser.add_argument('-config', type=str,  help='World Setting?', default='two_test')
+parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_loose')
+parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=True)
 parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
 
 

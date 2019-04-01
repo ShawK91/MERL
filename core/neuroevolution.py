@@ -1,4 +1,4 @@
-import random
+import random, sys
 import numpy as np
 import math
 import core.mod_utils as utils
@@ -16,11 +16,29 @@ class SSNE:
 
 	def __init__(self, args):
 		self.gen = 0
-		self.args = args;
-		self.population_size = self.args.popn_size;
+
 		#RL TRACKERS
 		self.rl_sync_pool = []; self.all_offs = []; self.rl_res = {"elites":0.0, 'selects': 0.0, 'discarded':0.0}; self.num_rl_syncs = 0.0001
-		self.lineage = [0.0 for _ in range(self.population_size)]; self.lineage_depth = 10
+
+		#Lineage scores
+		self.lineage = [[] for _ in range(self.args.popn_size)]
+
+		#Import Params
+		self.popn_size = self.args.popn_size
+		self.crossover_prob = args.crossover_prob
+		self.mutation_prob = args.mutation_prob
+		self.extinction_prob = args.extinction_prob  # Probability of extinction event
+		self.extinction_magnituide = args.extinction_magnitude  # Probabilty of extinction for each genome, given an extinction event
+		self.weight_clamp = args.weight_clamp
+		self.mut_distribution = args.mut_distribution
+		self.lineage_depth = args.lineage_depth
+		self.ccea_reduction = args.ccea_reduction
+		self.num_probes = args.num_probes
+		self.num_anchors = args.num_anchors
+		self.num_elites = 2
+
+
+
 
 	def selection_tournament(self, index_rank, num_offsprings, tournament_size):
 		"""Conduct tournament selection
@@ -206,13 +224,65 @@ class SSNE:
 		for param in (gene.parameters()):
 			param.data.copy_(param.data)
 
-	def evolve(self, pop, fitness_evals, migration):
+	def get_anchors(self, states, pop, net_inds, lineage_rank):
+
+		#Compute all actions
+		actions = [pop[i].clean_action(states) for i in net_inds]
+
+		#Compute div_scores
+		div_matrix = np.zeros((len(net_inds), len(net_inds)))
+		for i in range(len(net_inds)):
+			for j in range(len(net_inds)):
+				div_matrix[i,j] = ((actions[i]-actions[j])**2).mean().item()
+
+		#Get the anchor indices [indices to net_inds]
+		anchor_inds = [0]
+		for _ in range(self.num_anchors-1):
+
+			#Compute div_distance with existing probes
+			div_dist = div_matrix[0]
+			for ind in anchor_inds:
+				if ind == 0: continue
+				div_dist += div_matrix[ind]
+
+			#Get div_rank based on the div_dist with existing probes
+			div_rank = np.argsort(div_dist).flip()
+
+			#Hybridize neg_scores
+			neg_scores = [0 for _ in range(net_inds)]
+			for i, div_ind in enumerate(div_rank):
+				neg_scores[div_ind] += i
+
+			for i, lineage_ind in enumerate(lineage_rank.list()):
+				neg_scores[lineage_rank] += i
+
+			#Compute hybrid rank
+			hybrid_rank = self.list_argsort(neg_scores)
+
+			#Add anchor
+			while True:
+				for ind in hybrid_rank:
+					if ind in anchor_inds: continue
+					else:
+						anchor_inds.append(ind)
+						break
+
+		return anchor_inds
+
+
+
+
+
+
+
+
+	def evolve(self, pop, net_inds, fitness_evals, migration, states):
 		"""Method to implement a round of selection and mutation operation
 
 			Parameters:
 				  pop (shared_list): Population of models
 				  net_inds (list): Indices of individuals evaluated this generation
-				  fitness_evals (list): Fitness values for evaluated individuals
+				  fitness_evals (list of lists): Fitness values for evaluated individuals
 				  **migration (object): Policies from learners to be synced into population
 
 			Returns:
@@ -220,26 +290,45 @@ class SSNE:
 
 		"""
 
+		self.gen+= 1
+
+		#Convert the list of fitness values corresponding to each individual into a float [CCEA Reduction]
 		if isinstance(fitness_evals[0], list):
 			for i in range(len(fitness_evals)):
-				#fitness_evals[i] = sum(fitness_evals[i])/len(fitness_evals[i]) #Average
-				fitness_evals[i] = max(fitness_evals[i]) #Leniency
+				if self.ccea_reduction == "mean": fitness_evals[i] = sum(fitness_evals[i])/len(fitness_evals[i])
+				elif self.ccea_reduction == "leniency":fitness_evals[i] = max(fitness_evals[i])
+				elif self.ccea_reduction == "min": fitness_evals[i] = min(fitness_evals[i])
+				else: sys.exit('Incorrect ccea reduction scheme')
 
-		self.gen+= 1; num_elitists = int(self.args.elite_fraction * len(fitness_evals))
-		if num_elitists < 2: num_elitists = 2
 
-		#Update lineage
-		for i, fitness in enumerate(fitness_evals): self.lineage[i] = (self.lineage[i] * (self.lineage_depth-1) + fitness_evals[i])/(self.lineage_depth)
+		#Append new fitness to lineage
+		lineage_scores = [] #Tracks the average lineage score fot the generation
+		for ind, fitness in zip(net_inds, fitness_evals):
+			self.lineage[ind].append(fitness)
+			if len(self.lineage[ind]) > self.lineage_depth: self.lineage[ind].pop(0) #Housekeeping
+			lineage_scores.append(sum(self.lineage[ind])/len(self.lineage[ind]))
+
+
 
 		# Entire epoch is handled with indices; Index rank nets by fitness evaluation (0 is the best after reversing)
 		index_rank = self.list_argsort(fitness_evals); index_rank.reverse()
-		elitist_index = index_rank[:num_elitists]  # Elitist indexes safeguard
+		elitist_index = index_rank[:self.num_elites]  # Elitist indexes safeguard
 
 		#Lineage rankings to elitists
-		lineage_rank = self.list_argsort(self.lineage[:]); lineage_rank.reverse()
-		elitist_index = elitist_index + lineage_rank[:int(num_elitists)]
+		lineage_rank = self.list_argsort(lineage_scores[:]); lineage_rank.reverse()
+		elitist_index = elitist_index + lineage_rank[:int(self.num_elites)]
 
-		elitist_index = list(set(elitist_index)) #take out copies
+		#Take out copies in elitist indices
+		elitist_index = list(set(elitist_index))
+
+		#Compute anchors
+		anchor_inds = self.get_anchors(states, pop, net_inds[:], np.array(lineage_rank[:]))
+
+
+
+
+
+
 
 
 		# Selection step
@@ -315,6 +404,9 @@ class SSNE:
 
 		self.all_offs[:] = offsprings[:]
 		return new_elitists[0]
+
+
+
 
 
 
