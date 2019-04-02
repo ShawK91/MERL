@@ -306,6 +306,7 @@ class SSNE:
 		# print('Allocation', out)
 		# print()
 
+
 		return out
 
 
@@ -340,11 +341,9 @@ class SSNE:
 		#Append new fitness to lineage
 		lineage_scores = [] #Tracks the average lineage score fot the generation
 		for ind, fitness in zip(net_inds, fitness_evals):
-			lineage_scores.append( 0.75 * sum(self.lineage[ind])/len(self.lineage[ind]) + 0.25 * fitness) #Current fitness is weighted higher than lineage info
 			self.lineage[ind].append(fitness)
+			lineage_scores.append( 0.75 * sum(self.lineage[ind])/len(self.lineage[ind]) + 0.25 * fitness) #Current fitness is weighted higher than lineage info
 			if len(self.lineage[ind]) > self.lineage_depth: self.lineage[ind].pop(0) #Housekeeping
-
-
 
 
 		# Entire epoch is handled with indices; Index rank nets by fitness evaluation (0 is the best after reversing)
@@ -395,7 +394,7 @@ class SSNE:
 			self.mutate_inplace(pop[replacee])
 			#genealogy.mutation(int(pop[replacee].wwid.item()), gen)
 
-		print('Evo_Info #Anchors', len(anchors), '#Probes_dist', {i:sampled_anchors.count(i) for i in sampled_anchors}, '#elites', len(elites), '#Blends', len(unselects), '#Migration', len(migration), 'Nets', len(net_inds), 'Index/Lineage rank', index_rank[0:3], lineage_rank[0:3])
+		print('Evo_Info #Anchors', len(anchors), '#Probes_allocation', [sampled_anchors.count(i) for i in anchors], '#elites', len(elites), '#Blends', len(unselects), '#Migration', len(migration), 'Nets', len(net_inds), 'Index/Lineage rank', index_rank[0:3], lineage_rank[0:3])
 
 		###### Create the blends to fill the rest of the unselects by crossovers #########
 		# Number of unselects left should be even
