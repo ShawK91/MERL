@@ -11,15 +11,15 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=50)
-parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
-parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=40)
+parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
+parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
 parser.add_argument('-seed', type=float,  help='#Seed',  default=1)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-parser.add_argument('-config', type=str,  help='World Setting?', default='single_test')
+parser.add_argument('-config', type=str,  help='World Setting?', default='mtc_mac')
 parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_loose')
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=True)
 parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
@@ -65,6 +65,20 @@ class ConfigSettings:
 			self.ep_len = 40
 			self.poi_rand = 1
 			self.coupling = 1
+			self.rover_speed = 1
+			self.sensor_model = 'closest'
+
+		elif config == 'mtc_mac':
+			# Rover domain
+			self.dim_x = self.dim_y = 7
+			self.obs_radius = self.dim_x * 10;
+			self.act_dist = 2
+			self.angle_res = 20
+			self.num_poi = 2
+			self.num_agents = 2
+			self.ep_len = 15
+			self.poi_rand = 1
+			self.coupling = 2
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
@@ -158,15 +172,15 @@ class Parameters:
 		self.config = ConfigSettings()
 
 		#Fairly Stable Algo params
-		self.hidden_size = 100
+		self.hidden_size = 128
 		self.algo_name = vars(parser.parse_args())['algo']
-		self.actor_lr = 1e-3
-		self.critic_lr = 1e-3
+		self.actor_lr = 1e-4
+		self.critic_lr = 1e-4
 		self.tau = 5e-3
 		self.init_w = True
 		self.gradperstep = vars(parser.parse_args())['gradperstep']
 		self.gamma = 0.997
-		self.batch_size = 128
+		self.batch_size = 256
 		self.buffer_size = 100000
 		self.updates_per_step = 1
 		self.action_loss = False
@@ -187,8 +201,8 @@ class Parameters:
 		self.weight_clamp = 1000000
 		self.mut_distribution = 1  # 1-Gaussian, 2-Laplace, 3-Uniform
 		self.lineage_depth = 10
-		self.ccea_reduction = "mean"
-		self.num_anchors = 10
+		self.ccea_reduction = "leniency"
+		self.num_anchors = 5
 		self.num_elites = 2
 		self.num_blends = int(0.15 * self.popn_size)
 
