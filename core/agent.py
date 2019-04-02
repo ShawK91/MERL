@@ -1,9 +1,10 @@
 from core.off_policy_algo import TD3, SAC
-from torch.multiprocessing import Process, Pipe, Manager
+from torch.multiprocessing import Manager
 from core.models import Actor
 from core.buffer import Buffer
 from core.neuroevolution import SSNE
 import core.mod_utils as mod
+import random
 
 class Agent:
 	"""Learner object encapsulating a local learner
@@ -77,9 +78,23 @@ class Agent:
 	def evolve(self):
 
 		## One gen of evolution ###
-		if self.args.popn_size > 1:
+		if self.args.popn_size > 1: #If not no-evo
 
-			self.champ_ind = self.evolver.evolve(self.popn, self.fitnesses, [self.rollout_actor[0]])
+			#Make sure that the buffer has been refereshed and tensorified
+			if self.buffer.__len__() < 1000: self.buffer.tensorify()
+			if random.random() < 0.1: self.buffer.tensorify()
+
+			#Get sample of states from the buffer
+			if self.buffer.__len__() < 1000: sample_size = self.buffer.__len__()
+			else: sample_size = 1000
+
+			states, _,_,_,_,_ = self.buffer.sample(sample_size, pr_rew=0.0, pr_global=0.0)
+
+			#Net indices of nets that got evaluated this generation (meant for asynchronous evolution workloads)
+			net_inds = [i for i in range(len(self.popn))] #Hack for a synchronous run
+
+			#Evolve
+			self.champ_ind = self.evolver.evolve(self.popn, net_inds, self.fitnesses, [self.rollout_actor[0]], states)
 
 		#Reset fitness metrics
 		self.fitnesses = [[] for _ in range(self.args.popn_size)]

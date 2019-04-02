@@ -76,12 +76,13 @@ class Buffer():
 		#Uniform sampling
 		ind = random.sample(range(len(self.s)), batch_size)
 
-		#Prioritization
-		num_r = int(pr_rew * batch_size); num_global = int(pr_global * batch_size)
-		ind_r = random.sample(self.top_r, num_r)
-		ind_global = random.sample(self.top_g, num_global)
+		if pr_global != 0.0 or pr_rew !=0.0:
+			#Prioritization
+			num_r = int(pr_rew * batch_size); num_global = int(pr_global * batch_size)
+			ind_r = random.sample(self.top_r, num_r)
+			ind_global = random.sample(self.top_g, num_global)
 
-		ind = ind[num_r+num_global:] + ind_r + ind_global
+			ind = ind[num_r+num_global:] + ind_r + ind_global
 
 
 		return self.sT[ind], self.nsT[ind], self.aT[ind], self.rT[ind], self.doneT[ind], self.global_rewardT[ind]

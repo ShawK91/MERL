@@ -17,14 +17,8 @@ class SSNE:
 	def __init__(self, args):
 		self.gen = 0
 
-		#RL TRACKERS
-		self.rl_sync_pool = []; self.all_offs = []; self.rl_res = {"elites":0.0, 'selects': 0.0, 'discarded':0.0}; self.num_rl_syncs = 0.0001
-
-		#Lineage scores
-		self.lineage = [[] for _ in range(self.args.popn_size)]
-
 		#Import Params
-		self.popn_size = self.args.popn_size
+		self.popn_size = args.popn_size
 		self.crossover_prob = args.crossover_prob
 		self.mutation_prob = args.mutation_prob
 		self.extinction_prob = args.extinction_prob  # Probability of extinction event
@@ -33,9 +27,14 @@ class SSNE:
 		self.mut_distribution = args.mut_distribution
 		self.lineage_depth = args.lineage_depth
 		self.ccea_reduction = args.ccea_reduction
-		self.num_probes = args.num_probes
 		self.num_anchors = args.num_anchors
-		self.num_elites = 2
+		self.num_elites = args.num_elites
+
+		#RL TRACKERS
+		self.rl_sync_pool = []; self.all_offs = []; self.rl_res = {"elites":0.0, 'selects': 0.0, 'discarded':0.0}; self.num_rl_syncs = 0.0001
+
+		#Lineage scores
+		self.lineage = [[] for _ in range(self.popn_size)]
 
 
 
@@ -188,7 +187,7 @@ class SSNE:
 
 						# Regularization hard limit
 						W[ind_dim1, ind_dim2] = self.regularize_weight(W[ind_dim1, ind_dim2],
-																	   self.args.weight_magnitude_limit)
+																	   self.weight_clamp)
 
 			elif len(W.shape) == 1:  # Bias or layernorm
 				num_weights = W.shape[0]
@@ -209,7 +208,7 @@ class SSNE:
 							W[ind_dim] += random.gauss(0, mut_strength * W[ind_dim])
 
 						# Regularization hard limit
-						W[ind_dim] = self.regularize_weight(W[ind_dim], self.args.weight_magnitude_limit)
+						W[ind_dim] = self.regularize_weight(W[ind_dim], self.weight_clamp)
 
 	def reset_genome(self, gene):
 		"""Reset a model's weights in place
@@ -226,6 +225,8 @@ class SSNE:
 
 	def get_anchors(self, states, pop, net_inds, lineage_rank):
 
+		#return lineage_rank[0:self.num_anchors]
+
 		#Compute all actions
 		actions = [pop[i].clean_action(states) for i in net_inds]
 
@@ -236,35 +237,37 @@ class SSNE:
 				div_matrix[i,j] = ((actions[i]-actions[j])**2).mean().item()
 
 		#Get the anchor indices [indices to net_inds]
-		anchor_inds = [0]
+		anchor_inds = [lineage_rank[0]] #Initialize with the best one from lineage rank as the first anchor
 		for _ in range(self.num_anchors-1):
 
-			#Compute div_distance with existing probes
-			div_dist = div_matrix[0]
+			#Compute div_distance with existing anchors
+			div_dist = div_matrix[lineage_rank[0]]
 			for ind in anchor_inds:
-				if ind == 0: continue
+				if ind == lineage_rank[0]: continue
 				div_dist += div_matrix[ind]
 
 			#Get div_rank based on the div_dist with existing probes
-			div_rank = np.argsort(div_dist).flip()
+			div_rank = np.flip(np.argsort(div_dist))
 
 			#Hybridize neg_scores
-			neg_scores = [0 for _ in range(net_inds)]
+			neg_scores = [0 for _ in range(len(net_inds))]
 			for i, div_ind in enumerate(div_rank):
 				neg_scores[div_ind] += i
 
-			for i, lineage_ind in enumerate(lineage_rank.list()):
-				neg_scores[lineage_rank] += i
+			for i, lineage_ind in enumerate(list(lineage_rank)):
+				neg_scores[lineage_ind] += i
 
 			#Compute hybrid rank
 			hybrid_rank = self.list_argsort(neg_scores)
 
 			#Add anchor
-			while True:
+			continue_flag = True
+			while continue_flag:
 				for ind in hybrid_rank:
 					if ind in anchor_inds: continue
 					else:
 						anchor_inds.append(ind)
+						continue_flag = False
 						break
 
 		return anchor_inds
@@ -298,7 +301,7 @@ class SSNE:
 				if self.ccea_reduction == "mean": fitness_evals[i] = sum(fitness_evals[i])/len(fitness_evals[i])
 				elif self.ccea_reduction == "leniency":fitness_evals[i] = max(fitness_evals[i])
 				elif self.ccea_reduction == "min": fitness_evals[i] = min(fitness_evals[i])
-				else: sys.exit('Incorrect ccea reduction scheme')
+				else: sys.exit('Incorrect CCEA Reduction scheme')
 
 
 		#Append new fitness to lineage
@@ -324,28 +327,17 @@ class SSNE:
 		#Compute anchors
 		anchor_inds = self.get_anchors(states, pop, net_inds[:], np.array(lineage_rank[:]))
 
+		#Remove duplicates between anchors and elitists
+		for i, elite in enumerate(elitist_index):
+			if elite in anchor_inds: elitist_index.pop(i)
 
+		##################### TRANSFER INDICES BACK TO POP INDICES: Change from ind in net_inds to ind referring to the real ind in pop ###############################
+		elites = [net_inds[i] for i in elitist_index]
+		anchors = [net_inds[i] for i in anchor_inds]
+		#######################################################################################################################################################
 
-
-
-
-
-
-		# Selection step
-		offsprings = self.selection_tournament(lineage_rank, num_offsprings=len(index_rank) - len(elitist_index) - len(migration), tournament_size=3)
-
-		#Transcripe ranked indexes from now on to refer to net indexes
-		elitist_index = [i for i in elitist_index]
-		offsprings = [i for i in offsprings]
-
-		#Figure out unselected candidates
-		unselects = []; new_elitists = []
-		for i in range(len(pop)):
-			if i in offsprings or i in elitist_index:
-				continue
-			else:
-				unselects.append(i)
-		random.shuffle(unselects)
+		#Unselects are the individuals left in the population
+		unselects = [ind for ind in net_inds if ind not in elites and ind not in anchors]
 
 		#Inheritance step (sync learners to population)
 		for policy in migration:
@@ -353,57 +345,45 @@ class SSNE:
 			utils.hard_update(target=pop[replacee], source=policy)
 			#wwid = genealogy.asexual(int(policy.wwid.item()))
 			#pop[replacee].wwid[0] = wwid
-			self.lineage[replacee] = sum(self.lineage)/len(self.lineage) #Initialize as average
+			self.lineage[replacee] = [] #Reinitialize as empty
 
-		# Elitism step, assigning elite candidates to some unselects
-		for i in elitist_index:
-			try: replacee = unselects.pop(0)
-			except: replacee = offsprings.pop(0)
-			new_elitists.append(replacee)
-			utils.hard_update(target=pop[replacee], source=pop[i])
-			#wwid = genealogy.asexual(int(pop[i].wwid.item()))
-			#pop[replacee].wwid[0] = wwid
-			#genealogy.elite(wwid, gen)
+		#Compute the amount of probes/blends possible
+		num_probes = int(len(unselects)/(self.num_anchors))
 
-			self.lineage[replacee] = self.lineage[i]
+		#Mutate the anchors to form probes
+		for anchor_ind in anchors:
+			for _ in range(num_probes):
+				# Mutate to form probes from anchors
+				replacee = unselects.pop(0)
+				utils.hard_update(target=pop[replacee], source=pop[anchor_ind])
+				self.lineage[replacee] = [utils.list_mean(self.lineage[anchor_ind])]  #Inherit lineage from replacee
+				self.mutate_inplace(pop[replacee])
+				#genealogy.mutation(int(pop[replacee].wwid.item()), gen)
 
-		# Crossover for unselected genes with 100 percent probability
-		if len(unselects) % 2 != 0:  # Number of unselects left should be even
+		print('Evo_Info #Anchors', len(anchors), '#Probes', num_probes, '#elites', len(elites), '#Blends', len(unselects), '#Migration', len(migration), 'Nets', len(net_inds), 'Index/Lineage rank', index_rank[0:3], lineage_rank[0:3])
+
+		###### Create the blends to fill the rest of the unselects by crossovers #########
+		# Number of unselects left should be even
+		if len(unselects) % 2 != 0:
 			unselects.append(unselects[random.randint(0, len(unselects)-1)])
+
 		for i, j in zip(unselects[0::2], unselects[1::2]):
-			off_i = random.choice(new_elitists);
-			off_j = random.choice(offsprings)
+			off_i = random.choice(anchors)
+			while True:
+				off_j = random.choice(anchors)
+				if off_j != off_i: break
+
 			utils.hard_update(target=pop[i], source=pop[off_i])
 			utils.hard_update(target=pop[j], source=pop[off_j])
 			self.crossover_inplace(pop[i], pop[j])
 			#wwid1 = genealogy.crossover(int(pop[off_i].wwid.item()), int(pop[off_j].wwid.item()), gen)
 			#wwid2 = genealogy.crossover(int(pop[off_i].wwid.item()), int(pop[off_j].wwid.item()), gen)
 			#pop[i].wwid[0] = wwid1; pop[j].wwid[0] = wwid2
-
-			self.lineage[i] = (self.lineage[off_i]+self.lineage[off_j])/2
-			self.lineage[j] = (self.lineage[off_i] + self.lineage[off_j]) / 2
-
-		# Crossover for selected offsprings
-		for i, j in zip(offsprings[0::2], offsprings[1::2]):
-			if random.random() < self.args.crossover_prob:
-				self.crossover_inplace(pop[i], pop[j])
-				#wwid1 = genealogy.crossover(int(pop[i].wwid.item()), int(pop[j].wwid.item()), gen)
-				#wwid2 = genealogy.crossover(int(pop[i].wwid.item()), int(pop[j].wwid.item()), gen)
-				#pop[i].wwid[0] = wwid1; pop[j].wwid[0] = wwid2
-				self.lineage[i] = (self.lineage[i]+self.lineage[j])/2
-				self.lineage[j] = (self.lineage[i] + self.lineage[j]) / 2
+			self.lineage[i] = [0.5*utils.list_mean(self.lineage[off_i]) + 0.5*utils.list_mean(self.lineage[off_j])]
+			self.lineage[j] = [0.5*utils.list_mean(self.lineage[off_i]) + 0.5*utils.list_mean(self.lineage[off_j])]
 
 
-		# Mutate all genes in the population except the new elitists
-		for i in range(len(pop)):
-			if i not in new_elitists:  # Spare the new elitists
-				if random.random() < self.args.mutation_prob:
-					self.mutate_inplace(pop[i])
-					#genealogy.mutation(int(pop[net_i].wwid.item()), gen)
-
-
-		self.all_offs[:] = offsprings[:]
-		return new_elitists[0]
+		return anchors[0]
 
 
 

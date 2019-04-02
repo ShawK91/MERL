@@ -11,15 +11,15 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
-parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
-parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=50)
+parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
+parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
 parser.add_argument('-seed', type=float,  help='#Seed',  default=1)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-parser.add_argument('-config', type=str,  help='World Setting?', default='two_test')
+parser.add_argument('-config', type=str,  help='World Setting?', default='single_test')
 parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_loose')
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=True)
 parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
@@ -149,7 +149,6 @@ class Parameters:
 
 		#Transitive Algo Params
 		self.rollout_size = vars(parser.parse_args())['rollsize']
-		self.popn_size = vars(parser.parse_args())['popsize']
 		self.num_evals = vars(parser.parse_args())['evals']
 		self.frames_bound = 100000000
 		self.actualize = vars(parser.parse_args())['alz']
@@ -180,13 +179,18 @@ class Parameters:
 		self.target_update_interval = 1
 
 		# NeuroEvolution stuff
-		self.elite_fraction = 0.2
-		self.crossover_prob = 0.15
-		self.mutation_prob = 0.90
-		self.extinction_prob = 0.005  # Probability of extinction event
-		self.extinction_magnituide = 0.5  # Probabilty of extinction for each genome, given an extinction event
-		self.weight_magnitude_limit = 10000000
+		self.popn_size = vars(parser.parse_args())['popsize']
+		self.crossover_prob = 0.1
+		self.mutation_prob = 0.9
+		self.extinction_prob = 0.005 # Probability of extinction event
+		self.extinction_magnitude = 0.5  # Probabilty of extinction for each genome, given an extinction event
+		self.weight_clamp = 1000000
 		self.mut_distribution = 1  # 1-Gaussian, 2-Laplace, 3-Uniform
+		self.lineage_depth = 10
+		self.ccea_reduction = "mean"
+		self.num_anchors = 10
+		self.num_elites = 2
+
 
 		#Dependents
 		self.state_dim = int(720 / self.config.angle_res)
@@ -254,7 +258,7 @@ class MERL:
 		self.evo_task_pipes = [Pipe() for _ in range(args.popn_size*args.num_evals)]
 		self.evo_result_pipes = [Pipe() for _ in range(args.popn_size*args.num_evals)]
 		self.evo_workers = [Process(target=rollout_worker, args=(self.args, i, 'evo', self.evo_task_pipes[i][1], self.evo_result_pipes[i][0],
-																   self.buffer_bucket, self.popn_bucket, USE_PG, RANDOM_BASELINE)) for i in range(args.popn_size*args.num_evals)]
+																   self.buffer_bucket, self.popn_bucket, True, RANDOM_BASELINE)) for i in range(args.popn_size*args.num_evals)]
 		for worker in self.evo_workers: worker.start()
 
 
