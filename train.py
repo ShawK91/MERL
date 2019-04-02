@@ -190,6 +190,7 @@ class Parameters:
 		self.ccea_reduction = "mean"
 		self.num_anchors = 10
 		self.num_elites = 2
+		self.num_blends = int(0.15 * self.popn_size)
 
 
 		#Dependents

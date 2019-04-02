@@ -29,6 +29,7 @@ class SSNE:
 		self.ccea_reduction = args.ccea_reduction
 		self.num_anchors = args.num_anchors
 		self.num_elites = args.num_elites
+		self.num_blends = args.num_blends
 
 		#RL TRACKERS
 		self.rl_sync_pool = []; self.all_offs = []; self.rl_res = {"elites":0.0, 'selects': 0.0, 'discarded':0.0}; self.num_rl_syncs = 0.0001
@@ -278,6 +279,34 @@ class SSNE:
 
 
 
+	def roulette_wheel(self, probs, num_samples):
+		"""Roulette_wheel selection from a prob. distribution
+	        Parameters:
+	            probs (list): Probability distribution
+				num_samples (int): Num of iterations to sample from distribution
+	        Returns:
+	            out (list): List of samples based on incoming distribution
+		"""
+
+		# Normalize
+		probs = [prob - min(probs) + abs(min(probs)) for prob in probs]  # Biased translation (to positive axis) to ensure the lowest does not end up with a probability of zero
+		probs = [prob / sum(probs) for prob in probs]
+
+		# Selection
+		out = []
+		for _ in range(num_samples):
+			rand = random.random()
+
+			for i in range(len(probs)):
+				if rand < sum(probs[0:i + 1]):
+					out.append(i)
+					break
+
+		# print('UCB_prob_mass', ["%.2f" % i for i in probs])
+		# print('Allocation', out)
+		# print()
+
+		return out
 
 
 
@@ -309,6 +338,7 @@ class SSNE:
 
 
 		#Append new fitness to lineage
+		#TODO Make lineage score weighh history: recent ones more than older ones
 		lineage_scores = [] #Tracks the average lineage score fot the generation
 		for ind, fitness in zip(net_inds, fitness_evals):
 			self.lineage[ind].append(fitness)
@@ -338,6 +368,7 @@ class SSNE:
 		##################### TRANSFER INDICES BACK TO POP INDICES: Change from ind in net_inds to ind referring to the real ind in pop ###############################
 		elites = [net_inds[i] for i in elitist_index]
 		anchors = [net_inds[i] for i in anchor_inds]
+		anchor_fitnesses = [fitness_evals[i] for i in anchor_inds]
 		#######################################################################################################################################################
 
 		#Unselects are the individuals left in the population
@@ -351,20 +382,20 @@ class SSNE:
 			#pop[replacee].wwid[0] = wwid
 			self.lineage[replacee] = [] #Reinitialize as empty
 
-		#Compute the amount of probes/blends possible
-		num_probes = int(len(unselects)/(self.num_anchors))
+		#Sample anchors from a probability distribution formed of their relative fitnesses using a roulette wheel
+		sampled_inds = self.roulette_wheel(anchor_fitnesses, len(unselects)-self.num_blends)
+		sampled_anchors = [anchors[i] for i in sampled_inds]
 
 		#Mutate the anchors to form probes
-		for anchor_ind in anchors:
-			for _ in range(num_probes):
-				# Mutate to form probes from anchors
-				replacee = unselects.pop(0)
-				utils.hard_update(target=pop[replacee], source=pop[anchor_ind])
-				self.lineage[replacee] = [utils.list_mean(self.lineage[anchor_ind])]  #Inherit lineage from replacee
-				self.mutate_inplace(pop[replacee])
-				#genealogy.mutation(int(pop[replacee].wwid.item()), gen)
+		for anchor_ind in sampled_anchors:
+			# Mutate to form probes from anchors
+			replacee = unselects.pop(0)
+			utils.hard_update(target=pop[replacee], source=pop[anchor_ind])
+			self.lineage[replacee] = [utils.list_mean(self.lineage[anchor_ind])]  #Inherit lineage from replacee
+			self.mutate_inplace(pop[replacee])
+			#genealogy.mutation(int(pop[replacee].wwid.item()), gen)
 
-		print('Evo_Info #Anchors', len(anchors), '#Probes', num_probes, '#elites', len(elites), '#Blends', len(unselects), '#Migration', len(migration), 'Nets', len(net_inds), 'Index/Lineage rank', index_rank[0:3], lineage_rank[0:3])
+		print('Evo_Info #Anchors', len(anchors), '#Probes_dist', {i:sampled_anchors.count(i) for i in sampled_anchors}, '#elites', len(elites), '#Blends', len(unselects), '#Migration', len(migration), 'Nets', len(net_inds), 'Index/Lineage rank', index_rank[0:3], lineage_rank[0:3])
 
 		###### Create the blends to fill the rest of the unselects by crossovers #########
 		# Number of unselects left should be even
