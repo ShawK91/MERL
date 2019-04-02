@@ -338,12 +338,12 @@ class SSNE:
 
 
 		#Append new fitness to lineage
-		#TODO Make lineage score weighh history: recent ones more than older ones
 		lineage_scores = [] #Tracks the average lineage score fot the generation
 		for ind, fitness in zip(net_inds, fitness_evals):
+			lineage_scores.append( 0.75 * sum(self.lineage[ind])/len(self.lineage[ind]) + 0.25 * fitness) #Current fitness is weighted higher than lineage info
 			self.lineage[ind].append(fitness)
 			if len(self.lineage[ind]) > self.lineage_depth: self.lineage[ind].pop(0) #Housekeeping
-			lineage_scores.append(sum(self.lineage[ind])/len(self.lineage[ind]))
+
 
 
 
@@ -383,8 +383,8 @@ class SSNE:
 			self.lineage[replacee] = [] #Reinitialize as empty
 
 		#Sample anchors from a probability distribution formed of their relative fitnesses using a roulette wheel
-		sampled_inds = self.roulette_wheel(anchor_fitnesses, len(unselects)-self.num_blends)
-		sampled_anchors = [anchors[i] for i in sampled_inds]
+		probe_allocation_inds = self.roulette_wheel(anchor_fitnesses, len(unselects)-self.num_blends)
+		sampled_anchors = [anchors[i] for i in probe_allocation_inds]
 
 		#Mutate the anchors to form probes
 		for anchor_ind in sampled_anchors:
