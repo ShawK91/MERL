@@ -228,12 +228,16 @@ class SSNE:
 		#return lineage_rank[0:self.num_anchors]
 
 		#Compute all actions
-		actions = [pop[i].clean_action(states) for i in net_inds]
+		# TODO [NOTE] THAT we ignore the magnitude part (first entry in a 2-dim action vector) of the action and only measure diversity in the bearing [WON'T BE GENERALIZABLE TO OTHER DOMAINS]
+		actions = [pop[i].clean_action(states)[:,1] for i in net_inds]
 
 		#Compute div_scores
-		div_matrix = np.zeros((len(net_inds), len(net_inds)))
+		div_matrix = np.zeros((len(net_inds), len(net_inds)))-1
 		for i in range(len(net_inds)):
 			for j in range(len(net_inds)):
+				if div_matrix[j,i] != -1: #Optimization for a symmetric matrix about its diagonal
+					div_matrix[i,j] = div_matrix[j,i]
+					continue
 				div_matrix[i,j] = ((actions[i]-actions[j])**2).mean().item()
 
 		#Get the anchor indices [indices to net_inds]
