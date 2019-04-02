@@ -290,7 +290,8 @@ class SSNE:
 
 		# Normalize
 		probs = [prob - min(probs) + abs(min(probs)) for prob in probs]  # Biased translation (to positive axis) to ensure the lowest does not end up with a probability of zero
-		probs = [prob / sum(probs) for prob in probs]
+		total_prob = sum(probs) if sum(probs) != 0 else 1.0
+		probs = [prob / total_prob for prob in probs]
 
 		# Selection
 		out = []
