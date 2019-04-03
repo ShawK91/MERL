@@ -30,6 +30,7 @@ class SSNE:
 		self.num_anchors = args.num_anchors
 		self.num_elites = args.num_elites
 		self.num_blends = args.num_blends
+		self.scheme = args.scheme
 
 		#RL TRACKERS
 		self.rl_sync_pool = []; self.all_offs = []; self.rl_res = {"elites":0.0, 'selects': 0.0, 'discarded':0.0}; self.num_rl_syncs = 0.0001
@@ -277,8 +278,6 @@ class SSNE:
 
 		return anchor_inds
 
-
-
 	def roulette_wheel(self, probs, num_samples):
 		"""Roulette_wheel selection from a prob. distribution
 	        Parameters:
@@ -311,9 +310,6 @@ class SSNE:
 		return out
 
 
-
-
-
 	def evolve(self, pop, net_inds, fitness_evals, migration, states):
 		"""Method to implement a round of selection and mutation operation
 
@@ -329,6 +325,7 @@ class SSNE:
 		"""
 
 		self.gen+= 1
+
 
 		#Convert the list of fitness values corresponding to each individual into a float [CCEA Reduction]
 		if isinstance(fitness_evals[0], list):
@@ -358,69 +355,161 @@ class SSNE:
 		#Take out copies in elitist indices
 		elitist_index = list(set(elitist_index))
 
-		#Compute anchors
-		anchor_inds = self.get_anchors(states, pop, net_inds[:], np.array(lineage_rank[:]))
-
-		#Remove duplicates between anchors and elitists
-		for i, elite in enumerate(elitist_index):
-			if elite in anchor_inds: elitist_index.pop(i)
-
-		##################### TRANSFER INDICES BACK TO POP INDICES: Change from ind in net_inds to ind referring to the real ind in pop ###############################
-		elites = [net_inds[i] for i in elitist_index]
-		anchors = [net_inds[i] for i in anchor_inds]
-		anchor_fitnesses = [fitness_evals[i] for i in anchor_inds]
-		#######################################################################################################################################################
-
-		#Unselects are the individuals left in the population
-		unselects = [ind for ind in net_inds if ind not in elites and ind not in anchors]
-
-		#Inheritance step (sync learners to population)
-		for policy in migration:
-			replacee = unselects.pop(0)
-			utils.hard_update(target=pop[replacee], source=policy)
-			#wwid = genealogy.asexual(int(policy.wwid.item()))
-			#pop[replacee].wwid[0] = wwid
-			self.lineage[replacee] = [] #Reinitialize as empty
-
-		#Sample anchors from a probability distribution formed of their relative fitnesses using a roulette wheel
-		probe_allocation_inds = self.roulette_wheel(anchor_fitnesses, len(unselects)-self.num_blends)
-		sampled_anchors = [anchors[i] for i in probe_allocation_inds]
-
-		#Mutate the anchors to form probes
-		for anchor_ind in sampled_anchors:
-			# Mutate to form probes from anchors
-			replacee = unselects.pop(0)
-			utils.hard_update(target=pop[replacee], source=pop[anchor_ind])
-			self.lineage[replacee] = [utils.list_mean(self.lineage[anchor_ind])]  #Inherit lineage from replacee
-			self.mutate_inplace(pop[replacee])
-			#genealogy.mutation(int(pop[replacee].wwid.item()), gen)
-
-		print('Evo_Info #Anchors', len(anchors), '#Probes_allocation', [sampled_anchors.count(i) for i in anchors], '#elites', len(elites), '#Blends', len(unselects), '#Migration', len(migration), 'Nets', len(net_inds), 'Index/Lineage rank', index_rank[0:3], lineage_rank[0:3])
-
-		###### Create the blends to fill the rest of the unselects by crossovers #########
-		# Number of unselects left should be even
-		if len(unselects) % 2 != 0:
-			unselects.append(unselects[random.randint(0, len(unselects)-1)])
-
-		for i, j in zip(unselects[0::2], unselects[1::2]):
-			off_i = random.choice(anchors)
-			while True:
-				off_j = random.choice(anchors)
-				if off_j != off_i: break
-
-			utils.hard_update(target=pop[i], source=pop[off_i])
-			utils.hard_update(target=pop[j], source=pop[off_j])
-			self.crossover_inplace(pop[i], pop[j])
-			#wwid1 = genealogy.crossover(int(pop[off_i].wwid.item()), int(pop[off_j].wwid.item()), gen)
-			#wwid2 = genealogy.crossover(int(pop[off_i].wwid.item()), int(pop[off_j].wwid.item()), gen)
-			#pop[i].wwid[0] = wwid1; pop[j].wwid[0] = wwid2
-			self.lineage[i] = [0.5*utils.list_mean(self.lineage[off_i]) + 0.5*utils.list_mean(self.lineage[off_j])]
-			self.lineage[j] = [0.5*utils.list_mean(self.lineage[off_i]) + 0.5*utils.list_mean(self.lineage[off_j])]
 
 
-		return anchors[0]
+		#################### MULTI_POINT SEARCH WITH ANCHORS/PROBES/BLENDS AND EXPLICIT DIVERSITY-BASED SEPARATION
+		if self.scheme == 'multipoint':
+
+			#Compute anchors
+			anchor_inds = self.get_anchors(states, pop, net_inds[:], np.array(lineage_rank[:]))
+
+			#Remove duplicates between anchors and elitists
+			for i, elite in enumerate(elitist_index):
+				if elite in anchor_inds: elitist_index.pop(i)
+
+			##################### TRANSFER INDICES BACK TO POP INDICES: Change from ind in net_inds to ind referring to the real ind in pop ###############################
+			elites = [net_inds[i] for i in elitist_index]
+			anchors = [net_inds[i] for i in anchor_inds]
+			anchor_fitnesses = [fitness_evals[i] for i in anchor_inds]
+			anchor_index_ranks = [index_rank.index(i) for i in anchor_inds]
+			#######################################################################################################################################################
+
+			#Unselects are the individuals left in the population
+			unselects = [ind for ind in net_inds if ind not in elites and ind not in anchors]
+
+			#Inheritance step (sync learners to population)
+			for policy in migration:
+				replacee = unselects.pop(0)
+				utils.hard_update(target=pop[replacee], source=policy)
+				#wwid = genealogy.asexual(int(policy.wwid.item()))
+				#pop[replacee].wwid[0] = wwid
+				self.lineage[replacee] = [] #Reinitialize as empty
+
+			#Sample anchors from a probability distribution formed of their relative fitnesses using a roulette wheel
+			probe_allocation_inds = self.roulette_wheel(anchor_fitnesses, len(unselects)-self.num_blends)
+			sampled_anchors = [anchors[i] for i in probe_allocation_inds]
+
+			#Mutate the anchors to form probes
+			for anchor_ind in sampled_anchors:
+				# Mutate to form probes from anchors
+				replacee = unselects.pop(0)
+				utils.hard_update(target=pop[replacee], source=pop[anchor_ind])
+				self.lineage[replacee] = [utils.list_mean(self.lineage[anchor_ind])]  #Inherit lineage from replacee
+				self.mutate_inplace(pop[replacee])
+				#genealogy.mutation(int(pop[replacee].wwid.item()), gen)
+
+			if random.random() < 0.1:
+				print('Evo_Info #Anchors', len(anchors), '#Probes_allocation', [sampled_anchors.count(i) for i in anchors], '#elites', len(elites), '#Blends', len(unselects), '#Migration', len(migration), 'Nets', len(net_inds), 'Anchor fitness Ranks', anchor_index_ranks)
+
+			###### Create the blends to fill the rest of the unselects by crossovers #########
+			# Number of unselects left should be even
+			if len(unselects) % 2 != 0:
+				unselects.append(unselects[random.randint(0, len(unselects)-1)])
+
+			for i, j in zip(unselects[0::2], unselects[1::2]):
+				off_i = random.choice(anchors)
+				while True:
+					off_j = random.choice(anchors)
+					if off_j != off_i: break
+
+				utils.hard_update(target=pop[i], source=pop[off_i])
+				utils.hard_update(target=pop[j], source=pop[off_j])
+				self.crossover_inplace(pop[i], pop[j])
+				#wwid1 = genealogy.crossover(int(pop[off_i].wwid.item()), int(pop[off_j].wwid.item()), gen)
+				#wwid2 = genealogy.crossover(int(pop[off_i].wwid.item()), int(pop[off_j].wwid.item()), gen)
+				#pop[i].wwid[0] = wwid1; pop[j].wwid[0] = wwid2
+				self.lineage[i] = [0.5*utils.list_mean(self.lineage[off_i]) + 0.5*utils.list_mean(self.lineage[off_j])]
+				self.lineage[j] = [0.5*utils.list_mean(self.lineage[off_i]) + 0.5*utils.list_mean(self.lineage[off_j])]
 
 
+			return anchors[0]
+
+
+		####################### OLD EVOLVER WITHOUT MULTI_POINT SEARCH ###########
+		elif self.scheme == 'standard':
+
+			# Selection step
+			offsprings = self.selection_tournament(index_rank,
+			                                       num_offsprings=len(index_rank) - len(elitist_index) - len(
+				                                       migration), tournament_size=3)
+
+			# Transcripe ranked indexes from now on to refer to net indexes
+			elitist_index = [net_inds[i] for i in elitist_index]
+			offsprings = [net_inds[i] for i in offsprings]
+
+			# Figure out unselected candidates
+			unselects = []; new_elitists = []
+			for i in range(len(pop)):
+				if i in offsprings or i in elitist_index:
+					continue
+				else:
+					unselects.append(i)
+			random.shuffle(unselects)
+
+			# Inheritance step (sync learners to population)
+			for policy in migration:
+				replacee = unselects.pop(0)
+				utils.hard_update(target=pop[replacee], source=policy)
+				# wwid = genealogy.asexual(int(policy.wwid.item()))
+				# pop[replacee].wwid[0] = wwid
+				self.lineage[replacee] = [sum(lineage_scores) / len(lineage_scores)]  # Initialize as average
+
+			# Elitism step, assigning elite candidates to some unselects
+			for i in elitist_index:
+				try:
+					replacee = unselects.pop(0)
+				except:
+					replacee = offsprings.pop(0)
+				new_elitists.append(replacee)
+				utils.hard_update(target=pop[replacee], source=pop[i])
+				# wwid = genealogy.asexual(int(pop[i].wwid.item()))
+				# pop[replacee].wwid[0] = wwid
+				# genealogy.elite(wwid, gen)
+
+				self.lineage[replacee] = self.lineage[i][:]
+
+			# Crossover for unselected genes with 100 percent probability
+			if len(unselects) % 2 != 0:  # Number of unselects left should be even
+				unselects.append(unselects[random.randint(0, len(unselects) - 1)])
+			for i, j in zip(unselects[0::2], unselects[1::2]):
+				off_i = random.choice(new_elitists);
+				off_j = random.choice(offsprings)
+				utils.hard_update(target=pop[i], source=pop[off_i])
+				utils.hard_update(target=pop[j], source=pop[off_j])
+				self.crossover_inplace(pop[i], pop[j])
+				# wwid1 = genealogy.crossover(int(pop[off_i].wwid.item()), int(pop[off_j].wwid.item()), gen)
+				# wwid2 = genealogy.crossover(int(pop[off_i].wwid.item()), int(pop[off_j].wwid.item()), gen)
+				# pop[i].wwid[0] = wwid1; pop[j].wwid[0] = wwid2
+
+				self.lineage[i] = [
+					0.5 * utils.list_mean(self.lineage[off_i]) + 0.5 * utils.list_mean(self.lineage[off_j])]
+				self.lineage[j] = [
+					0.5 * utils.list_mean(self.lineage[off_i]) + 0.5 * utils.list_mean(self.lineage[off_j])]
+
+			# Crossover for selected offsprings
+			for i, j in zip(offsprings[0::2], offsprings[1::2]):
+				if random.random() < self.crossover_prob:
+					self.crossover_inplace(pop[i], pop[j])
+					# wwid1 = genealogy.crossover(int(pop[i].wwid.item()), int(pop[j].wwid.item()), gen)
+					# wwid2 = genealogy.crossover(int(pop[i].wwid.item()), int(pop[j].wwid.item()), gen)
+					# pop[i].wwid[0] = wwid1; pop[j].wwid[0] = wwid2
+					self.lineage[i] = [
+						0.5 * utils.list_mean(self.lineage[i]) + 0.5 * utils.list_mean(self.lineage[j])]
+					self.lineage[j] = [
+						0.5 * utils.list_mean(self.lineage[i]) + 0.5 * utils.list_mean(self.lineage[j])]
+
+			# Mutate all genes in the population except the new elitists
+			for i in range(len(pop)):
+				if i not in new_elitists:  # Spare the new elitists
+					if random.random() < self.mutation_prob:
+						self.mutate_inplace(pop[i])
+				# genealogy.mutation(int(pop[net_i].wwid.item()), gen)
+
+			self.all_offs[:] = offsprings[:]
+			return new_elitists[0]
+
+		else:
+			sys.exit('Incorrect Evolution Scheme')
 
 
 
