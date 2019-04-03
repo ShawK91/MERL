@@ -11,19 +11,19 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=40)
-parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
-parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=50)
+parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=0)
+parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
 parser.add_argument('-seed', type=float,  help='#Seed',  default=1)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
-parser.add_argument('-config', type=str,  help='World Setting?', default='mtc_mac')
+parser.add_argument('-config', type=str,  help='World Setting?', default='single_test')
 parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_loose')
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=False)
 parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
-parser.add_argument('-use_gpu', type=str2bool,  help='USE_GPU?', default=True)
+parser.add_argument('-use_gpu', type=str2bool,  help='USE_GPU?', default=False)
 
 
 SEED = vars(parser.parse_args())['seed']
@@ -76,7 +76,7 @@ class ConfigSettings:
 			self.angle_res = 20
 			self.num_poi = 2
 			self.num_agents = 2
-			self.ep_len = 15
+			self.ep_len = 20
 			self.poi_rand = 1
 			self.coupling = 2
 			self.rover_speed = 1
@@ -205,7 +205,7 @@ class Parameters:
 		self.lineage_depth = 10
 		self.ccea_reduction = "leniency"
 		self.num_anchors = 5
-		self.num_elites = 2
+		self.num_elites = 4
 		self.num_blends = int(0.15 * self.popn_size)
 
 
@@ -367,8 +367,8 @@ class MERL:
 			entry = pipe[1].recv()
 			team = entry[0]; fitness = entry[1][0]; frames = entry[2]
 
-			for agent_id, popn_id in enumerate(team): self.agents[agent_id].fitnesses[popn_id].append(fitness[0]) ##Assign
-			all_fits.append(fitness)
+			for agent_id, popn_id in enumerate(team): self.agents[agent_id].fitnesses[popn_id].append(utils.list_mean(fitness)) ##Assign
+			all_fits.append(utils.list_mean(fitness))
 			self.total_frames+=frames
 
 
@@ -425,7 +425,7 @@ if __name__ == "__main__":
 
 		#PRINT PROGRESS
 		print('Ep:/Frames', gen, '/', ai.total_frames, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:', mod.list_stat(pg_fits),
-			  'Test_trace:',[pprint(i) for i in ai.test_trace[-5:]], 'FPS:',pprint(ai.total_frames/(time.time()-time_start))
+			  'Test_trace:',[pprint(i) for i in ai.test_trace[-5:]], 'FPS:',pprint(ai.total_frames/(time.time()-time_start)), 'Evo', args.scheme
 			  )
 
 		if gen % 5 ==0:
@@ -434,7 +434,7 @@ if __name__ == "__main__":
 			print('SAVETAG:  ',args.savetag)
 			print()
 
-		if gen % 10 ==0:
+		if gen % 10 ==0 and USE_PG:
 			print()
 			print('Q', pprint(ai.agents[0].algo.q))
 			print('Q_loss', pprint(ai.agents[0].algo.q_loss))
