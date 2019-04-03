@@ -14,9 +14,9 @@ class TD3(object):
 
 
 	 """
-	def __init__(self, id, algo_name, state_dim, action_dim, hidden_size, actor_lr, critic_lr, gamma, tau, savetag, foldername, actualize, init_w = True):
+	def __init__(self, id, algo_name, state_dim, action_dim, hidden_size, actor_lr, critic_lr, gamma, tau, savetag, foldername, actualize, use_gpu, init_w = True):
 
-		self.algo_name = algo_name; self.gamma = gamma; self.tau = tau; self.total_update = 0; self.agent_id = id;	self.actualize = actualize
+		self.algo_name = algo_name; self.gamma = gamma; self.tau = tau; self.total_update = 0; self.agent_id = id;	self.actualize = actualize; self.use_gpu = use_gpu
 		self.tracker = utils.Tracker(foldername, ['q_'+savetag, 'qloss_'+savetag, 'policy_loss_'+savetag, 'alz_score'+savetag,'alz_policy'+savetag], '.csv', save_iteration=1000, conv_size=1000)
 
 		#Initialize actors
@@ -38,11 +38,12 @@ class TD3(object):
 			if init_w: self.ANetwork.apply(utils.init_weights)
 			self.actualize_optim = Adam(self.ANetwork.parameters(), critic_lr)
 			self.actualize_lr = 0.2
-			self.ANetwork.cuda()
+			if use_gpu: self.ANetwork.cuda()
 
 		self.loss = nn.MSELoss()
 
-		self.policy_target.cuda(); self.critic_target.cuda(); self.policy.cuda(); self.critic.cuda()
+		if use_gpu:
+			self.policy_target.cuda(); self.critic_target.cuda(); self.policy.cuda(); self.critic.cuda()
 		self.num_critic_updates = 0
 
 		#Statistics Tracker
@@ -84,7 +85,7 @@ class TD3(object):
 				policy_noise = torch.clamp(torch.Tensor(policy_noise), -kwargs['policy_noise_clip'], kwargs['policy_noise_clip'])
 
 				#Compute next action_bacth
-				next_action_batch = self.policy_target.clean_action(next_state_batch, return_only_action=True) + policy_noise.cuda()
+				next_action_batch = self.policy_target.clean_action(next_state_batch, return_only_action=True) + policy_noise.cuda() if self.use_gpu else policy_noise
 				next_action_batch = torch.clamp(next_action_batch, -1, 1)
 
 				#Compute Q-val and value of next state masking by done
@@ -195,7 +196,7 @@ class TD3(object):
 
 
 class SAC(object):
-	def __init__(self, id, num_inputs, action_dim, hidden_size, gamma, critic_lr, actor_lr, tau, alpha, target_update_interval, savetag, foldername, actualize):
+	def __init__(self, id, num_inputs, action_dim, hidden_size, gamma, critic_lr, actor_lr, tau, alpha, target_update_interval, savetag, foldername, actualize, use_gpu):
 
 		self.num_inputs = num_inputs
 		self.action_space = action_dim

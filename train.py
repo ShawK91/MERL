@@ -23,11 +23,11 @@ parser.add_argument('-config', type=str,  help='World Setting?', default='mtc_ma
 parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_loose')
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=True)
 parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
+parser.add_argument('-use_gpu', type=str2bool,  help='USE_GPU?', default=True)
 
 
 SEED = vars(parser.parse_args())['seed']
 USE_PG = vars(parser.parse_args())['pg']
-CUDA = True
 TEST_GAP = 5
 RANDOM_BASELINE = False
 
@@ -167,6 +167,7 @@ class Parameters:
 		self.frames_bound = 100000000
 		self.actualize = vars(parser.parse_args())['alz']
 		self.priority_rate = vars(parser.parse_args())['pr']
+		self.use_gpu = vars(parser.parse_args())['use_gpu']
 
 		#Rover domain
 		self.config = ConfigSettings()
