@@ -11,9 +11,9 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=20)
-parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
-parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=40)
+parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=10)
+parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=1)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
 parser.add_argument('-seed', type=float,  help='#Seed',  default=1)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
@@ -162,7 +162,7 @@ class Parameters:
 
 
 		#Transitive Algo Params
-		self.rollout_size = vars(parser.parse_args())['rollsize']
+		self.rollout_size = vars(parser.parse_args())['rollsize'] if USE_PG else 0
 		self.num_evals = vars(parser.parse_args())['evals']
 		self.frames_bound = 100000000
 		self.actualize = vars(parser.parse_args())['alz']

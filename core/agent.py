@@ -95,7 +95,8 @@ class Agent:
 			net_inds = [i for i in range(len(self.popn))] #Hack for a synchronous run
 
 			#Evolve
-			self.champ_ind = self.evolver.evolve(self.popn, net_inds, self.fitnesses, [self.rollout_actor[0]], states)
+			if self.args.rollout_size > 0: self.champ_ind = self.evolver.evolve(self.popn, net_inds, self.fitnesses, [self.rollout_actor[0]], states)
+			else: self.champ_ind = self.evolver.evolve(self.popn, net_inds, self.fitnesses, [], states)
 
 		#Reset fitness metrics
 		self.fitnesses = [[] for _ in range(self.args.popn_size)]
@@ -140,7 +141,7 @@ class TestAgent:
 
 	def make_champ_team(self, agents):
 		for agent_id, agent in enumerate(agents):
-			if self.args.popn_size < 2: #Testing without Evo
+			if self.args.popn_size <= 1: #Testing without Evo
 				agent.update_rollout_actor()
 				mod.hard_update(self.rollout_actor[agent_id], agent.rollout_actor[0])
 			else:

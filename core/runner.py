@@ -24,7 +24,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 	if type == 'test': NUM_EVALS = args.num_test
 	elif type == 'pg': NUM_EVALS = args.rollout_size
-	elif type == 'evo': NUM_EVALS = 10
+	elif type == 'evo': NUM_EVALS = 1
 	else: sys.exit('Incorrect type')
 
 	if args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose': env = RoverDomainPython(args, NUM_EVALS)
