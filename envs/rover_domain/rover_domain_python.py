@@ -30,7 +30,7 @@ class RoverDomain:
 
 		#Rover path trace for trajectory-wide global reward computation and vizualization purposes
 		self.rover_path = [[] for _ in range(self.args.num_agents)] # FORMAT: [rover_id][timestep][x, y]
-		self.action_seq = [[0.0 for _ in range(2)] for _ in range(self.args.num_agents)] # FORMAT: [timestep][rover_id][action]
+		self.action_seq = [[] for _ in range(self.args.num_agents)] # FORMAT: [timestep][rover_id][action]
 
 
 	def reset(self):
@@ -43,7 +43,7 @@ class RoverDomain:
 		self.poi_status = [False for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 		self.rover_path = [[] for _ in range(self.args.num_agents)]
-		self.action_seq = [[0.0 for _ in range(2)] for _ in range(self.args.num_agents)]
+		self.action_seq = [[] for _ in range(self.args.num_agents)]
 		self.istep = 0
 		return self.get_joint_state()
 
@@ -77,7 +77,7 @@ class RoverDomain:
 
 			#Log
 			self.rover_path[rover_id].append((self.rover_pos[rover_id][0], self.rover_pos[rover_id][1], self.rover_pos[rover_id][2]))
-			self.action_seq[rover_id].append((magnitude, joint_action[rover_id][1]*180))
+			self.action_seq[rover_id].append([magnitude, joint_action[rover_id][1]*180])
 
 
 
@@ -326,9 +326,12 @@ class RoverDomain:
 
 		for row in grid:
 			print(row)
-		#print(self.rover_path)
-		for i, temp in enumerate(self.action_seq[0:10]):
-			print('Action Sequence Rover ', str(i), temp)
+
+		for agent_id, temp in enumerate(self.action_seq):
+			print()
+			print('Action Sequence Rover ', str(agent_id),)
+			for entry in temp:
+				print(['{0: 1.1f}'.format(x) for x in entry], end =" " )
 		print()
 
 

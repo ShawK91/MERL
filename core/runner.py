@@ -103,8 +103,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 		if type == "test" and random.random() < 0.9:
 			env.render()
-			print([len(world.rover_path[0]) for world in env.universe])
-
+			print('Test trajectory lens',[len(world.rover_path[0]) for world in env.universe])
 			#print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
 
 		#Send back id, fitness, total length and shaped fitness using the result pipe

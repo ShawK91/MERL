@@ -195,7 +195,7 @@ class Parameters:
 
 		# NeuroEvolution stuff
 		self.popn_size = vars(parser.parse_args())['popsize']
-		self.scheme = 'standard' # 'multipoint' vs 'standard'
+		self.scheme = 'multipoint' # 'multipoint' vs 'standard'
 		self.crossover_prob = 0.1
 		self.mutation_prob = 0.9
 		self.extinction_prob = 0.005 # Probability of extinction event
