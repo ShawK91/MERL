@@ -20,7 +20,8 @@ class RoverDomain:
 		# Initialize POI containers tha track POI position and status
 		self.poi_pos = [[None, None] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][x, y] coordinate
 		self.poi_status = [False for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][status] --> [T/F] is observed?
-		self.poi_value = [float(i+1) for i in range(self.args.num_poi)]  # FORMAT: [poi_id][value]?
+		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]  # FORMAT: [poi_id][value]?
+		self.poi_value = [1.0 for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 
 		# Initialize rover pose container
@@ -36,7 +37,9 @@ class RoverDomain:
 		self.done = False
 		self.reset_poi_pos()
 		self.reset_rover_pos()
-		self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
+		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
+		self.poi_value = [1.0 for _ in range(self.args.num_poi)]
+
 		self.poi_status = [False for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 		self.rover_path = [[] for _ in range(self.args.num_agents)]
@@ -279,7 +282,6 @@ class RoverDomain:
 		return joint_state, rewards, True, None
 
 
-	#TODO
 	def get_global_reward(self):
 		#use
 		#self.rover_path and self.poi_pos and self.poi_value to compute TRAJECTORY_WIDE REWARD
