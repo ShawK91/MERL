@@ -100,6 +100,18 @@ class Actor(nn.Module):
 
 
 
+	def get_norm_stats(self):
+		minimum = min([torch.min(param).item() for param in self.parameters()])
+		maximum = max([torch.max(param).item() for param in self.parameters()])
+		means = [torch.mean(torch.abs(param)).item() for param in self.parameters()]
+		mean = sum(means)/len(means)
+
+		return minimum, maximum, mean
+
+
+
+
+
 class ValueNetwork(nn.Module):
 	def __init__(self, state_dim, hidden_dim):
 		super(ValueNetwork, self).__init__()
