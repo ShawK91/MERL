@@ -14,7 +14,7 @@ class RoverDomain:
 		else: sys.exit('Unknown Env type')
 
 		#Gym compatible attributes
-		self.observation_space = np.zeros((1, int(2*360 / self.args.angle_res)))
+		self.observation_space = np.zeros((1, int(2*360 / self.args.angle_res)+1))
 		self.action_space = np.zeros((1, 2))
 
 		self.istep = 0 #Current Step counter
@@ -223,7 +223,7 @@ class RoverDomain:
 					else: sys.exit('Incorrect sensor model')
 				else: rover_state[bracket] = -1.0
 
-			state = rover_state + poi_state #Append rover and poi to form the full state
+			state = [rover_id] + rover_state + poi_state #Append rover_id, rover LIDAR and poi LIDAR to form the full state
 
 			# #Append wall info
 			# state = state + [-1.0, -1.0, -1.0, -1.0]
@@ -281,7 +281,7 @@ class RoverDomain:
 
 
 	def dummy_transition(self):
-		joint_state = [[0.0 for _ in range(int(720 / self.args.angle_res))] for _ in range(self.args.num_agents)]
+		joint_state = [[0.0 for _ in range(int(720 / self.args.angle_res)+1)] for _ in range(self.args.num_agents)]
 		rewards = [0.0 for _ in range(self.args.num_agents)]
 
 		return joint_state, rewards, True, None

@@ -11,8 +11,8 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=20)
-parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=0)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=10)
+parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=1)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
 parser.add_argument('-seed', type=float,  help='#Seed',  default=1000000)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
@@ -22,7 +22,7 @@ parser.add_argument('-config', type=str,  help='World Setting?', default='mtc_ma
 parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_tight')
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=False)
 parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
-parser.add_argument('-use_gpu', type=str2bool,  help='USE_GPU?', default=False)
+parser.add_argument('-use_gpu', type=str2bool,  help='USE_GPU?', default=True)
 parser.add_argument('-scheme', type=str,  help='Scheme?', default='standard')
 
 
@@ -209,7 +209,7 @@ class Parameters:
 
 
 		#Dependents
-		self.state_dim = int(720 / self.config.angle_res)
+		self.state_dim = int(720 / self.config.angle_res) + 1
 		self.action_dim = 2
 		self.num_test = 25 if self.config.poi_rand else 1
 
@@ -284,7 +284,7 @@ class MERL:
 			self.pg_task_pipes = Pipe()
 			self.pg_result_pipes = Pipe()
 			self.pg_workers = [Process(target=rollout_worker, args=(self.args, 0, 'pg', self.pg_task_pipes[1], self.pg_result_pipes[0],
-																	   self.buffer_bucket, self.rollout_bucket, self.rollout_size>0, RANDOM_BASELINE))]
+																	   self.buffer_bucket, self.rollout_bucket, self.args.rollout_size>0, RANDOM_BASELINE))]
 			for worker in self.pg_workers: worker.start()
 
 		######### TEST WORKERS ############
@@ -338,8 +338,9 @@ class MERL:
 		teams = self.make_teams(args.config.num_agents, args.popn_size, args.num_evals)
 
 		########## START EVO ROLLOUT ##########
-		for pipe, team in zip(self.evo_task_pipes, teams):
-			pipe[0].send(team)
+		if self.args.popn_size > 0:
+			for pipe, team in zip(self.evo_task_pipes, teams):
+				pipe[0].send(team)
 
 
 		########## START POLICY GRADIENT ROLLOUT ##########
@@ -364,13 +365,14 @@ class MERL:
 
 		all_fits = []
 		####### JOIN EVO ROLLOUTS ########
-		for pipe in self.evo_result_pipes:
-			entry = pipe[1].recv()
-			team = entry[0]; fitness = entry[1][0]; frames = entry[2]
+		if self.args.popn_size > 0:
+			for pipe in self.evo_result_pipes:
+				entry = pipe[1].recv()
+				team = entry[0]; fitness = entry[1][0]; frames = entry[2]
 
-			for agent_id, popn_id in enumerate(team): self.agents[agent_id].fitnesses[popn_id].append(utils.list_mean(fitness)) ##Assign
-			all_fits.append(utils.list_mean(fitness))
-			self.total_frames+=frames
+				for agent_id, popn_id in enumerate(team): self.agents[agent_id].fitnesses[popn_id].append(utils.list_mean(fitness)) ##Assign
+				all_fits.append(utils.list_mean(fitness))
+				self.total_frames+=frames
 
 
 		####### JOIN PG ROLLOUTS ########
@@ -432,7 +434,7 @@ if __name__ == "__main__":
 		if gen % 5 ==0:
 			print()
 			print('Test_stat:', mod.list_stat(test_fits), 'SAVETAG:  ',args.savetag)
-			print('Weight Stats: min/max/average', pprint(ai.agents[0].popn[ai.agents[0].champ_ind].get_norm_stats()))
+			print('Weight Stats: min/max/average', pprint(ai.agents[0].rollout_actor[0].get_norm_stats()))
 			print()
 
 		if gen % 10 ==0 and args.rollout_size>0:
