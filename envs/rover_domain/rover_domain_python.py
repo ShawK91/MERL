@@ -9,6 +9,9 @@ class RoverDomain:
 
 		self.args = args
 		self.task_type = args.env_choice
+		if args.env_choice == "rover_loose": self.harvest_period = 3
+		elif args.env_choice == "rover_tight": self.harvest_period = 1
+		else: sys.exit('Unknown Env type')
 
 		#Gym compatible attributes
 		self.observation_space = np.zeros((1, int(2*360 / self.args.angle_res)))
@@ -19,7 +22,7 @@ class RoverDomain:
 
 		# Initialize POI containers tha track POI position and status
 		self.poi_pos = [[None, None] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][x, y] coordinate
-		self.poi_status = [False for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][status] --> [T/F] is observed?
+		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][status] --> [harvest_period --> 0 (observed)] is observed?
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]  # FORMAT: [poi_id][value]?
 		self.poi_value = [1.0 for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
@@ -40,7 +43,7 @@ class RoverDomain:
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
 		self.poi_value = [1.0 for _ in range(self.args.num_poi)]
 
-		self.poi_status = [False for _ in range(self.args.num_poi)]
+		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 		self.rover_path = [[] for _ in range(self.args.num_agents)]
 		self.action_seq = [[] for _ in range(self.args.num_agents)]
@@ -84,7 +87,7 @@ class RoverDomain:
 
 
 		#Compute done
-		self.done = int(self.istep >= self.args.ep_len or sum(self.poi_status) == len(self.poi_status))
+		self.done = int(self.istep >= self.args.ep_len or sum(self.poi_status) == 0)
 
 		#info
 		global_reward = None
@@ -169,7 +172,7 @@ class RoverDomain:
 
 			# Log all distance into brackets for POIs
 			for loc, status, value in zip(self.poi_pos, self.poi_status, self.poi_value):
-				if status == True: continue #If accessed ignore
+				if status == 0: continue #If accessed ignore
 
 				angle, dist = self.get_angle_dist(self_x, self_y, loc[0], loc[1])
 				if dist > self.args.obs_radius: continue #Observability radius
@@ -253,7 +256,8 @@ class RoverDomain:
 		#Update POI's visibility
 		poi_visitors = [[] for _ in range(self.args.num_poi)]
 		for i, loc in enumerate(self.poi_pos): #For all POIs
-			if self.poi_status[i]== True: continue #Ignore POIs that have been harvested already
+			if self.poi_status[i]== 0:
+				continue #Ignore POIs that have been harvested already
 
 			for rover_id in range(self.args.num_agents): #For each rover
 				x1 = loc[0] - self.rover_pos[rover_id][0]; y1 = loc[1] - self.rover_pos[rover_id][1]
@@ -266,8 +270,8 @@ class RoverDomain:
 				#if self.task_type == 'rover_tight' and len(rovers) >= self.args.coupling or self.task_type == 'rover_loose' and len(rovers) >= 1:
 				#Update POI status
 				if self.task_type == 'rover_tight' and len(rovers) >= self.args.coupling or self.task_type == 'rover_loose' and len(rovers) >= 1:
-					self.poi_status[poi_id] = True
-					self.poi_visitor_list[poi_id] = rovers[:]
+					self.poi_status[poi_id] -= 1
+					self.poi_visitor_list[poi_id] = list(set(self.poi_visitor_list[poi_id]+rovers[:]))
 
 				for rover_id in rovers:
 					rewards[rover_id] += self.poi_value[poi_id]
@@ -296,7 +300,7 @@ class RoverDomain:
 		if self.task_type == 'rover_tight':
 			global_rew = 0.0; max_reward = 0.0
 			for value, status in zip(self.poi_value, self.poi_status):
-				global_rew += status * value
+				global_rew += (status == 0) * value
 				max_reward += value
 
 
@@ -322,7 +326,7 @@ class RoverDomain:
 		for poi_pos, poi_status in zip(self.poi_pos, self.poi_status):
 			x = int(poi_pos[0]);
 			y = int(poi_pos[1])
-			marker = '$' if poi_status else '#'
+			marker = '$' if poi_status == 0 else '#'
 			grid[x][y] = marker
 
 		for row in grid:
