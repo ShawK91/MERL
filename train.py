@@ -11,11 +11,10 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=50)
+parser.add_argument('-popsize', type=int,  help='#Evo Population size',  default=20)
 parser.add_argument('-rollsize', type=int,  help='#Rollout size for agents',  default=0)
-parser.add_argument('-pg', type=str2bool,  help='#Use PG?',  default=0)
 parser.add_argument('-evals', type=int,  help='#Evals to compute a fitness',  default=1)
-parser.add_argument('-seed', type=float,  help='#Seed',  default=1)
+parser.add_argument('-seed', type=float,  help='#Seed',  default=1000000)
 parser.add_argument('-algo', type=str,  help='SAC Vs. TD3?',  default='TD3')
 parser.add_argument('-savetag', help='Saved tag',  default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',  default=1.0)
@@ -24,13 +23,10 @@ parser.add_argument('-env', type=str,  help='Env to test on?', default='rover_ti
 parser.add_argument('-alz', type=str2bool,  help='Actualize?', default=False)
 parser.add_argument('-pr', type=float,  help='Prioritization?', default=0.0)
 parser.add_argument('-use_gpu', type=str2bool,  help='USE_GPU?', default=False)
+parser.add_argument('-scheme', type=str,  help='Scheme?', default='standard')
 
 
-SEED = vars(parser.parse_args())['seed']
-USE_PG = vars(parser.parse_args())['pg']
-TEST_GAP = 5
 RANDOM_BASELINE = False
-
 
 
 class ConfigSettings:
@@ -58,7 +54,7 @@ class ConfigSettings:
 			# Rover domain
 			self.dim_x = self.dim_y = 10
 			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 2;
+			self.act_dist = 2
 			self.angle_res = 20
 			self.num_poi = 6
 			self.num_agents = 1
@@ -71,10 +67,10 @@ class ConfigSettings:
 		elif config == 'mtc_mac':
 			# Rover domain
 			self.dim_x = self.dim_y = 7
-			self.obs_radius = self.dim_x * 10;
+			self.obs_radius = self.dim_x * 10
 			self.act_dist = 2
 			self.angle_res = 20
-			self.num_poi = 2
+			self.num_poi = 1
 			self.num_agents = 2
 			self.ep_len = 20
 			self.poi_rand = 1
@@ -162,12 +158,15 @@ class Parameters:
 
 
 		#Transitive Algo Params
-		self.rollout_size = vars(parser.parse_args())['rollsize'] if USE_PG else 0
+		self.rollout_size = vars(parser.parse_args())['rollsize']
 		self.num_evals = vars(parser.parse_args())['evals']
 		self.frames_bound = 100000000
 		self.actualize = vars(parser.parse_args())['alz']
 		self.priority_rate = vars(parser.parse_args())['pr']
 		self.use_gpu = vars(parser.parse_args())['use_gpu']
+		self.seed = vars(parser.parse_args())['seed']
+		self.test_gap = 5
+
 
 		#Rover domain
 		self.config = ConfigSettings()
@@ -195,7 +194,7 @@ class Parameters:
 
 		# NeuroEvolution stuff
 		self.popn_size = vars(parser.parse_args())['popsize']
-		self.scheme = 'multipoint' # 'multipoint' vs 'standard'
+		self.scheme = vars(parser.parse_args())['scheme'] # 'multipoint' vs 'standard'
 		self.crossover_prob = 0.1
 		self.mutation_prob = 0.9
 		self.extinction_prob = 0.005 # Probability of extinction event
@@ -222,7 +221,7 @@ class Parameters:
 				   '_algo' + str(self.algo_name) + \
 				   '_config' + str(self.config.config) + \
 				   '_alz' + str(self.actualize) + \
-		           '_use_pg' + str(USE_PG) + \
+		           '_use_pg' + str(self.rollout_size>0) + \
 		           '_env' + str(self.config.env_choice) +\
 			       '_pr' + str(self.priority_rate)
 			#'_seed' + str(SEED)
@@ -272,19 +271,21 @@ class MERL:
 
 
 		######### EVOLUTIONARY WORKERS ############
-		self.evo_task_pipes = [Pipe() for _ in range(args.popn_size*args.num_evals)]
-		self.evo_result_pipes = [Pipe() for _ in range(args.popn_size*args.num_evals)]
-		self.evo_workers = [Process(target=rollout_worker, args=(self.args, i, 'evo', self.evo_task_pipes[i][1], self.evo_result_pipes[i][0],
-																   self.buffer_bucket, self.popn_bucket, True, RANDOM_BASELINE)) for i in range(args.popn_size*args.num_evals)]
-		for worker in self.evo_workers: worker.start()
+		if self.args.popn_size > 0:
+			self.evo_task_pipes = [Pipe() for _ in range(args.popn_size*args.num_evals)]
+			self.evo_result_pipes = [Pipe() for _ in range(args.popn_size*args.num_evals)]
+			self.evo_workers = [Process(target=rollout_worker, args=(self.args, i, 'evo', self.evo_task_pipes[i][1], self.evo_result_pipes[i][0],
+																	   self.buffer_bucket, self.popn_bucket, True, RANDOM_BASELINE)) for i in range(args.popn_size*args.num_evals)]
+			for worker in self.evo_workers: worker.start()
 
 
 		######### POLICY GRADIENT WORKERS ############
-		self.pg_task_pipes = Pipe()
-		self.pg_result_pipes = Pipe()
-		self.pg_workers = [Process(target=rollout_worker, args=(self.args, 0, 'pg', self.pg_task_pipes[1], self.pg_result_pipes[0],
-																   self.buffer_bucket, self.rollout_bucket, USE_PG, RANDOM_BASELINE))]
-		for worker in self.pg_workers: worker.start()
+		if self.args.rollout_size>0:
+			self.pg_task_pipes = Pipe()
+			self.pg_result_pipes = Pipe()
+			self.pg_workers = [Process(target=rollout_worker, args=(self.args, 0, 'pg', self.pg_task_pipes[1], self.pg_result_pipes[0],
+																	   self.buffer_bucket, self.rollout_bucket, self.rollout_size>0, RANDOM_BASELINE))]
+			for worker in self.pg_workers: worker.start()
 
 		######### TEST WORKERS ############
 		self.test_task_pipes = Pipe()
@@ -328,7 +329,7 @@ class MERL:
 
 
 		#Test Rollout
-		if gen % TEST_GAP == 0:
+		if gen % self.args.test_gap == 0:
 			self.test_agent.make_champ_team(self.agents) #Sync the champ policies into the TestAgent
 			self.test_task_pipes[0].send("START")
 
@@ -342,7 +343,7 @@ class MERL:
 
 
 		########## START POLICY GRADIENT ROLLOUT ##########
-		if USE_PG and not RANDOM_BASELINE:
+		if self.args.rollout_size>0 and not RANDOM_BASELINE:
 			#Synch pg_actors to its corresponding rollout_bucket
 			for agent in self.agents: agent.update_rollout_actor()
 
@@ -374,7 +375,7 @@ class MERL:
 
 		####### JOIN PG ROLLOUTS ########
 		pg_fits = []
-		if USE_PG and not RANDOM_BASELINE:
+		if self.args.rollout_size>0 and not RANDOM_BASELINE:
 			entry = self.pg_result_pipes[1].recv()
 			pg_fits = entry[1][0]
 			self.total_frames += entry[2]
@@ -382,7 +383,7 @@ class MERL:
 
 		####### JOIN TEST ROLLOUTS ########
 		test_fits = []
-		if gen % TEST_GAP == 0:
+		if gen % self.args.test_gap == 0:
 			entry = self.test_result_pipes[1].recv()
 			test_fits = entry[1][0]
 			test_tracker.update([mod.list_mean(test_fits)], self.total_frames)
@@ -409,7 +410,7 @@ class MERL:
 if __name__ == "__main__":
 	args = Parameters()  # Create the Parameters class
 	test_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
-	torch.manual_seed(SEED); np.random.seed(SEED); random.seed(SEED)    #Seeds
+	torch.manual_seed(args.seed); np.random.seed(args.seed); random.seed(args.seed)    #Seeds
 
 	# INITIALIZE THE MAIN AGENT CLASS
 	ai = MERL(args)
@@ -434,7 +435,7 @@ if __name__ == "__main__":
 			print('Weight Stats: min/max/average', pprint(ai.agents[0].popn[ai.agents[0].champ_ind].get_norm_stats()))
 			print()
 
-		if gen % 10 ==0 and USE_PG:
+		if gen % 10 ==0 and args.rollout_size>0:
 			print()
 			print('Q', pprint(ai.agents[0].algo.q))
 			print('Q_loss', pprint(ai.agents[0].algo.q_loss))
