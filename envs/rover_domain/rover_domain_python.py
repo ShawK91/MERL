@@ -240,6 +240,7 @@ class RoverDomain:
 		v2 = y2 - y1
 		angle = np.rad2deg(np.arctan2(v1, v2))
 		if angle < 0: angle += 360
+		if math.isnan(angle): angle = 0.0
 
 		dist = v1 * v1 + v2 * v2
 		dist = math.sqrt(dist)
