@@ -35,13 +35,24 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 		teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
 
 		# Get the current team actors
-		if type == 'test' or type == 'pg': team = models_bucket
-		else: team = [models_bucket[agent_id][popn_id] for agent_id, popn_id in enumerate(teams_blueprint)]
+		if args.is_homogeneous:
+			if type == 'test' or type == 'pg': team = [models_bucket[0] for _ in range(args.config.num_agents)]
+			elif type == "evo": team = [models_bucket[0][teams_blueprint[0]] for _ in range(args.config.num_agents)]
+			else: sys.exit('Incorrect type')
+
+		else: #Heterogeneous
+			if type == 'test' or type == 'pg': team = models_bucket
+			elif type == "evo": team = [models_bucket[agent_id][popn_id] for agent_id, popn_id in enumerate(teams_blueprint)]
+			else: sys.exit('Incorrect type')
 
 
+		if args.rollout_size == 0:
+			if args.scheme == 'standard': store_transitions = False
+			elif args.scheme == 'multipoint' and random.random() < 0.1: store_transitions = True
 		fitness = [None for _ in range(NUM_EVALS)]; frame=0
 		joint_state = env.reset(); rollout_trajectory = [[] for _ in range(args.config.num_agents)]
 		joint_state = utils.to_tensor(np.array(joint_state))
+
 		while True: #unless done
 
 			if random_baseline:
@@ -91,11 +102,19 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			if sum(done)==len(done):
 				#Push experiences to main
 				if store_transitions:
-					for agent_id, buffer in enumerate(data_bucket):
-						for entry in rollout_trajectory[agent_id]:
-							temp_global_reward = fitness[entry[5]]
-							entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
-							buffer.append(entry)
+					if args.is_homogeneous: #Homogeneous
+						for heap in rollout_trajectory:
+							for entry in heap:
+								temp_global_reward = fitness[entry[5]]
+								entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
+								data_bucket[0].append(entry)
+
+					else: #Heterogeneous
+						for agent_id, buffer in enumerate(data_bucket):
+							for entry in rollout_trajectory[agent_id]:
+								temp_global_reward = fitness[entry[5]]
+								entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
+								buffer.append(entry)
 
 				break
 

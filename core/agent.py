@@ -138,6 +138,8 @@ class TestAgent:
 			else:
 				self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
 
+			if self.args.is_homogeneous: break #Only need one for homogeneous workloads
+
 
 	def make_champ_team(self, agents):
 		for agent_id, agent in enumerate(agents):
