@@ -48,7 +48,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 		if args.rollout_size == 0:
 			if args.scheme == 'standard': store_transitions = False
-			elif args.scheme == 'multipoint' and random.random() < 0.1: store_transitions = True
+			elif args.scheme == 'multipoint' and random.random() < 0.1 and store_transitions: store_transitions = True
 		fitness = [None for _ in range(NUM_EVALS)]; frame=0
 		joint_state = env.reset(); rollout_trajectory = [[] for _ in range(args.config.num_agents)]
 		joint_state = utils.to_tensor(np.array(joint_state))

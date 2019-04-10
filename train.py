@@ -10,20 +10,22 @@ import random
 import threading, sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=20)
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
+parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
+parser.add_argument('-config', type=str, help='World Setting?', default='single_test')
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
+parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
+
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
-parser.add_argument('-seed', type=float, help='#Seed', default=1000000)
+parser.add_argument('-seed', type=float, help='#Seed', default=2019)
 parser.add_argument('-algo', type=str, help='SAC Vs. TD3?', default='TD3')
 parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
-parser.add_argument('-config', type=str, help='World Setting?', default='mtc_mac')
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
-parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
 parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
-parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
-parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
+
 
 RANDOM_BASELINE = False
 
@@ -35,26 +37,14 @@ class ConfigSettings:
 		self.config = config
 		self.env_choice = vars(parser.parse_args())['env']
 
-		if config == 'ssd':
-			# Rover domain
-			self.dim_x = self.dim_y = 8
-			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 2
-			self.angle_res = 20
-			self.num_poi = 2
-			self.num_agents = 2
-			self.ep_len = 20
-			self.poi_rand = 1
-			self.coupling = 1
-			self.rover_speed = 1
-			self.sensor_model = 'closest'
 
-		elif config == 'single_test':
+
+		if config == 'single_test':
 			# Rover domain
 			self.dim_x = self.dim_y = 10
-			self.obs_radius = self.dim_x * 10;
+			self.obs_radius = self.dim_x * 10
 			self.act_dist = 2
-			self.angle_res = 20
+			self.angle_res = 15
 			self.num_poi = 6
 			self.num_agents = 1
 			self.ep_len = 40
@@ -68,7 +58,7 @@ class ConfigSettings:
 			self.dim_x = self.dim_y = 7
 			self.obs_radius = self.dim_x * 10
 			self.act_dist = 2
-			self.angle_res = 20
+			self.angle_res = 15
 			self.num_poi = 2
 			self.num_agents = 2
 			self.ep_len = 20
@@ -80,9 +70,9 @@ class ConfigSettings:
 		elif config == 'two_test':
 			# Rover domain
 			self.dim_x = self.dim_y = 10
-			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 2;
-			self.angle_res = 20
+			self.obs_radius = self.dim_x * 10
+			self.act_dist = 2
+			self.angle_res = 15
 			self.num_poi = 6
 			self.num_agents = 2
 			self.ep_len = 50
@@ -94,7 +84,7 @@ class ConfigSettings:
 		elif config == '15_3':
 			# Rover domain
 			self.dim_x = self.dim_y = 15
-			self.obs_radius = self.dim_x * 10;
+			self.obs_radius = self.dim_x * 10
 			self.act_dist = 3
 			self.angle_res = 15
 			self.num_poi = 9
@@ -168,17 +158,16 @@ class Parameters:
 		self.config = ConfigSettings()
 
 		# Fairly Stable Algo params
-		self.hidden_size = 128
+		self.hidden_size = 200
 		self.algo_name = vars(parser.parse_args())['algo']
 		self.actor_lr = 1e-4
 		self.critic_lr = 1e-4
-		self.tau = 5e-3
+		self.tau = 1e-3
 		self.init_w = True
 		self.gradperstep = vars(parser.parse_args())['gradperstep']
 		self.gamma = 0.997
-		self.batch_size = 256
-		self.buffer_size = 100000
-		self.updates_per_step = 1
+		self.batch_size = 512
+		self.buffer_size = 1000000 if self.is_homogeneous else 100000
 		self.action_loss = False
 		self.policy_ups_freq = 2
 		self.policy_noise = True
@@ -430,6 +419,7 @@ if __name__ == "__main__":
 			print()
 			print('Test_stat:', mod.list_stat(test_fits), 'SAVETAG:  ', args.savetag)
 			print('Weight Stats: min/max/average', pprint(ai.test_bucket[0].get_norm_stats()))
+			print('Buffer Lens:', [ag.buffer.__len__() for ag in ai.agents])
 			print()
 
 		if gen % 10 == 0 and args.rollout_size > 0:
