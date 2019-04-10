@@ -255,6 +255,7 @@ class RoverDomain:
 	def get_local_reward(self):
 		#Update POI's visibility
 		poi_visitors = [[] for _ in range(self.args.num_poi)]
+		poi_visitor_dist = [[] for _ in range(self.args.num_poi)]
 		for i, loc in enumerate(self.poi_pos): #For all POIs
 			if self.poi_status[i]== 0:
 				continue #Ignore POIs that have been harvested already
@@ -262,7 +263,9 @@ class RoverDomain:
 			for rover_id in range(self.args.num_agents): #For each rover
 				x1 = loc[0] - self.rover_pos[rover_id][0]; y1 = loc[1] - self.rover_pos[rover_id][1]
 				dist = math.sqrt(x1 * x1 + y1 * y1)
-				if dist <= self.args.act_dist: poi_visitors[i].append(rover_id) #Add rover to POI's visitor list
+				if dist <= self.args.act_dist:
+					poi_visitors[i].append(rover_id) #Add rover to POI's visitor list
+					poi_visitor_dist[i].append(dist)
 
 		#Compute reward
 		rewards = [0.0 for _ in range(self.args.num_agents)]
@@ -273,8 +276,8 @@ class RoverDomain:
 					self.poi_status[poi_id] -= 1
 					self.poi_visitor_list[poi_id] = list(set(self.poi_visitor_list[poi_id]+rovers[:]))
 
-				for rover_id in rovers:
-					rewards[rover_id] += self.poi_value[poi_id]
+				for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
+					rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
 
 
 		return rewards
