@@ -74,7 +74,7 @@ class Buffer():
 				   Experience (tuple): A tuple of (state, next_state, action, shaped_reward, done) each as a numpy array with shape (batch_size, :)
 		   """
 		#Uniform sampling
-		ind = random.sample(range(len(self.s)), batch_size)
+		ind = random.sample(range(len(self.sT)), batch_size)
 
 		if pr_global != 0.0 or pr_rew !=0.0:
 			#Prioritization
