@@ -27,7 +27,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	elif type == 'evo': NUM_EVALS = 20
 	else: sys.exit('Incorrect type')
 
-	if args.config.env_choice == 'multiwalker': NUM_EVALS=10
+	if args.config.env_choice == 'multiwalker': NUM_EVALS=1
 
 
 
@@ -98,6 +98,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			joint_state = next_state
 			frame+=NUM_EVALS
 
+			if sum(done) > 0 and sum(done) != len(done):
+				k = None
+
 			#DONE FLAG IS Received
 			if sum(done)==len(done):
 				#Push experiences to main
@@ -120,7 +123,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 		#print(fitness)
 
-		if type == "test" and random.random() < 0.9:
+		if type == "test" and random.random() < 0.9 and args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose':
 			env.render()
 			print('Test trajectory lens',[len(world.rover_path[0]) for world in env.universe])
 			#print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])

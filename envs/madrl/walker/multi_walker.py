@@ -639,6 +639,12 @@ class MultiWalkerEnv(AbstractMAEnv, EzPickle):
             x2 = max([p[0] for p in poly])
             self.cloud_poly.append((poly, x1, x2))
 
+    def dummy_state(self):
+        return [np.zeros((32,)) for _ in range(self.n_walkers)]
+
+    def dummy_reward(self):
+        return np.zeros(self.n_walkers)
+
 
 if __name__ == "__main__":
     n_walkers = 3

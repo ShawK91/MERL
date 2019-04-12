@@ -109,6 +109,7 @@ class MultiWalker:
 		self.state_dim = 32
 
 		self.global_reward = [0.0 for _ in range(num_envs)]
+		self.env_dones = [False for _ in range(num_envs)]
 
 
 	def reset(self):
@@ -119,8 +120,9 @@ class MultiWalker:
 			Returns:
 				next_obs (list): Next state
 		"""
-		#Reset Global Reward
+		#Reset Global Reward and dones
 		self.global_reward = [0.0 for _ in range(self.num_envs)]
+		self.env_dones = [False for _ in range(self.num_envs)]
 
 		#Get joint observation
 		joint_obs = []
@@ -149,11 +151,20 @@ class MultiWalker:
 
 		joint_obs = []; joint_reward = []; joint_done = []; joint_global = []
 		for universe_id, env in enumerate(self.universe):
-			next_state, reward, done, info = env.step(action[:,universe_id,:])
-			joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
-			self.global_reward[universe_id] += sum(reward)
-			if done: joint_global.append(self.global_reward[universe_id])
-			else: joint_global.append(info)
+
+			#If this particular env instance in universe is already done:
+			if self.env_dones[universe_id]:
+				joint_obs.append(env.dummy_state()); joint_reward.append(env.dummy_reward()); joint_done.append(True); joint_global.append(None)
+
+			else:
+				next_state, reward, done, _ = env.step(action[:,universe_id,:])
+				joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
+
+				self.global_reward[universe_id] += sum(reward)
+				if done:
+					joint_global.append(self.global_reward[universe_id])
+					self.env_dones[universe_id] = True
+				else: joint_global.append(None)
 
 
 		joint_obs = np.stack(joint_obs, axis=1)

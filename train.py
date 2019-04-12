@@ -10,8 +10,8 @@ import random
 import threading, sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=20)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=10)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
@@ -149,7 +149,6 @@ class ConfigSettings:
 
 		else:
 			sys.exit('Unknown Environment Choice')
-
 
 
 
@@ -416,7 +415,7 @@ if __name__ == "__main__":
 
 	# INITIALIZE THE MAIN AGENT CLASS
 	ai = MERL(args)
-	print(' State_dim:', args.state_dim, 'Action_dim', args.action_dim)
+	print('Running ', args.config.env_choice, 'with config ', args.config.config, ' State_dim:', args.state_dim, 'Action_dim', args.action_dim)
 	time_start = time.time()
 
 	###### TRAINING LOOP ########
