@@ -1,4 +1,4 @@
-from envs.env_wrapper import RoverDomainPython, MultiWalker
+from envs.env_wrapper import RoverDomainPython
 from core import mod_utils as utils
 import numpy as np, random, sys
 
@@ -28,11 +28,20 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	else: sys.exit('Incorrect type')
 
 	if args.config.env_choice == 'multiwalker': NUM_EVALS=1
+	if args.config.env_choice == 'cassie': NUM_EVALS = 1
 
 
 
-	if args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose': env = RoverDomainPython(args, NUM_EVALS)
-	elif args.config.env_choice == 'multiwalker': env = MultiWalker(args, NUM_EVALS)
+
+	if args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose':
+		from envs.env_wrapper import RoverDomainPython
+		env = RoverDomainPython(args, NUM_EVALS)
+	elif args.config.env_choice == 'multiwalker':
+		from envs.env_wrapper import MultiWalker
+		env = MultiWalker(args, NUM_EVALS)
+	elif args.config.env_choice == 'cassie':
+		from envs.env_wrapper import Cassie
+		env = Cassie(args, NUM_EVALS)
 	else: sys.exit('Incorrect env type')
 	np.random.seed(id); random.seed(id)
 

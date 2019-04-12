@@ -90,6 +90,7 @@ class Agent:
 			else: sample_size = 1000
 
 			states, _,_,_,_,_ = self.buffer.sample(sample_size, pr_rew=0.0, pr_global=0.0)
+			states = states.cpu()
 
 			#Net indices of nets that got evaluated this generation (meant for asynchronous evolution workloads)
 			net_inds = [i for i in range(len(self.popn))] #Hack for a synchronous run

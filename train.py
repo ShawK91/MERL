@@ -15,7 +15,7 @@ parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', defa
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='multiwalker')
+parser.add_argument('-env', type=str, help='Env to test on?', default='cassie')
 parser.add_argument('-config', type=str, help='World Setting?', default='2')
 
 
@@ -147,6 +147,10 @@ class ConfigSettings:
 			except:
 				sys.exit('Unknown Config Choice for multiwalker env. Choose #walkers')
 
+		#MultiWalker Domain
+		elif self.env_choice == 'cassie': #MultiWalker Domain
+			self.num_agents = 1
+
 		else:
 			sys.exit('Unknown Environment Choice')
 
@@ -209,6 +213,9 @@ class Parameters:
 		elif self.config.env_choice == 'multiwalker': #MultiWalker Domain
 			self.state_dim = 32
 			self.action_dim = 4
+		elif self.config.env_choice == 'cassie': #Cassie Domain
+			self.state_dim = 80
+			self.action_dim = 10
 		else:
 			sys.exit('Unknown Environment Choice')
 
