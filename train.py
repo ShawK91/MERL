@@ -11,7 +11,7 @@ import threading, sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=10)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
@@ -149,7 +149,6 @@ class ConfigSettings:
 
 		else:
 			sys.exit('Unknown Environment Choice')
-
 
 
 class Parameters:

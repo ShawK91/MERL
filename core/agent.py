@@ -51,7 +51,7 @@ class Agent:
 			else: self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
 
 		#Initalize buffer
-		self.buffer = Buffer(args.buffer_size, buffer_gpu=False)
+		self.buffer = Buffer(args.buffer_size, buffer_gpu=True)
 
 		#Agent metrics
 		self.fitnesses = [[] for _ in range(args.popn_size)]
