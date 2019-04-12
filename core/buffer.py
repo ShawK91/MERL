@@ -46,7 +46,7 @@ class Buffer():
 			exp = self.tuples.pop()
 
 			#Only save if [gstats is unknown] OR [exp from evo and global reward is > than (mean_g + max_g)/2] OR [exp from pg]
-			if self.gstats['mean'] == None or exp[6] == 'evo' and exp[5] >= (self.gstats['mean'] + self.gstats['max'])/2.0 or exp[6] == 'pg':
+			if self.gstats['mean'] == None       or         exp[6] == 'evo' and exp[5] >= (self.gstats['mean'] + self.gstats['max'])/2.0         or          exp[6] == 'pg':
 
 				self.s.append(exp[0])
 				self.ns.append(exp[1])
