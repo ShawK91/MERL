@@ -18,6 +18,7 @@ class SSNE:
 		self.gen = 0
 
 		#Import Params
+		self.env = args.config.env_choice
 		self.popn_size = args.popn_size
 		self.crossover_prob = args.crossover_prob
 		self.mutation_prob = args.mutation_prob
@@ -230,8 +231,10 @@ class SSNE:
 		#return lineage_rank[0:self.num_anchors]
 
 		#Compute all actions
-		# TODO [NOTE] THAT we ignore the magnitude part (first entry in a 2-dim action vector) of the action and only measure diversity in the bearing [WON'T BE GENERALIZABLE TO OTHER DOMAINS]
-		actions = [pop[i].clean_action(states)[:,1] for i in net_inds]
+		if self.env == "rover_loose" or self.env == "rover_tight": 		#We ignore the magnitude part (first entry in a 2-dim action vector) of the action and only measure diversity in the bearing 
+			actions = [pop[i].clean_action(states)[:,1] for i in net_inds]
+		else:
+			actions = [pop[i].clean_action(states) for i in net_inds]
 
 		#Compute div_scores
 		div_matrix = np.zeros((len(net_inds), len(net_inds)))-1
