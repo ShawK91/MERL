@@ -14,9 +14,10 @@ parser.add_argument('-popsize', type=int, help='#Evo Population size', default=2
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
-parser.add_argument('-config', type=str, help='World Setting?', default='single_test')
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
+parser.add_argument('-env', type=str, help='Env to test on?', default='multiwalker')
+parser.add_argument('-config', type=str, help='World Setting?', default='2')
+
 
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
 parser.add_argument('-seed', type=float, help='#Seed', default=2019)
@@ -33,112 +34,123 @@ RANDOM_BASELINE = False
 class ConfigSettings:
 	def __init__(self):
 
+		self.env_choice = vars(parser.parse_args())['env']
 		config = vars(parser.parse_args())['config']
 		self.config = config
-		self.env_choice = vars(parser.parse_args())['env']
 
+		#ROVER DOMAIN
+		if self.env_choice == 'rover_loose' or  self.env_choice == 'rover_right': #Rover Domain
+			if config == 'single_test':
+				# Rover domain
+				self.dim_x = self.dim_y = 10
+				self.obs_radius = self.dim_x * 10
+				self.act_dist = 2
+				self.angle_res = 15
+				self.num_poi = 6
+				self.num_agents = 1
+				self.ep_len = 40
+				self.poi_rand = 1
+				self.coupling = 1
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
 
+			elif config == 'mtc_mac':
+				# Rover domain
+				self.dim_x = self.dim_y = 7
+				self.obs_radius = self.dim_x * 10
+				self.act_dist = 2
+				self.angle_res = 15
+				self.num_poi = 2
+				self.num_agents = 2
+				self.ep_len = 20
+				self.poi_rand = 1
+				self.coupling = 2
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
 
-		if config == 'single_test':
-			# Rover domain
-			self.dim_x = self.dim_y = 10
-			self.obs_radius = self.dim_x * 10
-			self.act_dist = 2
-			self.angle_res = 15
-			self.num_poi = 6
-			self.num_agents = 1
-			self.ep_len = 40
-			self.poi_rand = 1
-			self.coupling = 1
-			self.rover_speed = 1
-			self.sensor_model = 'closest'
+			elif config == 'two_test':
+				# Rover domain
+				self.dim_x = self.dim_y = 10
+				self.obs_radius = self.dim_x * 10
+				self.act_dist = 2
+				self.angle_res = 15
+				self.num_poi = 6
+				self.num_agents = 2
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 2
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
 
-		elif config == 'mtc_mac':
-			# Rover domain
-			self.dim_x = self.dim_y = 7
-			self.obs_radius = self.dim_x * 10
-			self.act_dist = 2
-			self.angle_res = 15
-			self.num_poi = 2
-			self.num_agents = 2
-			self.ep_len = 20
-			self.poi_rand = 1
-			self.coupling = 2
-			self.rover_speed = 1
-			self.sensor_model = 'closest'
+			elif config == '15_3':
+				# Rover domain
+				self.dim_x = self.dim_y = 15
+				self.obs_radius = self.dim_x * 10
+				self.act_dist = 3
+				self.angle_res = 15
+				self.num_poi = 9
+				self.num_agents = 6
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 3
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
 
-		elif config == 'two_test':
-			# Rover domain
-			self.dim_x = self.dim_y = 10
-			self.obs_radius = self.dim_x * 10
-			self.act_dist = 2
-			self.angle_res = 15
-			self.num_poi = 6
-			self.num_agents = 2
-			self.ep_len = 50
-			self.poi_rand = 1
-			self.coupling = 2
-			self.rover_speed = 1
-			self.sensor_model = 'closest'
+			elif config == '15_4':
+				# Rover domain
+				self.dim_x = self.dim_y = 15
+				self.obs_radius = self.dim_x * 10;
+				self.act_dist = 3
+				self.angle_res = 15
+				self.num_poi = 9
+				self.num_agents = 8
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 4
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
 
-		elif config == '15_3':
-			# Rover domain
-			self.dim_x = self.dim_y = 15
-			self.obs_radius = self.dim_x * 10
-			self.act_dist = 3
-			self.angle_res = 15
-			self.num_poi = 9
-			self.num_agents = 6
-			self.ep_len = 50
-			self.poi_rand = 1
-			self.coupling = 3
-			self.rover_speed = 1
-			self.sensor_model = 'closest'
+			elif config == '20_3':
+				# Rover domain
+				self.dim_x = self.dim_y = 20
+				self.obs_radius = self.dim_x * 10;
+				self.act_dist = 3
+				self.angle_res = 15
+				self.num_poi = 9
+				self.num_agents = 6
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 3
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
 
-		elif config == '15_4':
-			# Rover domain
-			self.dim_x = self.dim_y = 15
-			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 3
-			self.angle_res = 15
-			self.num_poi = 9
-			self.num_agents = 8
-			self.ep_len = 50
-			self.poi_rand = 1
-			self.coupling = 4
-			self.rover_speed = 1
-			self.sensor_model = 'closest'
+			elif config == '20_4':
+				# Rover domain
+				self.dim_x = self.dim_y = 20
+				self.obs_radius = self.dim_x * 10;
+				self.act_dist = 3
+				self.angle_res = 15
+				self.num_poi = 9
+				self.num_agents = 8
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 4
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
 
-		elif config == '20_3':
-			# Rover domain
-			self.dim_x = self.dim_y = 20
-			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 3
-			self.angle_res = 15
-			self.num_poi = 9
-			self.num_agents = 6
-			self.ep_len = 50
-			self.poi_rand = 1
-			self.coupling = 3
-			self.rover_speed = 1
-			self.sensor_model = 'closest'
+			else:
+				sys.exit('Unknown Config')
 
-		elif config == '20_4':
-			# Rover domain
-			self.dim_x = self.dim_y = 20
-			self.obs_radius = self.dim_x * 10;
-			self.act_dist = 3
-			self.angle_res = 15
-			self.num_poi = 9
-			self.num_agents = 8
-			self.ep_len = 50
-			self.poi_rand = 1
-			self.coupling = 4
-			self.rover_speed = 1
-			self.sensor_model = 'closest'
+		#MultiWalker Domain
+		elif self.env_choice == 'multiwalker': #MultiWalker Domain
+			try: self.num_agents = int(config)
+			except:
+				sys.exit('Unknown Config Choice for multiwalker env. Choose #walkers')
 
 		else:
-			sys.exit('Unknown Config')
+			sys.exit('Unknown Environment Choice')
+
+
 
 
 class Parameters:
@@ -193,20 +205,25 @@ class Parameters:
 		self.num_blends = int(0.15 * self.popn_size)
 
 		# Dependents
-		self.state_dim = int(720 / self.config.angle_res) + 1
-		self.action_dim = 2
-		self.num_test = 10 if self.config.poi_rand else 1
+		if self.config.env_choice == 'rover_loose' or  self.config.env_choice == 'rover_right': #Rover Domain
+			self.state_dim = int(720 / self.config.angle_res) + 1
+			self.action_dim = 2
+		elif self.config.env_choice == 'multiwalker': #MultiWalker Domain
+			self.state_dim = 32
+			self.action_dim = 4
+		else:
+			sys.exit('Unknown Environment Choice')
+
+		self.num_test = 10
 		self.test_gap = 5
 
 		# Save Filenames
 		self.savetag = vars(parser.parse_args())['savetag'] + \
 		               'pop' + str(self.popn_size) + \
 		               '_roll' + str(self.rollout_size) + \
-		               '_homogeny' + str(self.is_homogeneous) + \
-		               '_config' + str(self.config.config) + \
 		               '_alz' + str(self.actualize) + \
-		               '_env' + str(self.config.env_choice)
-		# '_pr' + str(self.priority_rate)
+		               '_env' + str(self.config.env_choice)+'_'+ str(self.config.config)
+			# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
 		# '_seed' + str(SEED)

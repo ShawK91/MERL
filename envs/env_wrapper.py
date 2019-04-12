@@ -77,6 +77,109 @@ class RoverDomainPython:
 		self.universe[rand_univ].render()
 
 
+class MultiWalker:
+	"""Wrapper around the Environment to expose a cleaner interface for RL
+
+		Parameters:
+			env_name (str): Env name
+
+
+	"""
+	def __init__(self, args, num_envs=1):
+		"""
+		A base template for all environment wrappers.
+		"""
+		#Initialize world with requiste params
+		self.args = args
+		self.num_envs = num_envs
+
+		from envs.madrl.walker.multi_walker import MultiWalkerEnv
+
+		self.universe = [] #Universe - collection of all envs running in parallel
+		for _ in range(num_envs):
+			env = MultiWalkerEnv(n_walkers=args.config.num_agents, position_noise=1e-3, angle_noise=1e-3, reward_mech='local',
+                 forward_reward=1.0, fall_reward=-100.0, drop_reward=-100.0, terminate_on_fall=True,
+                 one_hot=False)
+			self.universe.append(env)
+
+		#Action Space
+		self.action_low = -1.0
+		self.action_high = 1.0
+		self.action_dim = 4
+		self.state_dim = 32
+
+		self.global_reward = [0.0 for _ in range(num_envs)]
+
+
+	def reset(self):
+		"""Method overloads reset
+			Parameters:
+				None
+
+			Returns:
+				next_obs (list): Next state
+		"""
+		#Reset Global Reward
+		self.global_reward = [0.0 for _ in range(self.num_envs)]
+
+		#Get joint observation
+		joint_obs = []
+		for env in self.universe:
+			obs = env.reset()
+			joint_obs.append(obs)
+
+		joint_obs = np.stack(joint_obs, axis=1)
+
+
+		return joint_obs
+
+
+	def step(self, action): #Expects a numpy action
+		"""Take an action to forward the simulation
+
+			Parameters:
+				action (ndarray): action to take in the env
+
+			Returns:
+				next_obs (list): Next state
+				reward (float): Reward for this step
+				done (bool): Simulation done?
+				info (None): Template from OpenAi gym (doesnt have anything)
+		"""
+
+		joint_obs = []; joint_reward = []; joint_done = []; joint_global = []
+		for universe_id, env in enumerate(self.universe):
+			next_state, reward, done, info = env.step(action[:,universe_id,:])
+			joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
+			self.global_reward[universe_id] += sum(reward)
+			if done: joint_global.append(self.global_reward[universe_id])
+			else: joint_global.append(info)
+
+
+		joint_obs = np.stack(joint_obs, axis=1)
+		joint_reward = np.stack(joint_reward, axis=1)
+
+		return joint_obs, joint_reward, joint_done, joint_global
+
+
+
+	def render(self):
+		pass
+		# rand_univ = np.random.randint(0, len(self.universe))
+		# self.universe[rand_univ].render()
+
+
+
+
+
+
+
+
+
+
+
+
+
 class RoverDomainCython:
 	"""Wrapper around the Environment to expose a cleaner interface for RL
 
