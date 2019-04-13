@@ -43,7 +43,7 @@ class Buffer():
 
 		else:
 			prob_mass = (exp[5] - self.gstats['min']) / (self.gstats['max']-self.gstats['min']) #Normalization
-			prob = prob_mass * self.filter_c #Coefficient
+			prob = prob_mass.item() * self.filter_c #Coefficient
 			if random.random() < prob: save_data = True
 
 		if save_data:
