@@ -106,7 +106,7 @@ class MultiWalker:
 		self.action_low = -1.0
 		self.action_high = 1.0
 		self.action_dim = 4
-		self.state_dim = 32
+		self.state_dim = 33
 
 		self.global_reward = [0.0 for _ in range(num_envs)]
 		self.env_dones = [False for _ in range(num_envs)]
@@ -160,7 +160,7 @@ class MultiWalker:
 				next_state, reward, done, _ = env.step(action[:,universe_id,:])
 				joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
 
-				self.global_reward[universe_id] += sum(reward)
+				self.global_reward[universe_id] += sum(reward)/self.args.config.num_agents
 				if done:
 					joint_global.append(self.global_reward[universe_id])
 					self.env_dones[universe_id] = True

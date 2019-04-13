@@ -397,7 +397,7 @@ class MultiWalkerEnv(AbstractMAEnv, EzPickle):
                 nobs.extend(np.eye(MAX_AGENTS)[i])
             else:
                 nobs.append(float(i) / self.n_walkers)
-            obs.append(np.array(wobs + nobs))
+            obs.append(np.array([i] + wobs + nobs))
 
             #shaping = 130 * pos[0] / SCALE
             shaping = 0.0
@@ -640,7 +640,7 @@ class MultiWalkerEnv(AbstractMAEnv, EzPickle):
             self.cloud_poly.append((poly, x1, x2))
 
     def dummy_state(self):
-        return [np.zeros((32,)) for _ in range(self.n_walkers)]
+        return [np.zeros((33,)) for _ in range(self.n_walkers)]
 
     def dummy_reward(self):
         return np.zeros(self.n_walkers)

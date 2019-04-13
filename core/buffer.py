@@ -39,7 +39,7 @@ class Buffer():
 
 		if self.gstats['mean'] == None or exp[6] == 'pg': save_data=True #save automatically if [gstats is unknown] or Policy Gradient
 
-		elif self.filter_c == None: save_data=True
+		elif self.filter_c == -1: save_data=True
 
 		else:
 			prob_mass = (exp[6] - self.gstats['min']) / (self.gstats['max']-self.gstats['min']) #Normalization

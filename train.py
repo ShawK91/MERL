@@ -10,15 +10,14 @@ import random
 import threading, sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='cassie')
+parser.add_argument('-env', type=str, help='Env to test on?', default='multiwalker')
 parser.add_argument('-config', type=str, help='World Setting?', default='2')
-parser.add_argument('-filter_c', type=str, help='Prob multiplier for evo experiences absorbtion into buffer?', default='1')
-
+parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default='10000')
 
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
 parser.add_argument('-seed', type=float, help='#Seed', default=2019)
@@ -27,7 +26,6 @@ parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
 parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
-
 
 RANDOM_BASELINE = False
 
@@ -39,8 +37,8 @@ class ConfigSettings:
 		config = vars(parser.parse_args())['config']
 		self.config = config
 
-		#ROVER DOMAIN
-		if self.env_choice == 'rover_loose' or  self.env_choice == 'rover_right': #Rover Domain
+		# ROVER DOMAIN
+		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_right':  # Rover Domain
 			if config == 'single_test':
 				# Rover domain
 				self.dim_x = self.dim_y = 10
@@ -142,14 +140,15 @@ class ConfigSettings:
 			else:
 				sys.exit('Unknown Config')
 
-		#MultiWalker Domain
-		elif self.env_choice == 'multiwalker': #MultiWalker Domain
-			try: self.num_agents = int(config)
+		# MultiWalker Domain
+		elif self.env_choice == 'multiwalker':  # MultiWalker Domain
+			try:
+				self.num_agents = int(config)
 			except:
 				sys.exit('Unknown Config Choice for multiwalker env. Choose #walkers')
 
-		#MultiWalker Domain
-		elif self.env_choice == 'cassie': #MultiWalker Domain
+		# MultiWalker Domain
+		elif self.env_choice == 'cassie':  # MultiWalker Domain
 			self.num_agents = 1
 
 		else:
@@ -172,7 +171,6 @@ class Parameters:
 		# Env domain
 		self.config = ConfigSettings()
 
-
 		# Fairly Stable Algo params
 		self.hidden_size = 200
 		self.algo_name = vars(parser.parse_args())['algo']
@@ -185,7 +183,6 @@ class Parameters:
 		self.batch_size = 512
 		self.buffer_size = 1000000 if self.is_homogeneous else 100000
 		self.filter_c = vars(parser.parse_args())['filter_c']
-
 
 		self.action_loss = False
 		self.policy_ups_freq = 2
@@ -212,13 +209,13 @@ class Parameters:
 		self.num_blends = int(0.15 * self.popn_size)
 
 		# Dependents
-		if self.config.env_choice == 'rover_loose' or  self.config.env_choice == 'rover_right': #Rover Domain
+		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_right':  # Rover Domain
 			self.state_dim = int(720 / self.config.angle_res) + 1
 			self.action_dim = 2
-		elif self.config.env_choice == 'multiwalker': #MultiWalker Domain
-			self.state_dim = 32
+		elif self.config.env_choice == 'multiwalker':  # MultiWalker Domain
+			self.state_dim = 33
 			self.action_dim = 4
-		elif self.config.env_choice == 'cassie': #Cassie Domain
+		elif self.config.env_choice == 'cassie':  # Cassie Domain
 			self.state_dim = 80
 			self.action_dim = 10
 		else:
@@ -232,9 +229,9 @@ class Parameters:
 		               'pop' + str(self.popn_size) + \
 		               '_roll' + str(self.rollout_size) + \
 		               '_alz' + str(self.actualize) + \
-		               '_env' + str(self.config.env_choice)+'_'+ str(self.config.config) +\
-		               '_filter'+str(self.filter_c)
-			# '_pr' + str(self.priority_rate)
+		               '_env' + str(self.config.env_choice) + '_' + str(self.config.config) + \
+		               '_filter' + str(self.filter_c)
+		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
 		# '_seed' + str(SEED)
@@ -285,8 +282,8 @@ class MERL:
 			self.evo_task_pipes = [Pipe() for _ in range(args.popn_size * args.num_evals)]
 			self.evo_result_pipes = [Pipe() for _ in range(args.popn_size * args.num_evals)]
 			self.evo_workers = [Process(target=rollout_worker, args=(
-			self.args, i, 'evo', self.evo_task_pipes[i][1], self.evo_result_pipes[i][0],
-			self.buffer_bucket, self.popn_bucket, True, RANDOM_BASELINE)) for i in
+				self.args, i, 'evo', self.evo_task_pipes[i][1], self.evo_result_pipes[i][0],
+				self.buffer_bucket, self.popn_bucket, True, RANDOM_BASELINE)) for i in
 			                    range(args.popn_size * args.num_evals)]
 			for worker in self.evo_workers: worker.start()
 
@@ -408,12 +405,11 @@ class MERL:
 		for agent in self.agents:
 			agent.evolve()
 
-		# #Save models periodically
-		# if gen % 20 == 0:
-		#     for rover_id in range(self.args.num_rover):
-		#         torch.save(self.agents[rover_id].critic.state_dict(), self.args.model_save + self.args.critic_fname + '_'+ str(rover_id))
-		#         torch.save(self.agents[rover_id].actor.state_dict(), self.args.model_save + self.args.actor_fname + '_'+ str(rover_id))
-		#     print("Models Saved")
+		# Save models periodically
+		if gen % 20 == 0:
+			for id, test_actor in self.test_agent.rollout_actor:
+				torch.save(test_actor.state_dict(), self.args.model_save + str(id) + '_' + self.args.actor_fname)
+			print("Models Saved")
 
 		return all_fits, pg_fits, test_fits
 
@@ -427,7 +423,8 @@ if __name__ == "__main__":
 
 	# INITIALIZE THE MAIN AGENT CLASS
 	ai = MERL(args)
-	print('Running ', args.config.env_choice, 'with config ', args.config.config, ' State_dim:', args.state_dim, 'Action_dim', args.action_dim)
+	print('Running ', args.config.env_choice, 'with config ', args.config.config, ' State_dim:', args.state_dim,
+	      'Action_dim', args.action_dim)
 	time_start = time.time()
 
 	###### TRAINING LOOP ########
