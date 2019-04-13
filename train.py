@@ -15,7 +15,7 @@ parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', defa
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
 parser.add_argument('-config', type=str, help='World Setting?', default='15_3')
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default='10000')
 
@@ -38,7 +38,7 @@ class ConfigSettings:
 		self.config = config
 
 		# ROVER DOMAIN
-		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_right':  # Rover Domain
+		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight':  # Rover Domain
 			if config == 'single_test':
 				# Rover domain
 				self.dim_x = self.dim_y = 10
@@ -209,7 +209,7 @@ class Parameters:
 		self.num_blends = int(0.15 * self.popn_size)
 
 		# Dependents
-		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_right':  # Rover Domain
+		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_tight':  # Rover Domain
 			self.state_dim = int(720 / self.config.angle_res) + 1
 			self.action_dim = 2
 		elif self.config.env_choice == 'multiwalker':  # MultiWalker Domain
