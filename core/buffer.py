@@ -11,8 +11,8 @@ class Buffer():
 			capacity (int): Maximum number of experiences to hold in cyclic buffer
 		"""
 
-	def __init__(self, capacity, buffer_gpu):
-		self.capacity = capacity; self.buffer_gpu = buffer_gpu
+	def __init__(self, capacity, buffer_gpu, filter_c=None):
+		self.capacity = capacity; self.buffer_gpu = buffer_gpu; self.filter_c = filter_c
 		self.manager = Manager()
 		self.tuples = self.manager.list() #Temporary shared buffer to get experiences from processes
 		self.s = []; self.ns = []; self.a = []; self.r = []; self.done = []; self.global_reward = []
@@ -32,6 +32,30 @@ class Buffer():
 
 
 
+	def data_filter(self, exp):
+
+		#Initialize to not save
+		save_data = False
+
+		if self.gstats['mean'] == None or exp[6] == 'pg': save_data=True #save automatically if [gstats is unknown] or Policy Gradient
+
+		elif self.filter_c == None: save_data=True
+
+		else:
+			prob_mass = (exp[6] - self.gstats['min']) / (self.gstats['max']-self.gstats['min']) #Normalization
+			prob = prob_mass * self.filter_c #Coefficient
+			if random.random() < prob: save_data = True
+
+		if save_data:
+			self.s.append(exp[0])
+			self.ns.append(exp[1])
+			self.a.append(exp[2])
+			self.r.append(exp[3])
+			self.done.append(exp[4])
+			self.global_reward.append(exp[5])
+			self.pg_frames += 1
+			self.total_frames += 1
+
 
 	def referesh(self):
 		"""Housekeeping
@@ -44,18 +68,7 @@ class Buffer():
 		# Add ALL EXPERIENCE COLLECTED TO MEMORY concurrently
 		for _ in range(len(self.tuples)):
 			exp = self.tuples.pop()
-
-			#Only save if [gstats is unknown] OR [exp from evo and global reward is > than (mean_g + max_g)/2] OR [exp from pg]
-			if self.gstats['mean'] == None       or         exp[6] == 'evo' and exp[5] >= (self.gstats['mean'] + self.gstats['max'])/2.0         or          exp[6] == 'pg':
-
-				self.s.append(exp[0])
-				self.ns.append(exp[1])
-				self.a.append(exp[2])
-				self.r.append(exp[3])
-				self.done.append(exp[4])
-				self.global_reward.append(exp[5])
-				self.pg_frames += 1
-				self.total_frames += 1
+			self.data_filter(exp)
 
 
 		#Trim to make the buffer size < capacity
