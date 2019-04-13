@@ -17,6 +17,7 @@ parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneou
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-env', type=str, help='Env to test on?', default='cassie')
 parser.add_argument('-config', type=str, help='World Setting?', default='2')
+parser.add_argument('-filter_c', type=str, help='Prob multiplier for evo experiences absorbtion into buffer?', default='1')
 
 
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
@@ -168,8 +169,9 @@ class Parameters:
 		self.seed = vars(parser.parse_args())['seed']
 		self.is_homogeneous = vars(parser.parse_args())['homogeny']
 
-		# Rover domain
+		# Env domain
 		self.config = ConfigSettings()
+
 
 		# Fairly Stable Algo params
 		self.hidden_size = 200
@@ -182,6 +184,9 @@ class Parameters:
 		self.gamma = 0.997
 		self.batch_size = 512
 		self.buffer_size = 1000000 if self.is_homogeneous else 100000
+		self.filter_c = vars(parser.parse_args())['filter_c']
+
+
 		self.action_loss = False
 		self.policy_ups_freq = 2
 		self.policy_noise = True
@@ -227,7 +232,8 @@ class Parameters:
 		               'pop' + str(self.popn_size) + \
 		               '_roll' + str(self.rollout_size) + \
 		               '_alz' + str(self.actualize) + \
-		               '_env' + str(self.config.env_choice)+'_'+ str(self.config.config)
+		               '_env' + str(self.config.env_choice)+'_'+ str(self.config.config) +\
+		               '_filter'+str(self.filter_c)
 			# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
