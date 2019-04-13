@@ -10,13 +10,13 @@ import random
 import threading, sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='multiwalker')
-parser.add_argument('-config', type=str, help='World Setting?', default='2')
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
+parser.add_argument('-config', type=str, help='World Setting?', default='15_3')
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default='10000')
 
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
@@ -87,9 +87,9 @@ class ConfigSettings:
 				self.obs_radius = self.dim_x * 10
 				self.act_dist = 3
 				self.angle_res = 15
-				self.num_poi = 9
+				self.num_poi = 8
 				self.num_agents = 6
-				self.ep_len = 50
+				self.ep_len = 40
 				self.poi_rand = 1
 				self.coupling = 3
 				self.rover_speed = 1
@@ -98,12 +98,12 @@ class ConfigSettings:
 			elif config == '15_4':
 				# Rover domain
 				self.dim_x = self.dim_y = 15
-				self.obs_radius = self.dim_x * 10;
+				self.obs_radius = self.dim_x * 10
 				self.act_dist = 3
 				self.angle_res = 15
-				self.num_poi = 9
+				self.num_poi = 8
 				self.num_agents = 8
-				self.ep_len = 50
+				self.ep_len = 40
 				self.poi_rand = 1
 				self.coupling = 4
 				self.rover_speed = 1
@@ -406,10 +406,10 @@ class MERL:
 			agent.evolve()
 
 		# Save models periodically
-		if gen % 20 == 0:
-			for id, test_actor in self.test_agent.rollout_actor:
-				torch.save(test_actor.state_dict(), self.args.model_save + str(id) + '_' + self.args.actor_fname)
-			print("Models Saved")
+		# if gen % 20 == 0:
+		# 	for id, test_actor in self.test_agent.rollout_actor:
+		# 		torch.save(test_actor.state_dict(), self.args.model_save + str(id) + '_' + self.args.actor_fname)
+		# 	print("Models Saved")
 
 		return all_fits, pg_fits, test_fits
 
