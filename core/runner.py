@@ -29,6 +29,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 	if args.config.env_choice == 'multiwalker': NUM_EVALS=1
 	if args.config.env_choice == 'cassie': NUM_EVALS = 1
+	if args.config.env_choice == 'hyper': NUM_EVALS = 1
 
 
 
@@ -42,6 +43,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	elif args.config.env_choice == 'cassie':
 		from envs.env_wrapper import Cassie
 		env = Cassie(args, NUM_EVALS)
+	elif args.config.env_choice == 'hyper':
+		from envs.env_wrapper import PowerPlant
+		env = PowerPlant(args, NUM_EVALS)
 	else: sys.exit('Incorrect env type')
 	np.random.seed(id); random.seed(id)
 
@@ -65,6 +69,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			elif args.scheme == 'multipoint' and random.random() < 0.1 and store_transitions: store_transitions = True
 		fitness = [None for _ in range(NUM_EVALS)]; frame=0
 		joint_state = env.reset(); rollout_trajectory = [[] for _ in range(args.config.num_agents)]
+
 		joint_state = utils.to_tensor(np.array(joint_state))
 
 		while True: #unless done

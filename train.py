@@ -9,13 +9,14 @@ import argparse
 import random
 import threading, sys
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
+parser.add_argument('-env', type=str, help='Env to test on?', default='hyper')
 parser.add_argument('-config', type=str, help='World Setting?', default='15_3')
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default='10000')
 
@@ -28,6 +29,7 @@ parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
 parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
 
 RANDOM_BASELINE = False
+
 
 
 class ConfigSettings:
@@ -147,9 +149,19 @@ class ConfigSettings:
 			except:
 				sys.exit('Unknown Config Choice for multiwalker env. Choose #walkers')
 
-		# MultiWalker Domain
-		elif self.env_choice == 'cassie':  # MultiWalker Domain
+		# Cassie Domain
+		elif self.env_choice == 'cassie':  # Cassie Domain
 			self.num_agents = 1
+
+		# Hyper Domain
+		elif self.env_choice == 'hyper':  # Hyper Domain
+			self.num_agents = 1
+			self.target_sensor = 1
+			self.run_time = 300
+			self.sensor_noise = 0.00
+			self.reconf_shape = 0
+			self.num_profiles = 3 #only applicable for some reconf_shapes
+
 
 		else:
 			sys.exit('Unknown Environment Choice')
@@ -218,6 +230,9 @@ class Parameters:
 		elif self.config.env_choice == 'cassie':  # Cassie Domain
 			self.state_dim = 80
 			self.action_dim = 10
+		elif self.config.env_choice == 'hyper':  # Cassie Domain
+			self.state_dim = 20
+			self.action_dim = 2
 		else:
 			sys.exit('Unknown Environment Choice')
 
@@ -420,6 +435,7 @@ if __name__ == "__main__":
 	torch.manual_seed(args.seed);
 	np.random.seed(args.seed);
 	random.seed(args.seed)  # Seeds
+	if args.config.env_choice == 'hyper': from envs.hyper.PowerPlant_env import Fast_Simulator  # Main Module needs access to this class for some reason
 
 	# INITIALIZE THE MAIN AGENT CLASS
 	ai = MERL(args)
