@@ -46,9 +46,9 @@ class Agent:
 
 		#### Rollout Actor is a template used for MP #####
 		self.rollout_actor = self.manager.list()
-		for _ in range(args.rollout_size):
-			if args.algo_name == 'TD3': self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='DeterministicPolicy'))
-			else: self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
+
+		if args.algo_name == 'TD3': self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='DeterministicPolicy'))
+		else: self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
 
 		#Initalize buffer
 		self.buffer = Buffer(args.buffer_size, buffer_gpu=False, filter_c=args.filter_c)
@@ -83,7 +83,7 @@ class Agent:
 
 			#Make sure that the buffer has been refereshed and tensorified
 			if self.buffer.__len__() < 1000: self.buffer.tensorify()
-			if random.random() < 0.1: self.buffer.tensorify()
+			if random.random() < 0.01: self.buffer.tensorify()
 
 			#Get sample of states from the buffer
 			if self.buffer.__len__() < 1000: sample_size = self.buffer.__len__()

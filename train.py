@@ -16,7 +16,7 @@ parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', defa
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='hyper')
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
 parser.add_argument('-config', type=str, help='World Setting?', default='15_3')
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default='10000')
 
@@ -156,10 +156,10 @@ class ConfigSettings:
 		# Hyper Domain
 		elif self.env_choice == 'hyper':  # Hyper Domain
 			self.num_agents = 1
-			self.target_sensor = 1
+			self.target_sensor = 11
 			self.run_time = 300
-			self.sensor_noise = 0.00
-			self.reconf_shape = 0
+			self.sensor_noise = 0.1
+			self.reconf_shape = 2
 			self.num_profiles = 3 #only applicable for some reconf_shapes
 
 

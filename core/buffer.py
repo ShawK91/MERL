@@ -34,9 +34,9 @@ class Buffer():
 
 	def data_filter(self, exp):
 
-		#Initialize to not save
+		# #Initialize to not save
 		save_data = False
-
+		#
 		if self.gstats['mean'] == None or exp[6] == 'pg': save_data=True #save automatically if [gstats is unknown] or Policy Gradient
 
 		elif self.filter_c == -1: save_data=True
