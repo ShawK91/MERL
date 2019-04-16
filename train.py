@@ -420,11 +420,11 @@ class MERL:
 		for agent in self.agents:
 			agent.evolve()
 
-		# Save models periodically
-		# if gen % 20 == 0:
-		# 	for id, test_actor in self.test_agent.rollout_actor:
-		# 		torch.save(test_actor.state_dict(), self.args.model_save + str(id) + '_' + self.args.actor_fname)
-		# 	print("Models Saved")
+		#Save models periodically
+		if gen % 20 == 0:
+			for id, test_actor in enumerate(self.test_agent.rollout_actor):
+				torch.save(test_actor.state_dict(), self.args.model_save + str(id) + '_' + self.args.actor_fname)
+			print("Models Saved")
 
 		return all_fits, pg_fits, test_fits
 
