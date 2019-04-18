@@ -111,25 +111,27 @@ class Buffer():
 		   """
 		self.referesh() #Referesh first
 
-		self.sT = torch.tensor(np.vstack(self.s))
-		self.nsT = torch.tensor(np.vstack(self.ns))
-		self.aT = torch.tensor(np.vstack(self.a))
-		self.rT = torch.tensor(np.vstack(self.r))
-		self.doneT = torch.tensor(np.vstack(self.done))
-		self.global_rewardT = torch.tensor(np.vstack(self.global_reward))
-		if self.buffer_gpu:
-			self.sT = self.sT.cuda()
-			self.nsT = self.nsT.cuda()
-			self.aT = self.aT.cuda()
-			self.rT = self.rT.cuda()
-			self.doneT = self.doneT.cuda()
-			self.global_rewardT = self.global_rewardT.cuda()
+		if self.__len__() >1:
 
-		#Prioritized indices update
-		self.top_r = list(np.argsort(np.vstack(self.r), axis=0)[-int(len(self.s)/10):])
-		self.top_g = list(np.argsort(np.vstack(self.global_reward), axis=0)[-int(len(self.s) / 10):])
+			self.sT = torch.tensor(np.vstack(self.s))
+			self.nsT = torch.tensor(np.vstack(self.ns))
+			self.aT = torch.tensor(np.vstack(self.a))
+			self.rT = torch.tensor(np.vstack(self.r))
+			self.doneT = torch.tensor(np.vstack(self.done))
+			self.global_rewardT = torch.tensor(np.vstack(self.global_reward))
+			if self.buffer_gpu:
+				self.sT = self.sT.cuda()
+				self.nsT = self.nsT.cuda()
+				self.aT = self.aT.cuda()
+				self.rT = self.rT.cuda()
+				self.doneT = self.doneT.cuda()
+				self.global_rewardT = self.global_rewardT.cuda()
 
-		#Update Stats
-		compute_stats(self.rT, self.rstats)
-		compute_stats(self.global_rewardT, self.gstats)
+			#Prioritized indices update
+			self.top_r = list(np.argsort(np.vstack(self.r), axis=0)[-int(len(self.s)/10):])
+			self.top_g = list(np.argsort(np.vstack(self.global_reward), axis=0)[-int(len(self.s) / 10):])
+
+			#Update Stats
+			compute_stats(self.rT, self.rstats)
+			compute_stats(self.global_rewardT, self.gstats)
 
