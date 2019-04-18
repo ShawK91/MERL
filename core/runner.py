@@ -30,6 +30,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	if args.config.env_choice == 'multiwalker': NUM_EVALS=1
 	if args.config.env_choice == 'cassie': NUM_EVALS = 1
 	if args.config.env_choice == 'hyper': NUM_EVALS = 1
+	if args.config.env_choice == 'motivate': NUM_EVALS = 1
 
 
 
@@ -37,6 +38,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	if args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose':
 		from envs.env_wrapper import RoverDomainPython
 		env = RoverDomainPython(args, NUM_EVALS)
+	elif args.config.env_choice == 'motivate':
+		from envs.env_wrapper import MotivateDomain
+		env = MotivateDomain(args, NUM_EVALS)
 	elif args.config.env_choice == 'multiwalker':
 		from envs.env_wrapper import MultiWalker
 		env = MultiWalker(args, NUM_EVALS)
@@ -137,7 +141,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 		#print(fitness)
 
-		if type == "test" and random.random() < 0.05 and (args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose'):
+		if type == "test" and random.random() < 1.0 and (args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'motivate'):
 			env.render()
 			print('Test trajectory lens',[len(world.rover_path[0]) for world in env.universe])
 			#print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])

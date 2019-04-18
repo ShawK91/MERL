@@ -12,12 +12,12 @@ import threading, sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
-parser.add_argument('-config', type=str, help='World Setting?', default='15_3')
+parser.add_argument('-env', type=str, help='Env to test on?', default='motivate')
+parser.add_argument('-config', type=str, help='World Setting?', default='motivate')
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default='10000')
 
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
@@ -65,6 +65,20 @@ class ConfigSettings:
 				self.num_agents = 2
 				self.ep_len = 20
 				self.poi_rand = 1
+				self.coupling = 2
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
+
+			elif config == 'motivate':
+				# Rover domain
+				self.dim_x = self.dim_y = 7
+				self.obs_radius = self.dim_x * 10
+				self.act_dist = 2
+				self.angle_res = 1
+				self.num_poi = 2
+				self.num_agents = 2
+				self.ep_len = 20
+				self.poi_rand = 0
 				self.coupling = 2
 				self.rover_speed = 1
 				self.sensor_model = 'closest'
@@ -141,6 +155,21 @@ class ConfigSettings:
 
 			else:
 				sys.exit('Unknown Config')
+
+		elif self.env_choice == 'motivate':  # Rover Domain
+			# Motivate domain
+			self.dim_x = self.dim_y = 20
+			self.obs_radius = self.dim_x * 10
+			self.act_dist = 1.5
+			self.angle_res = 15
+			self.num_poi = 2
+			self.num_agents = 2
+			self.ep_len = 20
+			self.poi_rand = 0
+			self.coupling = 1
+			self.rover_speed = 1
+			self.sensor_model = 'closest'
+
 
 		# MultiWalker Domain
 		elif self.env_choice == 'multiwalker':  # MultiWalker Domain
@@ -221,7 +250,7 @@ class Parameters:
 		self.num_blends = int(0.15 * self.popn_size)
 
 		# Dependents
-		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_tight':  # Rover Domain
+		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_tight' or self.config.env_choice == 'motivate':  # Rover Domain
 			self.state_dim = int(720 / self.config.angle_res) + 1
 			self.action_dim = 2
 		elif self.config.env_choice == 'multiwalker':  # MultiWalker Domain
@@ -235,6 +264,12 @@ class Parameters:
 			self.action_dim = 2
 		else:
 			sys.exit('Unknown Environment Choice')
+
+		if self.config.env_choice == 'motivate':
+			self.hidden_size = 50
+			self.buffer_size = 10000
+			self.batch_size = 256
+
 
 		self.num_test = 10
 		self.test_gap = 5
