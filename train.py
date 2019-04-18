@@ -12,7 +12,7 @@ import threading, sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
 parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
@@ -213,16 +213,16 @@ class Parameters:
 		self.config = ConfigSettings()
 
 		# Fairly Stable Algo params
-		self.hidden_size = 200
+		self.hidden_size = 100
 		self.algo_name = vars(parser.parse_args())['algo']
 		self.actor_lr = 1e-4
 		self.critic_lr = 1e-4
 		self.tau = 1e-3
 		self.init_w = True
 		self.gradperstep = vars(parser.parse_args())['gradperstep']
-		self.gamma = 0.997
-		self.batch_size = 512
-		self.buffer_size = 1000000 if self.is_homogeneous else 100000
+		self.gamma = 0.995
+		self.batch_size = 256
+		self.buffer_size = 100000 if self.is_homogeneous else 100000
 		self.filter_c = vars(parser.parse_args())['filter_c']
 
 		self.action_loss = False
@@ -280,11 +280,13 @@ class Parameters:
 		               '_roll' + str(self.rollout_size) + \
 		               '_alz' + str(self.actualize) + \
 		               '_env' + str(self.config.env_choice) + '_' + str(self.config.config) + \
-		               '_filter' + str(self.filter_c)
+			           '_ps' + str(self.is_homogeneous)
+
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
 		# '_seed' + str(SEED)
+		#'_filter' + str(self.filter_c)
 
 		self.save_foldername = 'R_MERL/'
 		if not os.path.exists(self.save_foldername): os.makedirs(self.save_foldername)
