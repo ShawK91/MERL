@@ -4,7 +4,7 @@ from core.models import Actor
 from core.buffer import Buffer
 from core.neuroevolution import SSNE
 import core.mod_utils as mod
-import random
+import random, sys
 
 class Agent:
 	"""Learner object encapsulating a local learner
@@ -81,16 +81,23 @@ class Agent:
 		## One gen of evolution ###
 		if self.args.popn_size > 1: #If not no-evo
 
+			if self.args.scheme == 'multipoint':
 			#Make sure that the buffer has been refereshed and tensorified
-			if self.buffer.__len__() < 1000: self.buffer.tensorify()
-			if random.random() < 0.01: self.buffer.tensorify()
+				if self.buffer.__len__() < 1000: self.buffer.tensorify()
+				if random.random() < 0.01: self.buffer.tensorify()
 
-			#Get sample of states from the buffer
-			if self.buffer.__len__() < 1000: sample_size = self.buffer.__len__()
-			else: sample_size = 1000
+				#Get sample of states from the buffer
+				if self.buffer.__len__() < 1000: sample_size = self.buffer.__len__()
+				else: sample_size = 1000
 
-			states, _,_,_,_,_ = self.buffer.sample(sample_size, pr_rew=0.0, pr_global=0.0)
-			states = states.cpu()
+				states, _,_,_,_,_ = self.buffer.sample(sample_size, pr_rew=0.0, pr_global=0.0)
+				states = states.cpu()
+
+			elif self.args.scheme == 'standard':
+				states = None
+
+			else:
+				sys.exit('Unknow Evo Scheme')
 
 			#Net indices of nets that got evaluated this generation (meant for asynchronous evolution workloads)
 			net_inds = [i for i in range(len(self.popn))] #Hack for a synchronous run
