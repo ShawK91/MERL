@@ -297,7 +297,7 @@ class RoverDomain:
 			global_rew = 0.0; max_reward = 0.0
 			for value, visitors in zip(self.poi_value, self.poi_visitor_list):
 				global_rew += value * len(visitors)
-				max_reward += self.args.num_agents * value
+				max_reward += self.args.coupling * value
 
 
 		if self.task_type == 'rover_tight':
