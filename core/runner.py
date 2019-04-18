@@ -93,11 +93,16 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			#info --> [universe_id]
 
 
+
+
 			next_state = utils.to_tensor(np.array(next_state))
 
 			#Grab global reward as fitnesses
 			for i, grew in enumerate(global_reward):
 				if grew != None: fitness[i] = grew
+
+
+
 
 
 			#Push experiences to memory

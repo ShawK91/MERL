@@ -269,6 +269,7 @@ class Parameters:
 			self.hidden_size = 50
 			self.buffer_size = 10000
 			self.batch_size = 256
+			self.gamma = 0.9
 
 
 		self.num_test = 10

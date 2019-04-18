@@ -90,6 +90,8 @@ class Agent:
 				if self.buffer.__len__() < 1000: sample_size = self.buffer.__len__()
 				else: sample_size = 1000
 
+				if sample_size == 1000 and len(self.buffer.sT) < 1000: self.buffer.tensorify()
+
 				states, _,_,_,_,_ = self.buffer.sample(sample_size, pr_rew=0.0, pr_global=0.0)
 				states = states.cpu()
 

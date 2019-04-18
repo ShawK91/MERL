@@ -22,7 +22,7 @@ class MotivateDomain:
 		self.poi_pos = [[None, None] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][x, y] coordinate
 		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][status] --> [harvest_period --> 0 (observed)] is observed?
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]  # FORMAT: [poi_id][value]?
-		self.poi_value = [1000.0 for _ in range(self.args.num_poi)]
+		self.poi_value = [10.0 for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 
 		# Initialize rover pose container
@@ -42,7 +42,7 @@ class MotivateDomain:
 		self.reset_poi_pos()
 		self.reset_rover_pos()
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
-		self.poi_value = [1000.0 for _ in range(self.args.num_poi)]
+		self.poi_value = [10.0 for _ in range(self.args.num_poi)]
 
 		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
@@ -137,6 +137,11 @@ class MotivateDomain:
 				if dist == 0: dist = 0.001
 				temp_poi_dist_list[bracket].append((value/(dist*dist)))
 
+				################################################################################################################
+				if (self.args.dim_x*2-dist)/40.0 > self.rover_closest_poi[rover_id]:
+					self.rover_closest_poi[rover_id] = (self.args.dim_x*2-dist)/160.0
+				#################################################################################################################
+
 			# Log all distance into brackets for other drones
 			for id, loc, in enumerate(self.rover_pos):
 				if id == rover_id: continue #Ignore self
@@ -163,8 +168,6 @@ class MotivateDomain:
 					if self.args.sensor_model == 'density': poi_state[bracket] = sum(temp_poi_dist_list[bracket]) / num_poi #Density Sensor
 					elif self.args.sensor_model == 'closest':
 						poi_state[bracket] = max(temp_poi_dist_list[bracket])  #Closest Sensor
-						if poi_state[bracket] > self.rover_closest_poi[rover_id]:
-							self.rover_closest_poi[rover_id] = poi_state[bracket]
 					else: sys.exit('Incorrect sensor model')
 				else: poi_state[bracket] = -1.0
 
@@ -234,7 +237,7 @@ class MotivateDomain:
 
 		#POI Closeness Reward
 		for i in range(self.args.num_agents):
-			rewards[i] += self.rover_closest_poi[i]*100
+			rewards[i] += self.rover_closest_poi[i]
 		self.rover_closest_poi = [0 for _ in range(self.args.num_agents)] #Reset
 
 
