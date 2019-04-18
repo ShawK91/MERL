@@ -34,27 +34,27 @@ class Buffer():
 
 	def data_filter(self, exp):
 
-		# #Initialize to not save
-		save_data = False
+		# # #Initialize to not save
+		# save_data = False
+		# #
+		# if self.gstats['mean'] == None or exp[6] == 'pg': save_data=True #save automatically if [gstats is unknown] or Policy Gradient
 		#
-		if self.gstats['mean'] == None or exp[6] == 'pg': save_data=True #save automatically if [gstats is unknown] or Policy Gradient
-
-		elif self.filter_c == -1: save_data=True
-
-		else:
-			prob_mass = (exp[5] - self.gstats['min']) / (self.gstats['max']-self.gstats['min']) #Normalization
-			prob = prob_mass.item() * self.filter_c #Coefficient
-			if random.random() < prob: save_data = True
-
-		if save_data:
-			self.s.append(exp[0])
-			self.ns.append(exp[1])
-			self.a.append(exp[2])
-			self.r.append(exp[3])
-			self.done.append(exp[4])
-			self.global_reward.append(exp[5])
-			self.pg_frames += 1
-			self.total_frames += 1
+		# elif self.filter_c == -1: save_data=True
+		#
+		# else:
+		# 	prob_mass = (exp[5] - self.gstats['min']) / (self.gstats['max']-self.gstats['min']) #Normalization
+		# 	prob = prob_mass.item() * self.filter_c #Coefficient
+		# 	if random.random() < prob: save_data = True
+		#
+		# if save_data:
+		self.s.append(exp[0])
+		self.ns.append(exp[1])
+		self.a.append(exp[2])
+		self.r.append(exp[3])
+		self.done.append(exp[4])
+		self.global_reward.append(exp[5])
+		self.pg_frames += 1
+		self.total_frames += 1
 
 
 	def referesh(self):
