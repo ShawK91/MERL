@@ -8,6 +8,83 @@ LOG_SIG_MAX = 5
 LOG_SIG_MIN = -10
 epsilon = 1e-6
 
+
+
+class MultiHeadActor(nn.Module):
+	"""Actor model
+
+		Parameters:
+			  args (object): Parameter class
+	"""
+
+	def __init__(self, num_inputs, num_actions, hidden_size, num_heads):
+		super(MultiHeadActor, self).__init__()
+
+		self.num_heads = num_heads
+
+		#Trunk
+		self.linear1 = nn.Linear(num_inputs, hidden_size)
+		self.linear2 = nn.Linear(hidden_size, hidden_size)
+
+		#Heads
+		self.mean = nn.Linear(hidden_size, num_actions*num_heads)
+		self.noise = torch.Tensor(num_actions*num_heads)
+
+		self.apply(weights_init_policy_fn)
+
+
+
+
+	def clean_action(self, state, head=-1):
+		"""Method to forward propagate through the actor's graph
+
+			Parameters:
+				  input (tensor): states
+
+			Returns:
+				  action (tensor): actions
+
+
+		"""
+
+		x = F.elu(self.linear1(state))
+		x = F.elu(self.linear2(x))
+		mean = torch.tanh(self.mean(x))
+
+		if head == -1:
+			return mean
+		else:
+			start = head*2
+			return mean[:,start:start+2]
+
+
+
+	def noisy_action(self, state, head=-1):
+
+		x = F.elu(self.linear1(state))
+		x = F.elu(self.linear2(x))
+		mean = torch.tanh(self.mean(x))
+
+		action = mean + self.noise.normal_(0., std=0.4)
+		if head == -1:
+			return action
+		else:
+			start = head * 2
+			return action[:, start:start + 2]
+
+
+
+
+	def get_norm_stats(self):
+		minimum = min([torch.min(param).item() for param in self.parameters()])
+		maximum = max([torch.max(param).item() for param in self.parameters()])
+		means = [torch.mean(torch.abs(param)).item() for param in self.parameters()]
+		mean = sum(means)/len(means)
+
+		return minimum, maximum, mean
+
+
+
 class Actor(nn.Module):
 	"""Actor model
 
@@ -107,8 +184,6 @@ class Actor(nn.Module):
 		mean = sum(means)/len(means)
 
 		return minimum, maximum, mean
-
-
 
 
 

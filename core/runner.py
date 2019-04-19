@@ -1,4 +1,3 @@
-from envs.env_wrapper import RoverDomainPython
 from core import mod_utils as utils
 import numpy as np, random, sys
 
@@ -57,7 +56,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 		teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
 
 		# Get the current team actors
-		if args.is_homogeneous:
+		if args.ps == 'full' or args.ps == 'trunk':
 			if type == 'test' or type == 'pg': team = [models_bucket[0] for _ in range(args.config.num_agents)]
 			elif type == "evo": team = [models_bucket[0][teams_blueprint[0]] for _ in range(args.config.num_agents)]
 			else: sys.exit('Incorrect type')
@@ -81,9 +80,15 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			if random_baseline:
 				joint_action = [np.random.random((NUM_EVALS, args.state_dim))for _ in range(args.config.num_agents)]
 			elif type == 'pg':
-				joint_action = [team[i][0].noisy_action(joint_state[i,:]).detach().numpy() for i in range(args.config.num_agents)]
+				if  args.ps == 'trunk':
+					joint_action = [team[i][0].noisy_action(joint_state[i,:], head=i).detach().numpy() for i in range(args.config.num_agents)]
+				else:
+					joint_action = [team[i][0].noisy_action(joint_state[i, :]).detach().numpy() for i in range(args.config.num_agents)]
 			else:
-				joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.config.num_agents)]
+				if args.ps == 'trunk':
+					joint_action = [team[i].clean_action(joint_state[i, :], head=i).detach().numpy() for i in range(args.config.num_agents)]
+				else:
+					joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.config.num_agents)]
 			#JOINT ACTION [agent_id, universe_id, action]
 
 			next_state, reward, done, global_reward = env.step(np.array(joint_action))  # Simulate one step in environment
@@ -128,7 +133,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			if sum(done)==len(done):
 				#Push experiences to main
 				if store_transitions:
-					if args.is_homogeneous: #Homogeneous
+					if args.ps == 'full': #Full setup with one replay buffer
 						for heap in rollout_trajectory:
 							for entry in heap:
 								temp_global_reward = fitness[entry[5]]

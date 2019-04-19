@@ -15,6 +15,8 @@ class SSNE:
 	"""
 
 	def __init__(self, args):
+
+		self.args=args
 		self.gen = 0
 
 		#Import Params
@@ -231,7 +233,7 @@ class SSNE:
 		#return lineage_rank[0:self.num_anchors]
 
 		#Compute all actions
-		if self.env == "rover_loose" or self.env == "rover_tight" or self.env == "motivate": 		#We ignore the magnitude part (first entry in a 2-dim action vector) of the action and only measure diversity in the bearing
+		if self.args.ps != 'trunk' and (self.env == "rover_loose" or self.env == "rover_tight" or self.env == "motivate"): 		#We ignore the magnitude part (first entry in a 2-dim action vector) of the action and only measure diversity in the bearing
 			actions = [pop[i].clean_action(states)[:,1] for i in net_inds]
 		else:
 			actions = [pop[i].clean_action(states) for i in net_inds]

@@ -11,15 +11,15 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=20)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
-parser.add_argument('-homogeny', type=str2bool, help='Make the policy homogeneous?', default=True)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-env', type=str, help='Env to test on?', default='motivate')
 parser.add_argument('-config', type=str, help='World Setting?', default='motivate')
-parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default='10000')
 
+parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
 parser.add_argument('-seed', type=float, help='#Seed', default=2019)
 parser.add_argument('-algo', type=str, help='SAC Vs. TD3?', default='TD3')
@@ -207,7 +207,7 @@ class Parameters:
 		self.priority_rate = vars(parser.parse_args())['pr']
 		self.use_gpu = vars(parser.parse_args())['use_gpu']
 		self.seed = vars(parser.parse_args())['seed']
-		self.is_homogeneous = vars(parser.parse_args())['homogeny']
+		self.ps = vars(parser.parse_args())['ps']
 
 		# Env domain
 		self.config = ConfigSettings()
@@ -222,7 +222,7 @@ class Parameters:
 		self.gradperstep = vars(parser.parse_args())['gradperstep']
 		self.gamma = 0.995
 		self.batch_size = 256
-		self.buffer_size = 100000 if self.is_homogeneous else 100000
+		self.buffer_size = 500000
 		self.filter_c = vars(parser.parse_args())['filter_c']
 
 		self.action_loss = False
@@ -281,7 +281,7 @@ class Parameters:
 		               '_roll' + str(self.rollout_size) + \
 		               '_alz' + str(self.actualize) + \
 		               '_env' + str(self.config.env_choice) + '_' + str(self.config.config) + \
-			           '_ps' + str(self.is_homogeneous)
+			           '_ps' + str(self.ps)
 
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
@@ -318,14 +318,17 @@ class MERL:
 		self.args = args
 
 		######### Initialize the Multiagent Team of agents ########
-		if self.args.is_homogeneous:
+		if self.args.ps == 'full' or self.args.ps == 'trunk':
 			self.agents = [Agent(self.args, id)]
-		else:
+		elif self.args.ps == 'none':
 			self.agents = [Agent(self.args, id) for id in range(self.args.config.num_agents)]
+		else: sys.exit('Incorrect PS choice')
 		self.test_agent = TestAgent(self.args, 991)
 
 		###### Buffer and Model Bucket as references to the corresponding agent's attributes ####
-		self.buffer_bucket = [ag.buffer.tuples for ag in self.agents]
+		if args.ps == "trunk": self.buffer_bucket = [buffer.tuples for buffer in self.agents[0].buffer]
+		else: self.buffer_bucket = [ag.buffer.tuples for ag in self.agents]
+
 		self.popn_bucket = [ag.popn for ag in self.agents]
 		self.rollout_bucket = [ag.rollout_actor for ag in self.agents]
 		self.test_bucket = self.test_agent.rollout_actor
@@ -396,9 +399,8 @@ class MERL:
 			self.test_task_pipes[0].send("START")
 
 		# Figure out teams for Coevolution
-		if self.args.is_homogeneous:
-			teams = [[i] for i in list(range(
-				args.popn_size))]  # Homogeneous case is just the popn as a list of lists to maintain compatibility
+		if self.args.ps == 'full' or self.args.ps == 'trunk':
+			teams = [[i] for i in list(range(args.popn_size))]  # Homogeneous case is just the popn as a list of lists to maintain compatibility
 		else:
 			teams = self.make_teams(args.config.num_agents, args.popn_size, args.num_evals)  # Heterogeneous Case
 
@@ -491,14 +493,14 @@ if __name__ == "__main__":
 		print('Ep:/Frames', gen, '/', ai.total_frames, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:',
 		      mod.list_stat(pg_fits),
 		      'Test_trace:', [pprint(i) for i in ai.test_trace[-5:]], 'FPS:',
-		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'Homogeny:', args.is_homogeneous
+		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'PS:', args.ps
 		      )
 
 		if gen % 5 == 0:
 			print()
 			print('Test_stat:', mod.list_stat(test_fits), 'SAVETAG:  ', args.savetag)
 			print('Weight Stats: min/max/average', pprint(ai.test_bucket[0].get_norm_stats()))
-			print('Buffer Lens:', [ag.buffer.__len__() for ag in ai.agents])
+			print('Buffer Lens:', [ag.buffer[0].__len__() for ag in ai.agents] if args.ps == 'trunk' else [ag.buffer.__len__() for ag in ai.agents])
 			print()
 
 		if gen % 10 == 0 and args.rollout_size > 0:
@@ -517,7 +519,8 @@ if __name__ == "__main__":
 				print('Std_loss', pprint(ai.agents[0].algo.std_loss))
 
 			# Buffer Stats
-			print('R_mean:', [agent.buffer.rstats['mean'] for agent in ai.agents])
-			print('G_mean:', [agent.buffer.gstats['mean'] for agent in ai.agents])
+			if args.ps != 'trunk':
+				print('R_mean:', [agent.buffer.rstats['mean'] for agent in ai.agents])
+				print('G_mean:', [agent.buffer.gstats['mean'] for agent in ai.agents])
 
 			print('########################################################################')
