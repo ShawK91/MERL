@@ -21,6 +21,7 @@ class MultiHeadActor(nn.Module):
 		super(MultiHeadActor, self).__init__()
 
 		self.num_heads = num_heads
+		self.num_actions = num_actions
 
 		#Trunk
 		self.linear1 = nn.Linear(num_inputs, hidden_size)
@@ -54,8 +55,8 @@ class MultiHeadActor(nn.Module):
 		if head == -1:
 			return mean
 		else:
-			start = head*2
-			return mean[:,start:start+2]
+			start = head*self.num_actions
+			return mean[:,start:start+self.num_actions]
 
 
 
