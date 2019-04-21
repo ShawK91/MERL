@@ -70,8 +70,8 @@ class MultiHeadActor(nn.Module):
 		if head == -1:
 			return action
 		else:
-			start = head * 2
-			return action[:, start:start + 2]
+			start = head * self.num_actions
+			return action[:, start:start + self.num_actions]
 
 
 
