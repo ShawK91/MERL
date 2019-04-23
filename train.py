@@ -12,16 +12,16 @@ import threading, sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=20)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
-parser.add_argument('-scheme', type=str, help='Scheme?', default='multipoint')
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-env', type=str, help='Env to test on?', default='motivate')
 parser.add_argument('-config', type=str, help='World Setting?', default='motivate')
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
-parser.add_argument('-seed', type=float, help='#Seed', default=2019)
+parser.add_argument('-seed', type=int, help='#Seed', default=2019)
 parser.add_argument('-algo', type=str, help='SAC Vs. TD3?', default='TD3')
 parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
@@ -130,7 +130,7 @@ class ConfigSettings:
 				self.dim_x = self.dim_y = 20
 				self.obs_radius = self.dim_x * 10;
 				self.act_dist = 3
-				self.angle_res = 15
+				self.angle_res = 10
 				self.num_poi = 9
 				self.num_agents = 6
 				self.ep_len = 50
@@ -144,7 +144,7 @@ class ConfigSettings:
 				self.dim_x = self.dim_y = 20
 				self.obs_radius = self.dim_x * 10;
 				self.act_dist = 3
-				self.angle_res = 15
+				self.angle_res = 10
 				self.num_poi = 9
 				self.num_agents = 8
 				self.ep_len = 50
@@ -213,14 +213,14 @@ class Parameters:
 		self.config = ConfigSettings()
 
 		# Fairly Stable Algo params
-		self.hidden_size = 100
+		self.hidden_size = 200
 		self.algo_name = vars(parser.parse_args())['algo']
 		self.actor_lr = 1e-4
 		self.critic_lr = 1e-4
 		self.tau = 1e-3
 		self.init_w = True
 		self.gradperstep = vars(parser.parse_args())['gradperstep']
-		self.gamma = 0.995
+		self.gamma = 0.99
 		self.batch_size = 256
 		self.buffer_size = 500000
 		self.filter_c = vars(parser.parse_args())['filter_c']
@@ -250,9 +250,12 @@ class Parameters:
 		self.num_blends = int(0.15 * self.popn_size)
 
 		# Dependents
-		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_tight' or self.config.env_choice == 'motivate':  # Rover Domain
+		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_tight':  # Rover Domain
 			self.state_dim = int(720 / self.config.angle_res) + 1
 			self.action_dim = 2
+		elif self.config.env_choice == 'motivate':  # MultiWalker Domain
+			self.state_dim = int(720 / self.config.angle_res) + 1
+			self.action_dim = 1
 		elif self.config.env_choice == 'multiwalker':  # MultiWalker Domain
 			self.state_dim = 33
 			self.action_dim = 4
@@ -267,9 +270,10 @@ class Parameters:
 
 		if self.config.env_choice == 'motivate':
 			self.hidden_size = 50
-			self.buffer_size = 10000
+			self.buffer_size = 100000
 			self.batch_size = 256
 			self.gamma = 0.9
+			self.num_anchors=7
 
 
 		self.num_test = 10
