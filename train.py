@@ -41,6 +41,9 @@ class ConfigSettings:
 
 		# ROVER DOMAIN
 		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight':  # Rover Domain
+			self.is_gsl = False #Does global subsume local?
+			self.is_lsg = False  #Does local subsume local?
+
 			if config == 'single_test':
 				# Rover domain
 				self.dim_x = self.dim_y = 10
@@ -169,6 +172,8 @@ class ConfigSettings:
 			self.coupling = 1
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
+			self.is_gsl = False #Does global subsume local?
+			self.is_lsg = False  #Does local subsume local?
 
 
 		# MultiWalker Domain
@@ -273,6 +278,8 @@ class Parameters:
 			self.buffer_size = 100000
 			self.batch_size = 256
 			self.gamma = 0.9
+			self.actor_lr = 1e-5
+			self.critic_lr = 1e-5
 			self.num_anchors=7
 
 
