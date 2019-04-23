@@ -30,6 +30,10 @@ class RoverDomain:
 		# Initialize rover pose container
 		self.rover_pos = [[0.0, 0.0, 0.0] for _ in range(self.args.num_agents)]  # FORMAT: [rover_id][x, y, orientation] coordinate with pose info
 
+		#Local Reward computing methods
+		self.rover_closest_poi = [self.args.dim_x*2 for _ in range(self.args.num_agents)]
+		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
+
 
 		#Rover path trace for trajectory-wide global reward computation and vizualization purposes
 		self.rover_path = [[] for _ in range(self.args.num_agents)] # FORMAT: [rover_id][timestep][x, y]
@@ -42,6 +46,9 @@ class RoverDomain:
 		self.reset_rover_pos()
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
 		self.poi_value = [1.0 for _ in range(self.args.num_poi)]
+
+		self.rover_closest_poi = [self.args.dim_x*2 for _ in range(self.args.num_agents)]
+		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
 
 		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
@@ -187,6 +194,9 @@ class RoverDomain:
 				if dist == 0: dist = 0.001
 				temp_poi_dist_list[bracket].append((value/(dist*dist)))
 
+				#update closest POI for each rover info
+				if dist < self.rover_closest_poi[rover_id]: self.rover_closest_poi[rover_id] = dist
+
 			# Log all distance into brackets for other drones
 			for id, loc, in enumerate(self.rover_pos):
 				if id == rover_id: continue #Ignore self
@@ -251,7 +261,6 @@ class RoverDomain:
 		return angle, dist
 
 
-
 	def get_local_reward(self):
 		#Update POI's visibility
 		poi_visitors = [[] for _ in range(self.args.num_poi)]
@@ -276,8 +285,15 @@ class RoverDomain:
 					self.poi_status[poi_id] -= 1
 					self.poi_visitor_list[poi_id] = list(set(self.poi_visitor_list[poi_id]+rovers[:]))
 
-				for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
-					rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
+				if self.args.is_lsg: #Local subsume Global?
+					for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
+						rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
+
+		#Proximity Rewards
+		for i in range(self.args.num_agents):
+			rewards[i] += (self.args.dim_x*2 - self.rover_closest_poi[i])
+			self.cumulative_local[i] += rewards[i]
+		self.rover_closest_poi = [self.args.dim_x * 2 for _ in range(self.args.num_agents)] #Reset closest POI
 
 
 		return rewards
@@ -306,8 +322,13 @@ class RoverDomain:
 				global_rew += (status == 0) * value
 				max_reward += value
 
+		global_rew = global_rew/max_reward
 
-		return global_rew/max_reward
+		if self.args.is_gsl:  # Gloabl subsumes local?
+			global_rew += sum(self.cumulative_local)
+
+
+		return global_rew
 
 
 
