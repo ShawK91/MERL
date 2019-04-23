@@ -18,6 +18,8 @@ parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-env', type=str, help='Env to test on?', default='motivate')
 parser.add_argument('-config', type=str, help='World Setting?', default='motivate')
+parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
+parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
@@ -39,21 +41,23 @@ class ConfigSettings:
 		config = vars(parser.parse_args())['config']
 		self.config = config
 
+		#Global subsumes local or vice-versa?
+		self.is_gsl = vars(parser.parse_args())['gsl']
+		self.is_lsg = vars(parser.parse_args())['lsg']
+
 		# ROVER DOMAIN
 		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight':  # Rover Domain
-			self.is_gsl = False #Does global subsume local?
-			self.is_lsg = False  #Does local subsume local?
 
 			if config == 'single_test':
 				# Rover domain
-				self.dim_x = self.dim_y = 10
-				self.obs_radius = self.dim_x * 10
+				self.dim_x = self.dim_y = 8
+				self.obs_radius = self.dim_x * 8
 				self.act_dist = 2
-				self.angle_res = 15
-				self.num_poi = 6
+				self.angle_res = 5
+				self.num_poi = 2
 				self.num_agents = 1
-				self.ep_len = 40
-				self.poi_rand = 1
+				self.ep_len = 20
+				self.poi_rand = 0
 				self.coupling = 1
 				self.rover_speed = 1
 				self.sensor_model = 'closest'
@@ -72,20 +76,6 @@ class ConfigSettings:
 				self.rover_speed = 1
 				self.sensor_model = 'closest'
 
-			elif config == 'motivate':
-				# Rover domain
-				self.dim_x = self.dim_y = 7
-				self.obs_radius = self.dim_x * 10
-				self.act_dist = 2
-				self.angle_res = 1
-				self.num_poi = 2
-				self.num_agents = 2
-				self.ep_len = 20
-				self.poi_rand = 0
-				self.coupling = 2
-				self.rover_speed = 1
-				self.sensor_model = 'closest'
-
 			elif config == 'two_test':
 				# Rover domain
 				self.dim_x = self.dim_y = 10
@@ -99,6 +89,21 @@ class ConfigSettings:
 				self.coupling = 2
 				self.rover_speed = 1
 				self.sensor_model = 'closest'
+
+			elif config == '10_3':
+				# Rover domain
+				self.dim_x = self.dim_y = 10
+				self.obs_radius = self.dim_x * 10
+				self.act_dist = 1.5
+				self.angle_res = 5
+				self.num_poi = 6
+				self.num_agents = 6
+				self.ep_len = 25
+				self.poi_rand = 1
+				self.coupling = 3
+				self.rover_speed = 1
+				self.sensor_model = 'closest'
+
 
 			elif config == '15_3':
 				# Rover domain
@@ -164,7 +169,7 @@ class ConfigSettings:
 			self.dim_x = self.dim_y = 20
 			self.obs_radius = self.dim_x * 10
 			self.act_dist = 1.5
-			self.angle_res = 15
+			self.angle_res = 5
 			self.num_poi = 2
 			self.num_agents = 2
 			self.ep_len = 20
@@ -172,8 +177,6 @@ class ConfigSettings:
 			self.coupling = 1
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
-			self.is_gsl = False #Does global subsume local?
-			self.is_lsg = False  #Does local subsume local?
 
 
 		# MultiWalker Domain
@@ -220,9 +223,9 @@ class Parameters:
 		# Fairly Stable Algo params
 		self.hidden_size = 200
 		self.algo_name = vars(parser.parse_args())['algo']
-		self.actor_lr = 1e-4
-		self.critic_lr = 1e-4
-		self.tau = 1e-3
+		self.actor_lr = 5e-5
+		self.critic_lr = 1e-5
+		self.tau = 1e-5
 		self.init_w = True
 		self.gradperstep = vars(parser.parse_args())['gradperstep']
 		self.gamma = 0.99
@@ -274,12 +277,10 @@ class Parameters:
 			sys.exit('Unknown Environment Choice')
 
 		if self.config.env_choice == 'motivate':
-			self.hidden_size = 50
+			self.hidden_size = 100
 			self.buffer_size = 100000
-			self.batch_size = 256
+			self.batch_size = 128
 			self.gamma = 0.9
-			self.actor_lr = 1e-5
-			self.critic_lr = 1e-5
 			self.num_anchors=7
 
 
@@ -292,8 +293,10 @@ class Parameters:
 		               '_roll' + str(self.rollout_size) + \
 		               '_alz' + str(self.actualize) + \
 		               '_env' + str(self.config.env_choice) + '_' + str(self.config.config) + \
-			           '_ps' + str(self.ps)
-
+			           '_ps' + str(self.ps) +\
+					   '_seed' + str(self.seed) +\
+					   ('_lsg' if self.config.is_lsg else '') + \
+					   ('_gsl' if self.config.is_gsl else '')
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
