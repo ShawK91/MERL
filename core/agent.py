@@ -86,7 +86,10 @@ class Agent:
 
 			for agent_id, buffer in enumerate(self.buffer):
 				buffer.referesh()
-				if buffer.__len__() < 10 * self.args.batch_size: return  ###BURN_IN_PERIOD
+				if buffer.__len__() < 10 * self.args.batch_size:
+					buffer.pg_frames = 0
+					return  ###BURN_IN_PERIOD
+
 				buffer.tensorify()
 
 				for _ in range(int(self.args.gradperstep * buffer.pg_frames)):
