@@ -99,6 +99,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 
 
+			if args.config.env_choice == 'motivate' and type == "test": print(['%.2f'%r for r in reward], global_reward)
 
 			next_state = utils.to_tensor(np.array(next_state))
 
