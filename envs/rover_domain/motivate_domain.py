@@ -33,7 +33,7 @@ class MotivateDomain:
 		self.rover_path = [[] for _ in range(self.args.num_agents)] # FORMAT: [rover_id][timestep][x, y]
 		self.action_seq = [[] for _ in range(self.args.num_agents)] # FORMAT: [timestep][rover_id][action]
 
-		self.rover_closest_poi = [0 for _ in range(self.args.num_agents)]
+		self.rover_closest_poi = [self.args.dim_x * 2 for _ in range(self.args.num_agents)]
 		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
 
 
@@ -49,6 +49,9 @@ class MotivateDomain:
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 		self.rover_path = [[] for _ in range(self.args.num_agents)]
 		self.action_seq = [[] for _ in range(self.args.num_agents)]
+		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
+
+		self.rover_closest_poi = [self.args.dim_x * 2 for _ in range(self.args.num_agents)]
 		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
 
 
@@ -142,8 +145,8 @@ class MotivateDomain:
 				temp_poi_dist_list[bracket].append((value/(dist)))
 
 				################################################################################################################
-				if (self.args.dim_x*2-dist)/40.0 > self.rover_closest_poi[rover_id]:
-					self.rover_closest_poi[rover_id] = (self.args.dim_x*2-dist)/40.0
+				if dist < self.rover_closest_poi[rover_id]:
+					self.rover_closest_poi[rover_id] = dist
 				#################################################################################################################
 
 			# Log all distance into brackets for other drones
@@ -236,18 +239,19 @@ class MotivateDomain:
 					self.poi_status[poi_id] -= 1
 					self.poi_visitor_list[poi_id] = list(set(self.poi_visitor_list[poi_id]+rovers[:]))
 
-				for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
-					rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
+				if self.args.is_lsg: #Local subsume Global?
+					for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
+						rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
 
 
 
 
 		#POI Closeness Reward
 		for i in range(self.args.num_agents):
-			rewards[i] += self.rover_closest_poi[i]
+			rewards[i] += (self.args.dim_x*2 - self.rover_closest_poi[i])
 			self.cumulative_local[i] += rewards[i]
 
-		self.rover_closest_poi = [0 for _ in range(self.args.num_agents)] #Reset
+		self.rover_closest_poi = [self.args.dim_x * 2 for _ in range(self.args.num_agents)] #Reset
 
 
 		return rewards
@@ -270,8 +274,8 @@ class MotivateDomain:
 			if len(visitors)>=1: global_rew += value
 
 
-		#global_rew = global_rew/max_reward
-		#global_rew += sum(self.cumulative_local)
+		if self.args.is_gsl:  # Gloabl subsumes local?
+			global_rew += sum(self.cumulative_local)
 
 		return global_rew
 
