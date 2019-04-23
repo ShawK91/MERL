@@ -49,7 +49,6 @@ class MotivateDomain:
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 		self.rover_path = [[] for _ in range(self.args.num_agents)]
 		self.action_seq = [[] for _ in range(self.args.num_agents)]
-		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
 
 		self.rover_closest_poi = [self.args.dim_x * 2 for _ in range(self.args.num_agents)]
 		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
@@ -273,9 +272,6 @@ class MotivateDomain:
 			# #max_reward += self.args.coupling * value
 			if len(visitors)>=1: global_rew += value
 
-
-		if self.args.is_gsl:  # Gloabl subsumes local?
-			global_rew += sum(self.cumulative_local)
 
 		return global_rew
 

@@ -105,7 +105,13 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 			#Grab global reward as fitnesses
 			for i, grew in enumerate(global_reward):
-				if grew != None: fitness[i] = grew
+				if grew != None:
+					fitness[i] = grew
+
+					#Reward Shaping
+					if (args.config.env_choice == 'motivate' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'rover_tight') and type == "evo":
+						if args.config.is_gsl:  # Gloabl subsumes local?
+							fitness[i] += sum(env.universe[i].cumulative_local)
 
 
 
