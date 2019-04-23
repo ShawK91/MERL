@@ -22,7 +22,7 @@ class MotivateDomain:
 		self.poi_pos = [[None, None] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][x, y] coordinate
 		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][status] --> [harvest_period --> 0 (observed)] is observed?
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]  # FORMAT: [poi_id][value]?
-		self.poi_value = [10.0 for _ in range(self.args.num_poi)]
+		self.poi_value = [100.0 for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 
 		# Initialize rover pose container
@@ -34,6 +34,7 @@ class MotivateDomain:
 		self.action_seq = [[] for _ in range(self.args.num_agents)] # FORMAT: [timestep][rover_id][action]
 
 		self.rover_closest_poi = [0 for _ in range(self.args.num_agents)]
+		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
 
 
 
@@ -42,12 +43,15 @@ class MotivateDomain:
 		self.reset_poi_pos()
 		self.reset_rover_pos()
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
-		self.poi_value = [10.0 for _ in range(self.args.num_poi)]
+		self.poi_value = [100.0 for _ in range(self.args.num_poi)]
 
 		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 		self.rover_path = [[] for _ in range(self.args.num_agents)]
 		self.action_seq = [[] for _ in range(self.args.num_agents)]
+		self.cumulative_local = [0 for _ in range(self.args.num_agents)]
+
+
 		self.istep = 0
 		return self.get_joint_state()
 
@@ -68,7 +72,7 @@ class MotivateDomain:
 
 			#magnitude = 0.5*(joint_action[rover_id][0]+1) # [-1,1] --> [0,1]
 			magnitude=1.0 #TODO
-			theta = joint_action[rover_id][1] * 180 + self.rover_pos[rover_id][2]
+			theta = joint_action[rover_id][0] * 180 + self.rover_pos[rover_id][2]
 			if theta > 360: theta -= 360
 			if theta < 0: theta += 360
 			self.rover_pos[rover_id][2] = theta
@@ -82,7 +86,7 @@ class MotivateDomain:
 
 			#Log
 			self.rover_path[rover_id].append((self.rover_pos[rover_id][0], self.rover_pos[rover_id][1], self.rover_pos[rover_id][2]))
-			self.action_seq[rover_id].append([magnitude, joint_action[rover_id][1]*180])
+			self.action_seq[rover_id].append([magnitude, joint_action[rover_id][0]*180])
 
 
 
@@ -99,15 +103,14 @@ class MotivateDomain:
 
 
 	def reset_poi_pos(self):
-		self.poi_pos[0] = [1,1]
+		self.poi_pos[0] = [1, 1]
 		self.poi_pos[1] = [1, 18]
-		
 
 
 	def reset_rover_pos(self):
 
-		self.rover_pos[0] = [9, 11, 0.0]
-		self.rover_pos[1] = [18, 18, 0.0]
+		self.rover_pos[0] = [9, 10, 0.0]
+		self.rover_pos[1] = [14, 17, 0.0]
 
 
 	def get_joint_state(self):
@@ -122,7 +125,8 @@ class MotivateDomain:
 
 			# Log all distance into brackets for POIs
 			for loc, status, value in zip(self.poi_pos, self.poi_status, self.poi_value):
-				if status == 0: continue #If accessed ignore
+				if status == 0:
+					continue #If accessed ignore
 
 				angle, dist = self.get_angle_dist(self_x, self_y, loc[0], loc[1])
 				if dist > self.args.obs_radius: continue #Observability radius
@@ -135,11 +139,11 @@ class MotivateDomain:
 					print("ERROR: BRACKET EXCEED LIST", bracket, len(temp_poi_dist_list))
 					bracket = len(temp_poi_dist_list)-1
 				if dist == 0: dist = 0.001
-				temp_poi_dist_list[bracket].append((value/(dist*dist)))
+				temp_poi_dist_list[bracket].append((value/(dist)))
 
 				################################################################################################################
 				if (self.args.dim_x*2-dist)/40.0 > self.rover_closest_poi[rover_id]:
-					self.rover_closest_poi[rover_id] = (self.args.dim_x*2-dist)/160.0
+					self.rover_closest_poi[rover_id] = (self.args.dim_x*2-dist)/40.0
 				#################################################################################################################
 
 			# Log all distance into brackets for other drones
@@ -157,7 +161,7 @@ class MotivateDomain:
 				if bracket >= len(temp_rover_dist_list):
 					print("ERROR: BRACKET EXCEED LIST", bracket, len(temp_rover_dist_list))
 					bracket = len(temp_rover_dist_list)-1
-				temp_rover_dist_list[bracket].append((1/(dist*dist)))
+				temp_rover_dist_list[bracket].append((1/(dist)))
 
 
 			####Encode the information onto the state
@@ -235,9 +239,14 @@ class MotivateDomain:
 				for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
 					rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
 
+
+
+
 		#POI Closeness Reward
 		for i in range(self.args.num_agents):
 			rewards[i] += self.rover_closest_poi[i]
+			self.cumulative_local[i] += rewards[i]
+
 		self.rover_closest_poi = [0 for _ in range(self.args.num_agents)] #Reset
 
 
@@ -256,11 +265,15 @@ class MotivateDomain:
 		#self.rover_path and self.poi_pos and self.poi_value to compute TRAJECTORY_WIDE REWARD
 		global_rew = 0.0; max_reward = 0.0
 		for value, visitors in zip(self.poi_value, self.poi_visitor_list):
-			global_rew += value * len(visitors)
-			max_reward += self.args.coupling * value
+			# global_rew += value * len(visitors)
+			# #max_reward += self.args.coupling * value
+			if len(visitors)>=1: global_rew += value
 
 
-		return global_rew/max_reward
+		#global_rew = global_rew/max_reward
+		#global_rew += sum(self.cumulative_local)
+
+		return global_rew
 
 
 
