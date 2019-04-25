@@ -22,7 +22,7 @@ class MotivateDomain:
 		self.poi_pos = [[None, None] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][x, y] coordinate
 		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][status] --> [harvest_period --> 0 (observed)] is observed?
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]  # FORMAT: [poi_id][value]?
-		self.poi_value = [100.0 for _ in range(self.args.num_poi)]
+		self.poi_value = [1.0 for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
 
 		# Initialize rover pose container
@@ -43,7 +43,7 @@ class MotivateDomain:
 		self.reset_poi_pos()
 		self.reset_rover_pos()
 		#self.poi_value = [float(i+1) for i in range(self.args.num_poi)]
-		self.poi_value = [100.0 for _ in range(self.args.num_poi)]
+		self.poi_value = [1.0 for _ in range(self.args.num_poi)]
 
 		self.poi_status = [self.harvest_period for _ in range(self.args.num_poi)]
 		self.poi_visitor_list = [[] for _ in range(self.args.num_poi)]  # FORMAT: [poi_id][visitors]?
@@ -73,7 +73,8 @@ class MotivateDomain:
 		for rover_id in range(self.args.num_agents):
 
 			#magnitude = 0.5*(joint_action[rover_id][0]+1) # [-1,1] --> [0,1]
-			magnitude=1.0 #TODO
+			magnitude=1.0
+			joint_action[rover_id][0] /= 2.0 #Theta (bearing constrained to be within 90 degree turn from heading)
 			theta = joint_action[rover_id][0] * 180 + self.rover_pos[rover_id][2]
 			if theta > 360: theta -= 360
 			if theta < 0: theta += 360
@@ -247,7 +248,8 @@ class MotivateDomain:
 
 		#POI Closeness Reward
 		for i in range(self.args.num_agents):
-			rewards[i] += (self.args.dim_x - self.rover_closest_poi[i])
+			#rewards[i] += (self.args.dim_x - self.rover_closest_poi[i])
+			rewards[i] += self.args.coupling/self.rover_closest_poi[i]
 			self.cumulative_local[i] += rewards[i]
 
 		self.rover_closest_poi = [self.args.dim_x * 2 for _ in range(self.args.num_agents)] #Reset
