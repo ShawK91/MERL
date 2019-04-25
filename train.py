@@ -169,7 +169,7 @@ class ConfigSettings:
 			self.dim_x = self.dim_y = 20
 			self.obs_radius = self.dim_x * 10
 			self.act_dist = 1.5
-			self.angle_res = 5
+			self.angle_res = 10
 			self.num_poi = 2
 			self.num_agents = 2
 			self.ep_len = 20

@@ -247,7 +247,7 @@ class MotivateDomain:
 
 		#POI Closeness Reward
 		for i in range(self.args.num_agents):
-			rewards[i] += (self.args.dim_x*2 - self.rover_closest_poi[i])
+			rewards[i] += (self.args.dim_x - self.rover_closest_poi[i])
 			self.cumulative_local[i] += rewards[i]
 
 		self.rover_closest_poi = [self.args.dim_x * 2 for _ in range(self.args.num_agents)] #Reset
