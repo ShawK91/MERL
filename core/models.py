@@ -66,7 +66,7 @@ class MultiHeadActor(nn.Module):
 		x = F.elu(self.linear2(x))
 		mean = torch.tanh(self.mean(x))
 
-		action = mean + self.noise.normal_(0., std=0.4)
+		action = mean + self.noise.normal_(0., std=0.25)
 		if head == -1:
 			return action
 		else:
@@ -171,7 +171,7 @@ class Actor(nn.Module):
 
 		elif self.policy_type == 'DeterministicPolicy':
 			mean = self.clean_action(state)
-			action = mean + self.noise.normal_(0., std=0.4)
+			action = mean + self.noise.normal_(0., std=0.25)
 
 			if return_only_action: return action
 			else: return action, torch.tensor(0.), torch.tensor(0.), mean, torch.tensor(0.)
