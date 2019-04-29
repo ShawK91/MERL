@@ -113,10 +113,10 @@ class ConfigSettings:
 
 			#Fix Harvest Period and coupling given some config choices
 
-			if args.env_choice == "rover_trap": self.harvest_period = 3
+			if self.env_choice == "rover_trap": self.harvest_period = 3
 			else: self.harvest_period = 1
 
-			if args.env_choice == "rover_loose": self.coupling = 1 #Definiton of a Loosely coupled domain
+			if self.env_choice == "rover_loose": self.coupling = 1 #Definiton of a Loosely coupled domain
 
 
 
@@ -498,3 +498,11 @@ if __name__ == "__main__":
 
 		if ai.total_frames > args.frames_bound:
 			break
+
+	###Kill all processes
+	try:
+		for p in ai.pg_task_pipes: p[0].send('TERMINATE')
+		for p in ai.test_task_pipes: p[0].send('TERMINATE')
+		for p in ai.evo_task_pipes: p[0].send('TERMINATE')
+
+	except: None

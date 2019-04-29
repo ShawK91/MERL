@@ -54,6 +54,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 	while True:
 		teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
+		if teams_blueprint == 'TERMINATE': exit(0)  # Kill yourself
 
 		# Get the current team actors
 		if args.ps == 'full' or args.ps == 'trunk':
