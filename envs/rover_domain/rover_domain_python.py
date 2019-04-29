@@ -105,7 +105,7 @@ class RoverDomain:
 
 		start = 0.0;
 		end = self.args.dim_x - 1.0
-		rad = int(self.args.dim_x / math.sqrt(3) / 2.0)
+		rad = int(self.args.dim_x/(2*(math.sqrt(10)))) +2 #         int(self.args.dim_x / math.sqrt(3) / 2.0)
 		center = int((start + end) / 2.0)
 
 		if self.args.poi_rand: #Random
@@ -144,25 +144,33 @@ class RoverDomain:
 
 	def reset_rover_pos(self):
 		start = 1.0; end = self.args.dim_x - 1.0
-		rad = int(self.args.dim_x / math.sqrt(3) / 2.0)
+		rad = int(self.args.dim_x/(2*(math.sqrt(10)))) #10% area in the center for Rovers
 		center = int((start + end) / 2.0)
 
+		#Random Init
+		lower = center - rad
+		upper = center + rad
+		for i in range(self.args.num_agents):
+			x = randint(lower, upper)
+			y = randint(lower, upper)
+			self.rover_pos[i] = [x, y, 0.0]
 
-		for rover_id in range(self.args.num_agents):
-				quadrant = rover_id % 4
-				if quadrant == 0:
-					x = center - 1 - (rover_id / 4) % (center - rad)
-					y = center - (rover_id / (4 * center - rad)) % (center - rad)
-				if quadrant == 1:
-					x = center + (rover_id / (4 * center - rad)) % (center - rad)-1
-					y = center - 1 + (rover_id / 4) % (center - rad)
-				if quadrant == 2:
-					x = center + 1 + (rover_id / 4) % (center - rad)
-					y = center + (rover_id / (4 * center - rad)) % (center - rad)
-				if quadrant == 3:
-					x = center - (rover_id / (4 * center - rad)) % (center - rad)
-					y = center + 1 - (rover_id / 4) % (center - rad)
-				self.rover_pos[rover_id] = [x, y, 0.0]
+
+		# for rover_id in range(self.args.num_agents):
+		# 		quadrant = rover_id % 4
+		# 		if quadrant == 0:
+		# 			x = center - 1 - (rover_id / 4) % (center - rad)
+		# 			y = center - (rover_id / (4 * center - rad)) % (center - rad)
+		# 		if quadrant == 1:
+		# 			x = center + (rover_id / (4 * center - rad)) % (center - rad)-1
+		# 			y = center - 1 + (rover_id / 4) % (center - rad)
+		# 		if quadrant == 2:
+		# 			x = center + 1 + (rover_id / 4) % (center - rad)
+		# 			y = center + (rover_id / (4 * center - rad)) % (center - rad)
+		# 		if quadrant == 3:
+		# 			x = center - (rover_id / (4 * center - rad)) % (center - rad)
+		# 			y = center + 1 - (rover_id / 4) % (center - rad)
+		# 		self.rover_pos[rover_id] = [x, y, 0.0]
 
 
 	def get_joint_state(self):
@@ -255,6 +263,8 @@ class RoverDomain:
 
 		dist = v1 * v1 + v2 * v2
 		dist = math.sqrt(dist)
+
+		if math.isnan(angle): angle = 0.0
 
 		return angle, dist
 
