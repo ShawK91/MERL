@@ -16,8 +16,8 @@ parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='motivate')
-parser.add_argument('-config', type=str, help='World Setting?', default='motivate')
+parser.add_argument('-env', type=str, help='Env to test on?', default='')
+parser.add_argument('-config', type=str, help='World Setting?', default='')
 parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
 parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
 
@@ -29,6 +29,7 @@ parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
 parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
+parser.add_argument('-frames', type=float, help='Frames in millions?', default=50)
 
 RANDOM_BASELINE = False
 
@@ -46,7 +47,7 @@ class ConfigSettings:
 		self.is_lsg = vars(parser.parse_args())['lsg']
 
 		# ROVER DOMAIN
-		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight':  # Rover Domain
+		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight' or self.env_choice == 'rover_trap':  # Rover Domain
 
 			if config == 'single_test':
 				# Rover domain
@@ -59,20 +60,6 @@ class ConfigSettings:
 				self.ep_len = 20
 				self.poi_rand = 0
 				self.coupling = 1
-				self.rover_speed = 1
-				self.sensor_model = 'closest'
-
-			elif config == 'mtc_mac':
-				# Rover domain
-				self.dim_x = self.dim_y = 7
-				self.obs_radius = self.dim_x * 10
-				self.act_dist = 2
-				self.angle_res = 15
-				self.num_poi = 2
-				self.num_agents = 2
-				self.ep_len = 20
-				self.poi_rand = 1
-				self.coupling = 2
 				self.rover_speed = 1
 				self.sensor_model = 'closest'
 
@@ -90,79 +77,49 @@ class ConfigSettings:
 				self.rover_speed = 1
 				self.sensor_model = 'closest'
 
-			elif config == '10_3':
+			elif config == '30_4':
 				# Rover domain
-				self.dim_x = self.dim_y = 10
-				self.obs_radius = self.dim_x * 10
-				self.act_dist = 1.5
-				self.angle_res = 5
-				self.num_poi = 6
-				self.num_agents = 6
-				self.ep_len = 25
-				self.poi_rand = 1
-				self.coupling = 3
-				self.rover_speed = 1
-				self.sensor_model = 'closest'
-
-
-			elif config == '15_3':
-				# Rover domain
-				self.dim_x = self.dim_y = 15
-				self.obs_radius = self.dim_x * 10
-				self.act_dist = 3
-				self.angle_res = 15
-				self.num_poi = 8
-				self.num_agents = 6
-				self.ep_len = 40
-				self.poi_rand = 1
-				self.coupling = 3
-				self.rover_speed = 1
-				self.sensor_model = 'closest'
-
-			elif config == '15_4':
-				# Rover domain
-				self.dim_x = self.dim_y = 15
-				self.obs_radius = self.dim_x * 10
-				self.act_dist = 3
-				self.angle_res = 15
-				self.num_poi = 8
-				self.num_agents = 8
-				self.ep_len = 40
-				self.poi_rand = 1
-				self.coupling = 4
-				self.rover_speed = 1
-				self.sensor_model = 'closest'
-
-			elif config == '20_3':
-				# Rover domain
-				self.dim_x = self.dim_y = 20
-				self.obs_radius = self.dim_x * 10;
-				self.act_dist = 3
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
 				self.angle_res = 10
-				self.num_poi = 9
-				self.num_agents = 6
-				self.ep_len = 50
-				self.poi_rand = 1
-				self.coupling = 3
-				self.rover_speed = 1
-				self.sensor_model = 'closest'
-
-			elif config == '20_4':
-				# Rover domain
-				self.dim_x = self.dim_y = 20
-				self.obs_radius = self.dim_x * 10;
-				self.act_dist = 3
-				self.angle_res = 10
-				self.num_poi = 9
+				self.num_poi = 4
 				self.num_agents = 8
 				self.ep_len = 50
 				self.poi_rand = 1
 				self.coupling = 4
-				self.rover_speed = 1
-				self.sensor_model = 'closest'
+
+			elif config == '30_8':
+				# Rover domain
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 4
+				self.num_agents = 8
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 8
+
+			elif config == '30_1':
+				# Rover domain
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 16
+				self.num_agents = 4
+				self.ep_len = 30
+				self.poi_rand = 1
+				self.coupling = 1
+
 
 			else:
 				sys.exit('Unknown Config')
+
+			#Fix Harvest Period and coupling given some config choices
+
+			if args.env_choice == "rover_trap": self.harvest_period = 3
+			else: self.harvest_period = 1
+
+			if args.env_choice == "rover_loose": self.coupling = 1 #Definiton of a Loosely coupled domain
+
+
+
 
 		elif self.env_choice == 'motivate':  # Rover Domain
 			# Motivate domain
@@ -210,7 +167,7 @@ class Parameters:
 		# Transitive Algo Params
 		self.rollout_size = vars(parser.parse_args())['rollsize']
 		self.num_evals = vars(parser.parse_args())['evals']
-		self.frames_bound = 100000000
+		self.frames_bound = int(vars(parser.parse_args())['frames'] * 1000000)
 		self.actualize = vars(parser.parse_args())['alz']
 		self.priority_rate = vars(parser.parse_args())['pr']
 		self.use_gpu = vars(parser.parse_args())['use_gpu']
@@ -498,7 +455,7 @@ if __name__ == "__main__":
 	time_start = time.time()
 
 	###### TRAINING LOOP ########
-	for gen in range(1, args.frames_bound):  # RUN VIRTUALLY FOREVER
+	for gen in range(1, 10000000000):  # RUN VIRTUALLY FOREVER
 
 		# ONE EPOCH OF TRAINING
 		popn_fits, pg_fits, test_fits = ai.train(gen, test_tracker)
@@ -538,3 +495,6 @@ if __name__ == "__main__":
 				print('G_mean:', [agent.buffer.gstats['mean'] for agent in ai.agents])
 
 			print('########################################################################')
+
+		if ai.total_frames > args.frames_bound:
+			break
