@@ -34,7 +34,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 
 
-	if args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose':
+	if args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'rover_trap':
 		from envs.env_wrapper import RoverDomainPython
 		env = RoverDomainPython(args, NUM_EVALS)
 	elif args.config.env_choice == 'motivate':
