@@ -9,9 +9,7 @@ class RoverDomain:
 
 		self.args = args
 		self.task_type = args.env_choice
-		if args.env_choice == "rover_loose": self.harvest_period = 3
-		elif args.env_choice == "rover_tight": self.harvest_period = 1
-		else: sys.exit('Unknown Env type')
+		self.harvest_period = args.harvest_period
 
 		#Gym compatible attributes
 		self.observation_space = np.zeros((1, int(2*360 / self.args.angle_res)+1))
@@ -289,7 +287,7 @@ class RoverDomain:
 		for poi_id, rovers in enumerate(poi_visitors):
 				#if self.task_type == 'rover_tight' and len(rovers) >= self.args.coupling or self.task_type == 'rover_loose' and len(rovers) >= 1:
 				#Update POI status
-				if self.task_type == 'rover_tight' and len(rovers) >= self.args.coupling or self.task_type == 'rover_loose' and len(rovers) >= 1:
+				if self.task_type == 'rover_tight' and len(rovers) >= self.args.coupling or self.task_type == 'rover_loose' and len(rovers) >= 1 or self.task_type == 'rover_trap' and len(rovers) >= 1:
 					self.poi_status[poi_id] -= 1
 					self.poi_visitor_list[poi_id] = list(set(self.poi_visitor_list[poi_id]+rovers[:]))
 
@@ -316,20 +314,22 @@ class RoverDomain:
 
 
 	def get_global_reward(self):
-		#use
-		#self.rover_path and self.poi_pos and self.poi_value to compute TRAJECTORY_WIDE REWARD
-		if self.task_type == 'rover_loose':
-			global_rew = 0.0; max_reward = 0.0
-			for value, visitors in zip(self.poi_value, self.poi_visitor_list):
-				global_rew += value * len(visitors)
-				max_reward += self.args.coupling * value
+		global_rew = 0.0; max_reward = 0.0
 
-
-		if self.task_type == 'rover_tight':
-			global_rew = 0.0; max_reward = 0.0
+		if self.task_type == 'rover_tight' or self.task_type == 'rover_loose':
 			for value, status in zip(self.poi_value, self.poi_status):
 				global_rew += (status == 0) * value
 				max_reward += value
+
+		elif self.task_type == 'rover_trap':  # Rover_Trap domain
+			for value, visitors in zip(self.poi_value, self.poi_visitor_list):
+				multiplier = len(visitors) if len(visitors) < self.args.coupling else self.args.coupling
+				global_rew += value * multiplier
+				max_reward += self.args.coupling * value
+
+		else:
+			sys.exit('Incorrect task type')
+
 
 		global_rew = global_rew/max_reward
 
