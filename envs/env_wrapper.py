@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np, sys
 
 class RoverDomainPython:
 	"""Wrapper around the Environment to expose a cleaner interface for RL
@@ -369,7 +369,7 @@ class Cassie:
 
 
 	"""
-	def __init__(self, args, num_envs=1):
+	def __init__(self, args, num_envs=1, viz=False):
 		"""
 		A base template for all environment wrappers.
 		"""
@@ -377,11 +377,13 @@ class Cassie:
 		self.args = args
 		self.num_envs = num_envs
 
-		from envs.cassie.cassie_env.cassieRLEnv import cassieRLEnv
+		from envs.cassie.cassie_env.cassieRLEnv import cassieRLEnv, cassieRLEnvSparseReward
 
 		self.universe = [] #Universe - collection of all envs running in parallel
 		for _ in range(num_envs):
-			env = cassieRLEnv()
+			if args.config.config == 'sparse': env = cassieRLEnvSparseReward(viz)
+			elif args.config.config == 'dense': env = cassieRLEnv(viz)
+			else: sys.exit('Incorrect config given for Cassie')
 			self.universe.append(env)
 
 		#Action Space
@@ -457,15 +459,9 @@ class Cassie:
 
 
 	def render(self):
-		pass
+		self.universe[0].vis.draw(self.universe[0].sim)
 		# rand_univ = np.random.randint(0, len(self.universe))
 		# self.universe[rand_univ].render()
-
-
-
-
-
-
 
 
 
