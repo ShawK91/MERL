@@ -191,7 +191,8 @@ class RoverDomain:
 				angle -= self_orient
 				if angle < 0: angle += 360
 
-				bracket = int(angle / self.args.angle_res)
+				try: bracket = int(angle / self.args.angle_res)
+				except: bracket = 0
 				if bracket >= len(temp_poi_dist_list):
 					print("ERROR: BRACKET EXCEED LIST", bracket, len(temp_poi_dist_list))
 					bracket = len(temp_poi_dist_list)-1
@@ -212,7 +213,8 @@ class RoverDomain:
 				if dist > self.args.obs_radius: continue #Observability radius
 
 				if dist == 0: dist = 0.001
-				bracket = int(angle / self.args.angle_res)
+				try: bracket = int(angle / self.args.angle_res)
+				except: bracket = 0
 				if bracket >= len(temp_rover_dist_list):
 					print("ERROR: BRACKET EXCEED LIST", bracket, len(temp_rover_dist_list), angle)
 					bracket = len(temp_rover_dist_list)-1
@@ -262,7 +264,6 @@ class RoverDomain:
 		dist = v1 * v1 + v2 * v2
 		dist = math.sqrt(dist)
 
-		if math.isnan(angle): angle = 0.0
 
 		return angle, dist
 
