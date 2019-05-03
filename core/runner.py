@@ -30,6 +30,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	if args.config.env_choice == 'cassie': NUM_EVALS = 1
 	if args.config.env_choice == 'hyper': NUM_EVALS = 1
 	if args.config.env_choice == 'motivate': NUM_EVALS = 1
+	if args.config.env_choice == 'pursuit': NUM_EVALS = 1
 
 
 
@@ -40,6 +41,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	elif args.config.env_choice == 'motivate':
 		from envs.env_wrapper import MotivateDomain
 		env = MotivateDomain(args, NUM_EVALS)
+	elif args.config.env_choice == 'pursuit':
+		from envs.env_wrapper import Pursuit
+		env = Pursuit(args, NUM_EVALS)
 	elif args.config.env_choice == 'multiwalker':
 		from envs.env_wrapper import MultiWalker
 		env = MultiWalker(args, NUM_EVALS)

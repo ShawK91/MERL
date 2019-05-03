@@ -216,7 +216,7 @@ class RoverDomain:
 				try: bracket = int(angle / self.args.angle_res)
 				except: bracket = 0
 				if bracket >= len(temp_rover_dist_list):
-					print("ERROR: BRACKET EXCEED LIST", bracket, len(temp_rover_dist_list))
+					print("ERROR: BRACKET EXCEED LIST", bracket, len(temp_rover_dist_list), angle)
 					bracket = len(temp_rover_dist_list)-1
 				temp_rover_dist_list[bracket].append((1/(dist*dist)))
 
