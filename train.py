@@ -16,7 +16,7 @@ parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='')
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
 parser.add_argument('-config', type=str, help='World Setting?', default='')
 parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
 parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
@@ -96,6 +96,16 @@ class ConfigSettings:
 				self.ep_len = 50
 				self.poi_rand = 1
 				self.coupling = 8
+
+			elif config == '30_4b':
+				# Rover domain
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 20
+				self.num_agents = 4
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 4
 
 			elif config == '30_1':
 				# Rover domain
