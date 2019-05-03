@@ -40,6 +40,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 		env = RoverDomainPython(args, NUM_EVALS)
 	elif args.config.env_choice == 'motivate':
 		from envs.env_wrapper import MotivateDomain
+		env = MotivateDomain(args, NUM_EVALS)
 	elif args.config.env_choice == 'pursuit':
 		from envs.env_wrapper import Pursuit
 		env = Pursuit(args, NUM_EVALS)
