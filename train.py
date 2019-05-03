@@ -225,7 +225,7 @@ class Parameters:
 		self.num_blends = int(0.15 * self.popn_size)
 
 		# Dependents
-		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_tight':  # Rover Domain
+		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_tight' or self.config.env_choice == 'rover_trap':  # Rover Domain
 			self.state_dim = int(720 / self.config.angle_res) + 1
 			self.action_dim = 2
 		elif self.config.env_choice == 'motivate':  # MultiWalker Domain
