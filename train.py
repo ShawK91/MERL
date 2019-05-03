@@ -135,6 +135,12 @@ class ConfigSettings:
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
 
+		elif self.env_choice == 'pursuit':  # Rover Domain
+			# Motivate domain
+			self.num_agents = 2
+			self.coupling = 2
+
+
 
 		# MultiWalker Domain
 		elif self.env_choice == 'multiwalker':  # MultiWalker Domain

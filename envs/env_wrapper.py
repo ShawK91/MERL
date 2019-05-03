@@ -260,6 +260,113 @@ class MultiWalker:
 		# self.universe[rand_univ].render()
 
 
+class Pursuit:
+	"""Wrapper around the Environment to expose a cleaner interface for RL
+
+		Parameters:
+			env_name (str): Env name
+
+
+	"""
+	def __init__(self, args, num_envs=1):
+		"""
+		A base template for all environment wrappers.
+		"""
+		#Initialize world with requiste params
+		self.args = args
+		self.num_envs = num_envs
+
+		from envs.pursuit import MAWaterWorld_mod
+
+		self.universe = [] #Universe - collection of all envs running in parallel
+		for _ in range(num_envs):
+			env = MAWaterWorld_mod(n_pursuers=args.num_agents, n_evaders=50,
+                         n_poison=50, obstacle_radius=0.04,
+                         food_reward=10,
+                         poison_reward=-1.0,
+                         encounter_reward=0.01,
+                         n_coop=args.coupling,
+                         sensor_range=0.2, obstacle_loc=None, )
+			self.universe.append(env)
+
+		#Action Space
+		self.action_low = -1.0
+		self.action_high = 1.0
+		self.action_dim = 4
+		self.state_dim = 33
+
+		self.global_reward = [0.0 for _ in range(num_envs)]
+		self.env_dones = [False for _ in range(num_envs)]
+
+
+	def reset(self):
+		"""Method overloads reset
+			Parameters:
+				None
+
+			Returns:
+				next_obs (list): Next state
+		"""
+		#Reset Global Reward and dones
+		self.global_reward = [0.0 for _ in range(self.num_envs)]
+		self.env_dones = [False for _ in range(self.num_envs)]
+
+		#Get joint observation
+		joint_obs = []
+		for env in self.universe:
+			obs = env.reset()
+			joint_obs.append(obs)
+
+		joint_obs = np.stack(joint_obs, axis=1)
+
+
+		return joint_obs
+
+
+	def step(self, action): #Expects a numpy action
+		"""Take an action to forward the simulation
+
+			Parameters:
+				action (ndarray): action to take in the env
+
+			Returns:
+				next_obs (list): Next state
+				reward (float): Reward for this step
+				done (bool): Simulation done?
+				info (None): Template from OpenAi gym (doesnt have anything)
+		"""
+
+		joint_obs = []; joint_reward = []; joint_done = []; joint_global = []
+		for universe_id, env in enumerate(self.universe):
+
+			#If this particular env instance in universe is already done:
+			if self.env_dones[universe_id]:
+				joint_obs.append(env.dummy_state()); joint_reward.append(env.dummy_reward()); joint_done.append(True); joint_global.append(None)
+
+			else:
+				next_state, reward, done, _ = env.step(action[:,universe_id,:])
+				joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
+
+				self.global_reward[universe_id] += sum(reward)/self.args.config.num_agents
+				if done:
+					joint_global.append(self.global_reward[universe_id])
+					self.env_dones[universe_id] = True
+				else: joint_global.append(None)
+
+
+		joint_obs = np.stack(joint_obs, axis=1)
+		joint_reward = np.stack(joint_reward, axis=1)
+
+		return joint_obs, joint_reward, joint_done, joint_global
+
+
+
+	def render(self):
+		pass
+		# rand_univ = np.random.randint(0, len(self.universe))
+		# self.universe[rand_univ].render()
+
+
 class PowerPlant:
 	"""Wrapper around the Environment to expose a cleaner interface for RL
 
