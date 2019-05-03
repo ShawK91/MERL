@@ -74,7 +74,8 @@ class RoverDomainPython:
 	def render(self):
 
 		rand_univ = np.random.randint(0, len(self.universe))
-		self.universe[rand_univ].render()
+		try: self.universe[rand_univ].render()
+		except: 'Error rendering'
 
 
 

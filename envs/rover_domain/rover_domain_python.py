@@ -264,6 +264,7 @@ class RoverDomain:
 		dist = v1 * v1 + v2 * v2
 		dist = math.sqrt(dist)
 
+		if math.isnan(angle) or math.isinf(angle) or math.isfinite(angle): angle = 0.0
 
 		return angle, dist
 

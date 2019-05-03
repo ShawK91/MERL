@@ -77,40 +77,40 @@ class ConfigSettings:
 				self.rover_speed = 1
 				self.sensor_model = 'closest'
 
-			elif config == '30_4':
+			elif config == '4_4':
 				# Rover domain
-				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 10
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 5
 				self.num_poi = 4
-				self.num_agents = 8
+				self.num_agents = 4
 				self.ep_len = 50
 				self.poi_rand = 1
 				self.coupling = 4
 
-			elif config == '30_8':
+			elif config == '6_3':
 				# Rover domain
-				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 10
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 5
 				self.num_poi = 4
-				self.num_agents = 8
+				self.num_agents = 6
 				self.ep_len = 50
 				self.poi_rand = 1
-				self.coupling = 8
+				self.coupling = 3
 
-			elif config == '30_4b':
+			elif config == '4_4_plenty':
 				# Rover domain
-				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 10
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 5
 				self.num_poi = 20
 				self.num_agents = 4
 				self.ep_len = 50
 				self.poi_rand = 1
 				self.coupling = 4
 
-			elif config == '30_1':
+			elif config == '4_1_plenty':
 				# Rover domain
-				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 10
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 5
 				self.num_poi = 16
 				self.num_agents = 4
 				self.ep_len = 30
