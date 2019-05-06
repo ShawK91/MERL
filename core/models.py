@@ -48,8 +48,8 @@ class MultiHeadActor(nn.Module):
 
 		"""
 
-		x = F.elu(self.linear1(state))
-		x = F.elu(self.linear2(x))
+		x = torch.tanh(self.linear1(state))
+		x = torch.tanh(self.linear2(x))
 		mean = torch.tanh(self.mean(x))
 
 		if head == -1:
@@ -62,11 +62,11 @@ class MultiHeadActor(nn.Module):
 
 	def noisy_action(self, state, head=-1):
 
-		x = F.elu(self.linear1(state))
-		x = F.elu(self.linear2(x))
+		x = torch.tanh(self.linear1(state))
+		x = torch.tanh(self.linear2(x))
 		mean = torch.tanh(self.mean(x))
 
-		action = mean + self.noise.normal_(0., std=0.25)
+		action = mean + self.noise.normal_(0., std=0.4)
 		if head == -1:
 			return action
 		else:
@@ -224,13 +224,13 @@ class QNetwork(nn.Module):
 
 	def forward(self, state, action):
 		x1 = torch.cat([state, action], 1)
-		x1 = F.elu(self.linear1(x1))
-		x1 = F.elu(self.linear2(x1))
+		x1 = torch.tanh(self.linear1(x1))
+		x1 = torch.tanh(self.linear2(x1))
 		x1 = self.linear3(x1)
 
 		x2 = torch.cat([state, action], 1)
-		x2 = F.elu(self.linear4(x2))
-		x2 = F.elu(self.linear5(x2))
+		x2 = torch.tanh(self.linear4(x2))
+		x2 = torch.tanh(self.linear5(x2))
 		x2 = self.linear6(x2)
 
 		return x1, x2
