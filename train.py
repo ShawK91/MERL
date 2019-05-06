@@ -13,7 +13,7 @@ import threading, sys
 parser = argparse.ArgumentParser()
 parser.add_argument('-ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
@@ -49,21 +49,8 @@ class ConfigSettings:
 		# ROVER DOMAIN
 		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight' or self.env_choice == 'rover_trap':  # Rover Domain
 
-			if config == 'single_test':
-				# Rover domain
-				self.dim_x = self.dim_y = 8
-				self.obs_radius = self.dim_x * 8
-				self.act_dist = 2
-				self.angle_res = 5
-				self.num_poi = 2
-				self.num_agents = 1
-				self.ep_len = 20
-				self.poi_rand = 0
-				self.coupling = 1
-				self.rover_speed = 1
-				self.sensor_model = 'closest'
 
-			elif config == 'two_test':
+			if config == 'two_test':
 				# Rover domain
 				self.dim_x = self.dim_y = 10
 				self.obs_radius = self.dim_x * 10
@@ -90,7 +77,7 @@ class ConfigSettings:
 			elif config == '4_4':
 				# Rover domain
 				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 5
+				self.angle_res = 10
 				self.num_poi = 4
 				self.num_agents = 4
 				self.ep_len = 50
@@ -100,7 +87,7 @@ class ConfigSettings:
 			elif config == '6_3':
 				# Rover domain
 				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 5
+				self.angle_res = 10
 				self.num_poi = 4
 				self.num_agents = 6
 				self.ep_len = 50
@@ -110,7 +97,7 @@ class ConfigSettings:
 			elif config == '4_4_plenty':
 				# Rover domain
 				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 5
+				self.angle_res = 10
 				self.num_poi = 20
 				self.num_agents = 4
 				self.ep_len = 50
@@ -120,7 +107,7 @@ class ConfigSettings:
 			elif config == '4_1_plenty':
 				# Rover domain
 				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 5
+				self.angle_res = 10
 				self.num_poi = 16
 				self.num_agents = 4
 				self.ep_len = 30

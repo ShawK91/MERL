@@ -132,8 +132,8 @@ class Actor(nn.Module):
 
 		"""
 		if self.policy_type == 'GaussianPolicy':
-			x = F.elu(self.linear1(state))
-			x = F.elu(self.linear2(x))
+			x = torch.tanh(self.linear1(state))
+			x = torch.tanh(self.linear2(x))
 			mean = self.mean_linear(x)
 			if return_only_action: return torch.tanh(mean)
 
@@ -142,8 +142,8 @@ class Actor(nn.Module):
 			return mean, log_std
 
 		elif self.policy_type == 'DeterministicPolicy':
-			x = F.elu(self.linear1(state))
-			x = F.elu(self.linear2(x))
+			x = torch.tanh(self.linear1(state))
+			x = torch.tanh(self.linear2(x))
 			mean = torch.tanh(self.mean(x))
 			return mean
 
@@ -171,7 +171,7 @@ class Actor(nn.Module):
 
 		elif self.policy_type == 'DeterministicPolicy':
 			mean = self.clean_action(state)
-			action = mean + self.noise.normal_(0., std=0.25)
+			action = mean + self.noise.normal_(0., std=0.4)
 
 			if return_only_action: return action
 			else: return action, torch.tensor(0.), torch.tensor(0.), mean, torch.tensor(0.)
