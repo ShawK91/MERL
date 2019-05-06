@@ -15,11 +15,12 @@ class RoverDomainPython:
 		#Initialize world with requiste params
 		self.args = args
 
-		from envs.rover_domain.rover_domain_python import RoverDomain
+		from envs.rover_domain.rover_domain_python import RoverDomain, RoverDomainVel
 
 		self.universe = [] #Universe - collection of all envs running in parallel
 		for _ in range(num_envs):
-			env = RoverDomain(args.config)
+			if self.args.config.cmd_vel: env = RoverDomainVel(args.config)
+			else: env = RoverDomain(args.config)
 			self.universe.append(env)
 
 		#Action Space

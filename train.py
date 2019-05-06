@@ -20,6 +20,7 @@ parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loo
 parser.add_argument('-config', type=str, help='World Setting?', default='nav')
 parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
 parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
+parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=False)
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
@@ -45,6 +46,7 @@ class ConfigSettings:
 		#Global subsumes local or vice-versa?
 		self.is_gsl = vars(parser.parse_args())['gsl']
 		self.is_lsg = vars(parser.parse_args())['lsg']
+		self.cmd_vel = vars(parser.parse_args())['cmd_vel']
 
 		# ROVER DOMAIN
 		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight' or self.env_choice == 'rover_trap':  # Rover Domain
@@ -231,6 +233,7 @@ class Parameters:
 		# Dependents
 		if self.config.env_choice == 'rover_loose' or self.config.env_choice == 'rover_tight' or self.config.env_choice == 'rover_trap':  # Rover Domain
 			self.state_dim = int(720 / self.config.angle_res) + 1
+			if self.config.cmd_vel: self.state_dim += 2
 			self.action_dim = 2
 		elif self.config.env_choice == 'motivate':  # MultiWalker Domain
 			self.state_dim = int(720 / self.config.angle_res) + 1
@@ -262,12 +265,13 @@ class Parameters:
 		self.savetag = vars(parser.parse_args())['savetag'] + \
 		               'pop' + str(self.popn_size) + \
 		               '_roll' + str(self.rollout_size) + \
-		               '_alz' + str(self.actualize) + \
 		               '_env' + str(self.config.env_choice) + '_' + str(self.config.config) + \
 			           '_ps' + str(self.ps) +\
-					   '_seed' + str(self.seed) +\
-					   ('_lsg' if self.config.is_lsg else '') + \
-					   ('_gsl' if self.config.is_gsl else '')
+					   '_seed' + str(self.seed) + \
+					   ('_alz' if self.actualize else '') + \
+		               ('_lsg' if self.config.is_lsg else '') + \
+		               ('_cmdvel' if self.config.cmd_vel else '') + \
+		               ('_gsl' if self.config.is_gsl else '')
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
