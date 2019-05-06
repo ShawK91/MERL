@@ -672,7 +672,7 @@ class RoverDomainVel:
 			proxim_rew = self.args.act_dist/self.rover_closest_poi[i]
 			if proxim_rew > 1.0: proxim_rew = 1.0
 			rewards[i] += proxim_rew
-			print(self.rover_closest_poi[i], proxim_rew)
+			#print(self.rover_closest_poi[i], proxim_rew)
 			self.cumulative_local[i] += proxim_rew
 		self.rover_closest_poi = [self.args.dim_x * 2 for _ in range(self.args.num_agents)] #Reset closest POI
 
