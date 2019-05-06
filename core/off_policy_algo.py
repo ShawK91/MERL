@@ -161,7 +161,7 @@ class TD3(object):
 				if self.actualize:
 					A1 = self.ANetwork.forward(state_batch, actor_actions)
 					utils.compute_stats(A1, self.alz_policy)
-					policy_loss += -A1.mean()
+					policy_loss += -A1.mean()*0.1
 
 
 
