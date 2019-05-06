@@ -96,6 +96,7 @@ class Agent:
 					s, ns, a, r, done, global_reward = buffer.sample(self.args.batch_size,
 					                                                      pr_rew=self.args.priority_rate,
 					                                                      pr_global=self.args.priority_rate)
+					r*=self.args.reward_scaling
 					if self.args.use_gpu:
 						s = s.cuda(); ns = ns.cuda(); a = a.cuda(); r = r.cuda(); done = done.cuda(); global_reward = global_reward.cuda()
 					self.algo.update_parameters(s, ns, a, r, done, global_reward, agent_id, 1, **td3args)
