@@ -13,11 +13,11 @@ import threading, sys
 parser = argparse.ArgumentParser()
 parser.add_argument('-ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
-parser.add_argument('-config', type=str, help='World Setting?', default='')
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
+parser.add_argument('-config', type=str, help='World Setting?', default='nav')
 parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
 parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
 
@@ -76,6 +76,16 @@ class ConfigSettings:
 				self.coupling = 2
 				self.rover_speed = 1
 				self.sensor_model = 'closest'
+
+			elif config == 'nav':
+				# Rover domain
+				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 2; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 10
+				self.num_agents = 1
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 1
 
 			elif config == '4_4':
 				# Rover domain
@@ -194,17 +204,18 @@ class Parameters:
 		self.config = ConfigSettings()
 
 		# Fairly Stable Algo params
-		self.hidden_size = 200
+		self.hidden_size = 100
 		self.algo_name = vars(parser.parse_args())['algo']
 		self.actor_lr = 5e-5
 		self.critic_lr = 1e-5
 		self.tau = 1e-5
 		self.init_w = True
 		self.gradperstep = vars(parser.parse_args())['gradperstep']
-		self.gamma = 0.99
-		self.batch_size = 256
-		self.buffer_size = 500000
+		self.gamma = 0.5
+		self.batch_size = 512
+		self.buffer_size = 100000
 		self.filter_c = vars(parser.parse_args())['filter_c']
+		self.reward_scaling = 10.0
 
 		self.action_loss = False
 		self.policy_ups_freq = 2
