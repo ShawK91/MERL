@@ -96,12 +96,13 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 					joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.config.num_agents)]
 			#JOINT ACTION [agent_id, universe_id, action]
 
-			next_state, reward, done, global_reward = env.step(np.array(joint_action))  # Simulate one step in environment
+			#Bound Action
+			joint_action = np.array(joint_action).clip(-1.0, 1.0)
+			next_state, reward, done, global_reward = env.step(joint_action)  # Simulate one step in environment
 			#State --> [agent_id, universe_id, obs]
 			#reward --> [agent_id, universe_id]
 			#done --> [universe_id]
 			#info --> [universe_id]
-
 
 
 			if args.config.env_choice == 'motivate' and type == "test": print(['%.2f'%r for r in reward], global_reward)
@@ -129,7 +130,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 						if not done[universe_id]:
 							rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(joint_state)[agent_id,universe_id, :], 0),
 														  np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
-														  np.expand_dims(np.array(joint_action)[agent_id,universe_id, :], 0),
+														  np.expand_dims(joint_action[agent_id,universe_id, :], 0),
 														  np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
 														  np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
 														  universe_id,
