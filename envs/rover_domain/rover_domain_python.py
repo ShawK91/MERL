@@ -293,7 +293,7 @@ class RoverDomain:
 
 				if self.args.is_lsg: #Local subsume Global?
 					for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
-						rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
+						rewards[rover_id] += self.poi_value[poi_id]*10
 
 		#Proximity Rewards
 		for i in range(self.args.num_agents):
@@ -665,7 +665,7 @@ class RoverDomainVel:
 
 				if self.args.is_lsg: #Local subsume Global?
 					for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
-						rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
+						rewards[rover_id] += self.poi_value[poi_id]*10
 
 		#Proximity Rewards
 		for i in range(self.args.num_agents):
@@ -1029,7 +1029,7 @@ class RoverDomainOverActuated:
 
 				if self.args.is_lsg: #Local subsume Global?
 					for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
-						rewards[rover_id] += self.poi_value[poi_id] - (dist/(2*self.args.act_dist))
+						rewards[rover_id] += self.poi_value[poi_id]*10
 
 		#Proximity Rewards
 		for i in range(self.args.num_agents):
