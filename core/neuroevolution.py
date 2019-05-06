@@ -461,10 +461,9 @@ class SSNE:
 
 			# Elitism step, assigning elite candidates to some unselects
 			for i in elitist_index:
-				try:
-					replacee = unselects.pop(0)
-				except:
-					replacee = offsprings.pop(0)
+				if len(unselects) >= 1: replacee = unselects.pop(0)
+				elif len(offsprings) >= 1: replacee = offsprings.pop(0)
+				else: continue
 				new_elitists.append(replacee)
 				utils.hard_update(target=pop[replacee], source=pop[i])
 				# wwid = genealogy.asexual(int(pop[i].wwid.item()))
