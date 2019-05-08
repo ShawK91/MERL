@@ -79,8 +79,6 @@ class RoverDomainPython:
 		except: 'Error rendering'
 
 
-
-
 class MotivateDomain:
 	"""Wrapper around the Environment to expose a cleaner interface for RL
 
@@ -486,12 +484,13 @@ class Cassie:
 		self.args = args
 		self.num_envs = num_envs
 
-		from envs.cassie.cassie_env.cassieRLEnv import cassieRLEnv, cassieRLEnvSparseReward
+		from envs.cassie.cassie_env.cassieRLEnv import cassieRLEnv, cassieRLEnvSparseReward, cassieRlEnvAdaptive
 
 		self.universe = [] #Universe - collection of all envs running in parallel
 		for _ in range(num_envs):
 			if args.config.config == 'sparse': env = cassieRLEnvSparseReward(viz)
 			elif args.config.config == 'dense': env = cassieRLEnv(viz)
+			elif args.config.config == 'adaptive': env = cassieRlEnvAdaptive(viz)
 			else: sys.exit('Incorrect config given for Cassie')
 			self.universe.append(env)
 
