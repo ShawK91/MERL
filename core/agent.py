@@ -1,4 +1,4 @@
-from core.off_policy_algo import TD3, SAC, MultiTD3
+from core.off_policy_algo import TD3, SAC, MultiTD3, MADDPG
 from torch.multiprocessing import Manager
 from core.models import Actor, MultiHeadActor
 from core.buffer import Buffer
@@ -44,9 +44,17 @@ class Agent:
 
 		#### INITIALIZE PG ALGO #####
 		if args.ps == 'trunk':
-			self.algo = MultiTD3(id, args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr,
-			                args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.actualize,
-			                args.use_gpu, args.config.num_agents, args.init_w)
+
+			if self.args.is_maddpg:
+				self.algo = MADDPG(id, args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr,
+				                args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.actualize,
+				                args.use_gpu, args.config.num_agents, args.init_w)
+
+			else:
+				self.algo = MultiTD3(id, args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr,
+				                args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.actualize,
+				                args.use_gpu, args.config.num_agents, args.init_w)
+
 
 		else:
 			if args.algo_name == 'TD3':
@@ -85,6 +93,8 @@ class Agent:
 		if self.args.ps == 'trunk':
 
 			for agent_id, buffer in enumerate(self.buffer):
+				if self.args.is_maddpg: buffer = self.buffer[0] #Hardcoded Hack for MADDPG
+
 				buffer.referesh()
 				if buffer.__len__() < 10 * self.args.batch_size:
 					buffer.pg_frames = 0
@@ -109,6 +119,7 @@ class Agent:
 
 			for _ in range(int(self.args.gradperstep * self.buffer.pg_frames)):
 				s, ns, a, r, done, global_reward = self.buffer.sample(self.args.batch_size, pr_rew=self.args.priority_rate, pr_global=self.args.priority_rate)
+				r *= self.args.reward_scaling
 				if self.args.use_gpu:
 					s = s.cuda(); ns = ns.cuda(); a = a.cuda(); r = r.cuda(); done = done.cuda(); global_reward = global_reward.cuda()
 				self.algo.update_parameters(s, ns, a, r, done, global_reward, 1, **td3args)

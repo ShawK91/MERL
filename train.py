@@ -12,9 +12,10 @@ import threading, sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
-parser.add_argument('-env', type=str, help='Env to test on?', default='pursuit')
-parser.add_argument('-config', type=str, help='World Setting?', default='2_2')
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
+parser.add_argument('-config', type=str, help='World Setting?', default='')
+parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
 
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
@@ -225,6 +226,7 @@ class Parameters:
 		self.use_gpu = vars(parser.parse_args())['use_gpu']
 		self.seed = vars(parser.parse_args())['seed']
 		self.ps = vars(parser.parse_args())['ps']
+		self.is_maddpg = vars(parser.parse_args())['maddpg']
 
 		# Env domain
 		self.config = ConfigSettings()
@@ -319,7 +321,8 @@ class Parameters:
 		               ('_lsg' if self.config.is_lsg else '') + \
 		               ('_cmdvel' if self.config.cmd_vel else '') + \
 		               ('_gsl' if self.config.is_gsl else '') + \
-		               ('_multipoint' if self.scheme == 'multipoint' else '')
+		               ('_multipoint' if self.scheme == 'multipoint' else '') + \
+		               ('_maddpg' if self.is_maddpg else '')
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
@@ -545,7 +548,7 @@ if __name__ == "__main__":
 			print('Q', pprint(ai.agents[0].algo.q))
 			print('Q_loss', pprint(ai.agents[0].algo.q_loss))
 			print('Policy', pprint(ai.agents[0].algo.policy_loss))
-			if args.algo_name == 'TD3':
+			if args.algo_name == 'TD3' and not args.is_maddpg:
 				print('Alz_Score', pprint(ai.agents[0].algo.alz_score))
 				print('Alz_policy', pprint(ai.agents[0].algo.alz_policy))
 

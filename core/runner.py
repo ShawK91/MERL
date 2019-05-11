@@ -30,7 +30,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	if args.config.env_choice == 'cassie': NUM_EVALS = 1
 	if args.config.env_choice == 'hyper': NUM_EVALS = 1
 	if args.config.env_choice == 'motivate': NUM_EVALS = 1
-	if args.config.env_choice == 'pursuit': NUM_EVALS = 1
+	if args.config.env_choice == 'pursuit': NUM_EVALS = 10
 
 
 
@@ -125,16 +125,30 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 			#Push experiences to memory
 			if store_transitions:
-				for agent_id in range(args.config.num_agents):
+				if not args.is_maddpg: #Default
+					for agent_id in range(args.config.num_agents):
+						for universe_id in range(NUM_EVALS):
+							if not done[universe_id]:
+								rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(joint_state)[agent_id,universe_id, :], 0),
+															  np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
+															  np.expand_dims(joint_action[agent_id,universe_id, :], 0),
+															  np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
+															  np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
+															  universe_id,
+								                              type])
+
+				else:
 					for universe_id in range(NUM_EVALS):
 						if not done[universe_id]:
-							rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(joint_state)[agent_id,universe_id, :], 0),
-														  np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
-														  np.expand_dims(joint_action[agent_id,universe_id, :], 0),
-														  np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
-														  np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
-														  universe_id,
-							                              type])
+							rollout_trajectory[0].append(
+								[np.expand_dims(utils.to_numpy(joint_state)[:, universe_id, :], 0),
+								 np.expand_dims(utils.to_numpy(next_state)[:, universe_id, :], 0),
+								 np.expand_dims(joint_action[:, universe_id, :], 0), #[batch, agent_id, :]
+								 np.expand_dims(np.expand_dims(np.array([reward[:, universe_id]], dtype="float32").mean(), 0), 0),
+								 np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
+								 universe_id,
+								 type])
+
 
 			joint_state = next_state
 			frame+=NUM_EVALS
