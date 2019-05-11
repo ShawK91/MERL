@@ -33,8 +33,6 @@ parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
 parser.add_argument('-frames', type=float, help='Frames in millions?', default=50)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
-parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
-parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
 parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
 parser.add_argument('-ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
 
