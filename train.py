@@ -17,6 +17,10 @@ parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loo
 parser.add_argument('-config', type=str, help='World Setting?', default='')
 parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
 
+parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
+parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
+parser.add_argument('-proxim_rew', type=str2bool, help='Local Reward subsumes global reward?', default=True)
+
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
@@ -49,6 +53,7 @@ class ConfigSettings:
 		self.is_gsl = vars(parser.parse_args())['gsl']
 		self.is_lsg = vars(parser.parse_args())['lsg']
 		self.cmd_vel = vars(parser.parse_args())['cmd_vel']
+		self.is_proxim_rew = vars(parser.parse_args())['proxim_rew']
 
 		# ROVER DOMAIN
 		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight' or self.env_choice == 'rover_trap':  # Rover Domain
@@ -77,26 +82,6 @@ class ConfigSettings:
 				self.ep_len = 50
 				self.poi_rand = 1
 				self.coupling = 1
-
-			elif config == '4_4':
-				# Rover domain
-				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 10
-				self.num_poi = 4
-				self.num_agents = 4
-				self.ep_len = 50
-				self.poi_rand = 1
-				self.coupling = 4
-
-			elif config == '6_3':
-				# Rover domain
-				self.dim_x = self.dim_y = 20; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
-				self.angle_res = 10
-				self.num_poi = 4
-				self.num_agents = 6
-				self.ep_len = 50
-				self.poi_rand = 1
-				self.coupling = 3
 
 
 			##########LOOSE##########
