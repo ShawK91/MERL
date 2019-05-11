@@ -164,7 +164,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 		#print(fitness)
 
-		if type == "test" and random.random() < 1.0 and (args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'motivate'):
+		if type == "test" and random.random() < 1.0 and (args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'motivate'or args.config.env_choice == 'rover_trap'):
 			env.render()
 			print('Test trajectory lens',[len(world.rover_path[0]) for world in env.universe])
 			#print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
