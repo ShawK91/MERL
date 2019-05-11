@@ -12,9 +12,9 @@ import threading, sys
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_trap')
-parser.add_argument('-config', type=str, help='World Setting?', default='3_3')
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
+parser.add_argument('-env', type=str, help='Env to test on?', default='pursuit')
+parser.add_argument('-config', type=str, help='World Setting?', default='2_2')
 
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
@@ -168,9 +168,23 @@ class ConfigSettings:
 			self.sensor_model = 'closest'
 
 		elif self.env_choice == 'pursuit':  # Rover Domain
-			# Motivate domain
-			self.num_agents = 2
-			self.coupling = 2
+			#Pursuit Domain
+			if config == '2_2':
+				self.num_agents = 2
+				self.coupling = 2
+
+			elif config == '1_1':
+				self.num_agents = 1
+				self.coupling = 1
+
+			elif config == '3_3':
+				self.num_agents = 3
+				self.coupling = 3
+			elif config == '4_4':
+				self.num_agents = 4
+				self.coupling = 4
+			else:
+				sys.exit('Unknown Config')
 
 
 
@@ -275,6 +289,10 @@ class Parameters:
 
 		elif self.config.env_choice == 'hyper':  # Cassie Domain
 			self.state_dim = 20
+			self.action_dim = 2
+
+		elif self.config.env_choice == 'pursuit':  # Cassie Domain
+			self.state_dim = 213
 			self.action_dim = 2
 		else:
 			sys.exit('Unknown Environment Choice')

@@ -123,7 +123,7 @@ class MAWaterWorld_mod(AbstractMAEnv, EzPickle):
 
     @property
     def timestep_limit(self):
-        return 1000
+        return 300
 
     @property
     def agents(self):
@@ -218,7 +218,7 @@ class MAWaterWorld_mod(AbstractMAEnv, EzPickle):
         return sensed_objspeedfeatures_Np_K
 
     def step(self, action_Np2):
-        action_Np2 = np.asarray(action_Np2)
+
         action_Np_2 = action_Np2.reshape((self.n_pursuers, 2))
         # Players
         actions_Np_2 = action_Np_2 * self.action_scale
@@ -375,14 +375,13 @@ class MAWaterWorld_mod(AbstractMAEnv, EzPickle):
 
         ev_encounters, which_pursuer_encounterd_ev = self._caught(is_colliding_ev_Np_Ne, 1)
         # Update reward based on these collisions
-        if self.reward_mech == 'global':
-            rewards += (
-                (len(ev_caught) * self.food_reward) + (len(po_caught) * self.poison_reward) +
-                (len(ev_encounters) * self.encounter_reward))
-        else:
-            rewards[which_pursuer_caught_ev] += self.food_reward
-            rewards[which_pursuer_caught_po] += self.poison_reward
-            rewards[which_pursuer_encounterd_ev] += self.encounter_reward
+
+        global_rew = ((len(ev_caught) * self.food_reward) + (len(po_caught) * self.poison_reward) + (len(ev_encounters) * self.encounter_reward))
+
+        #Local Reward
+        rewards[which_pursuer_caught_ev] += self.food_reward
+        rewards[which_pursuer_caught_po] += self.poison_reward
+        rewards[which_pursuer_encounterd_ev] += self.encounter_reward
 
         # Add features together
         if self._speed_features:
@@ -441,7 +440,7 @@ class MAWaterWorld_mod(AbstractMAEnv, EzPickle):
         self._timesteps += 1
         done = self.is_terminal
         info = dict(evcatches=len(ev_caught), pocatches=len(po_caught))
-        return obslist, rewards, done, info
+        return obslist, rewards, done, global_rew
 
     def render(self, screen_size=800, rate=10, mode='human'):
         import cv2

@@ -280,12 +280,12 @@ class Pursuit:
 
 		self.universe = [] #Universe - collection of all envs running in parallel
 		for _ in range(num_envs):
-			env = MAWaterWorld_mod(n_pursuers=args.num_agents, n_evaders=50,
+			env = MAWaterWorld_mod(n_pursuers=args.config.num_agents, n_evaders=50,
                          n_poison=50, obstacle_radius=0.04,
                          food_reward=10,
                          poison_reward=-1.0,
                          encounter_reward=0.01,
-                         n_coop=args.coupling,
+                         n_coop=args.config.coupling,
                          sensor_range=0.2, obstacle_loc=None, )
 			self.universe.append(env)
 
@@ -344,10 +344,10 @@ class Pursuit:
 				joint_obs.append(env.dummy_state()); joint_reward.append(env.dummy_reward()); joint_done.append(True); joint_global.append(None)
 
 			else:
-				next_state, reward, done, _ = env.step(action[:,universe_id,:])
+				next_state, reward, done, global_reward = env.step(action[:,universe_id,:])
 				joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
 
-				self.global_reward[universe_id] += sum(reward)/self.args.config.num_agents
+				self.global_reward[universe_id] += global_reward
 				if done:
 					joint_global.append(self.global_reward[universe_id])
 					self.env_dones[universe_id] = True
