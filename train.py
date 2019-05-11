@@ -11,16 +11,11 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
-parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
-parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
-parser.add_argument('-config', type=str, help='World Setting?', default='nav')
-parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
-parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
-parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=False)
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_trap')
+parser.add_argument('-config', type=str, help='World Setting?', default='3_3')
+
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
 parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
@@ -31,6 +26,12 @@ parser.add_argument('-gradperstep', type=float, help='gradient steps per frame',
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
 parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
 parser.add_argument('-frames', type=float, help='Frames in millions?', default=50)
+parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
+parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
+parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
+parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
+parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
+parser.add_argument('-ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
 
 RANDOM_BASELINE = False
 
@@ -57,7 +58,7 @@ class ConfigSettings:
 				self.dim_x = self.dim_y = 10
 				self.obs_radius = self.dim_x * 10
 				self.act_dist = 2
-				self.angle_res = 15
+				self.angle_res = 10
 				self.num_poi = 6
 				self.num_agents = 2
 				self.ep_len = 50
@@ -88,7 +89,7 @@ class ConfigSettings:
 
 			elif config == '6_3':
 				# Rover domain
-				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.dim_x = self.dim_y = 20; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
 				self.angle_res = 10
 				self.num_poi = 4
 				self.num_agents = 6
@@ -96,25 +97,49 @@ class ConfigSettings:
 				self.poi_rand = 1
 				self.coupling = 3
 
-			elif config == '4_4_plenty':
+
+			##########LOOSE##########
+			elif config == '3_1':
 				# Rover domain
 				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
 				self.angle_res = 10
-				self.num_poi = 20
-				self.num_agents = 4
+				self.num_poi = 3
+				self.num_agents = 3
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 1
+
+			##########TIGHT##########
+			elif config == '6_3':
+				# Rover domain
+				self.dim_x = self.dim_y = 20; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 4
+				self.num_agents = 6
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 3
+
+			elif config == '8_4':
+				# Rover domain
+				self.dim_x = self.dim_y = 20; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 4
+				self.num_agents = 8
 				self.ep_len = 50
 				self.poi_rand = 1
 				self.coupling = 4
 
-			elif config == '4_1_plenty':
+			elif config == '10_5':
 				# Rover domain
-				self.dim_x = self.dim_y = 30; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.dim_x = self.dim_y = 20; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
 				self.angle_res = 10
-				self.num_poi = 16
-				self.num_agents = 4
-				self.ep_len = 30
+				self.num_poi = 4
+				self.num_agents = 10
+				self.ep_len = 50
 				self.poi_rand = 1
-				self.coupling = 1
+				self.coupling = 5
+
 
 
 			else:
@@ -126,8 +151,6 @@ class ConfigSettings:
 			else: self.harvest_period = 1
 
 			if self.env_choice == "rover_loose": self.coupling = 1 #Definiton of a Loosely coupled domain
-
-
 
 
 		elif self.env_choice == 'motivate':  # Rover Domain
@@ -242,8 +265,14 @@ class Parameters:
 			self.state_dim = 33
 			self.action_dim = 4
 		elif self.config.env_choice == 'cassie':  # Cassie Domain
-			self.state_dim = 80
+			self.state_dim = 82 if self.config.config == 'adaptive' else 80
 			self.action_dim = 10
+			self.hidden_size = 200
+			self.gamma = 0.99
+			self.buffer_size = 1000000
+
+
+
 		elif self.config.env_choice == 'hyper':  # Cassie Domain
 			self.state_dim = 20
 			self.action_dim = 2
@@ -271,7 +300,8 @@ class Parameters:
 					   ('_alz' if self.actualize else '') + \
 		               ('_lsg' if self.config.is_lsg else '') + \
 		               ('_cmdvel' if self.config.cmd_vel else '') + \
-		               ('_gsl' if self.config.is_gsl else '')
+		               ('_gsl' if self.config.is_gsl else '') + \
+		               ('_multipoint' if self.scheme == 'multipoint' else '')
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
@@ -519,8 +549,8 @@ if __name__ == "__main__":
 
 	###Kill all processes
 	try:
-		for p in ai.pg_task_pipes: p[0].send('TERMINATE')
-		for p in ai.test_task_pipes: p[0].send('TERMINATE')
+		ai.pg_task_pipes[0].send('TERMINATE')
+		ai.test_task_pipes[0].send('TERMINATE')
 		for p in ai.evo_task_pipes: p[0].send('TERMINATE')
 
 	except: None
