@@ -305,7 +305,8 @@ class Parameters:
 		               ('_cmdvel' if self.config.cmd_vel else '') + \
 		               ('_gsl' if self.config.is_gsl else '') + \
 		               ('_multipoint' if self.scheme == 'multipoint' else '') + \
-		               ('_maddpg' if self.is_maddpg else '')
+		               ('_maddpg' if self.is_maddpg else '') + \
+		               ('_noProximRew' if not self.config.is_proxim_rew else '')
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
