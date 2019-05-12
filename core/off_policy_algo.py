@@ -745,7 +745,6 @@ class MADDPG(object):
 		self.algo_name = algo_name; self.gamma = gamma; self.tau = tau; self.total_update = 0; self.agent_id = id;self.use_gpu = use_gpu
 		self.tracker = utils.Tracker(foldername, ['q_'+savetag, 'qloss_'+savetag, 'policy_loss_'+savetag], '.csv', save_iteration=1000, conv_size=1000)
 		self.num_agents = num_agents
-		hidden_size *= 3
 
 		#Initialize actors
 		self.policy = MultiHeadActor(state_dim, action_dim, hidden_size, num_agents)
@@ -755,9 +754,9 @@ class MADDPG(object):
 		self.policy_optim = Adam(self.policy.parameters(), actor_lr)
 
 
-		self.critics = [QNetwork(state_dim*num_agents, action_dim*num_agents, hidden_size) for _ in range(num_agents)]
+		self.critics = [QNetwork(state_dim*num_agents, action_dim*num_agents, hidden_size*3) for _ in range(num_agents)]
 
-		self.critics_target = [QNetwork(state_dim*num_agents, action_dim*num_agents, hidden_size) for _ in range(num_agents)]
+		self.critics_target = [QNetwork(state_dim*num_agents, action_dim*num_agents, hidden_size*3) for _ in range(num_agents)]
 		if init_w:
 			for critic, critic_target in zip(self.critics, self.critics_target):
 				critic.apply(utils.init_weights)
@@ -819,7 +818,7 @@ class MADDPG(object):
 
 				#Compute Q-val and value of next state masking by done
 
-				q1, q2 = self.critic_targets[agent_id].forward(next_state_batch.view(batch_size, -1), next_action_batch)
+				q1, q2 = self.critics_target[agent_id].forward(next_state_batch.view(batch_size, -1), next_action_batch)
 				q1 = (1 - done_batch) * q1
 				q2 = (1 - done_batch) * q2
 				#next_val = (1 - done_batch) * next_val
@@ -899,7 +898,8 @@ class MADDPG(object):
 
 
 			if self.num_critic_updates % kwargs['policy_ups_freq'] == 0: utils.soft_update(self.policy_target, self.policy, self.tau)
-			utils.soft_update(self.critic_target, self.critic, self.tau)
+			for critic, critic_target in zip(self.critics, self.critics_target):
+				utils.soft_update(critic_target, critic, self.tau)
 
 			self.total_update += 1
 			if self.agent_id == 0:
