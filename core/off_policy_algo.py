@@ -745,6 +745,7 @@ class MADDPG(object):
 		self.algo_name = algo_name; self.gamma = gamma; self.tau = tau; self.total_update = 0; self.agent_id = id;self.use_gpu = use_gpu
 		self.tracker = utils.Tracker(foldername, ['q_'+savetag, 'qloss_'+savetag, 'policy_loss_'+savetag], '.csv', save_iteration=1000, conv_size=1000)
 		self.num_agents = num_agents
+		hidden_size *= 3
 
 		#Initialize actors
 		self.policy = MultiHeadActor(state_dim, action_dim, hidden_size, num_agents)
@@ -754,17 +755,25 @@ class MADDPG(object):
 		self.policy_optim = Adam(self.policy.parameters(), actor_lr)
 
 
-		self.critic = QNetwork(state_dim*num_agents, action_dim*num_agents, hidden_size)
-		if init_w: self.critic.apply(utils.init_weights)
-		self.critic_target = QNetwork(state_dim*num_agents, action_dim*num_agents, hidden_size)
-		utils.hard_update(self.critic_target, self.critic)
-		self.critic_optim = Adam(self.critic.parameters(), critic_lr)
+		self.critics = [QNetwork(state_dim*num_agents, action_dim*num_agents, hidden_size) for _ in range(num_agents)]
+
+		self.critics_target = [QNetwork(state_dim*num_agents, action_dim*num_agents, hidden_size) for _ in range(num_agents)]
+		if init_w:
+			for critic, critic_target in zip(self.critics, self.critics_target):
+				critic.apply(utils.init_weights)
+				utils.hard_update(critic_target, critic)
+		self.critic_optims = [Adam(critic.parameters(), critic_lr) for critic in self.critics]
 
 
 		self.loss = nn.MSELoss()
 
 		if use_gpu:
-			self.policy_target.cuda(); self.critic_target.cuda(); self.policy.cuda(); self.critic.cuda()
+			self.policy_target.cuda(); self.policy.cuda()
+			for critic, critic_target in zip(self.critics, self.critics_target):
+				critic.cuda()
+				critic_target.cuda()
+
+
 		self.num_critic_updates = 0
 
 		#Statistics Tracker
@@ -810,7 +819,7 @@ class MADDPG(object):
 
 				#Compute Q-val and value of next state masking by done
 
-				q1, q2 = self.critic_target.forward(next_state_batch.view(batch_size, -1), next_action_batch)
+				q1, q2 = self.critic_targets[agent_id].forward(next_state_batch.view(batch_size, -1), next_action_batch)
 				q1 = (1 - done_batch) * q1
 				q2 = (1 - done_batch) * q2
 				#next_val = (1 - done_batch) * next_val
@@ -826,8 +835,8 @@ class MADDPG(object):
 
 
 
-			self.critic_optim.zero_grad()
-			current_q1, current_q2 = self.critic.forward((state_batch.view(batch_size, -1)), (action_batch.view(batch_size, -1)))
+			self.critic_optims[agent_id].zero_grad()
+			current_q1, current_q2 = self.critics[agent_id].forward((state_batch.view(batch_size, -1)), (action_batch.view(batch_size, -1)))
 			utils.compute_stats(current_q1, self.q)
 
 			dt = self.loss(current_q1, target_q)
@@ -843,7 +852,7 @@ class MADDPG(object):
 			#         dt = dt * (abs(self.args.critic_constraint_w / dt.item()))
 			dt.backward()
 
-			self.critic_optim.step()
+			self.critic_optims[agent_id].step()
 			self.num_critic_updates += 1
 
 			#Delayed Actor Update
@@ -859,7 +868,7 @@ class MADDPG(object):
 				#     actor_actions = action_batch - old_actor_actions
 
 
-				Q1, Q2 = self.critic.forward(state_batch.view(batch_size, -1), joint_action.view(batch_size, -1))
+				Q1, Q2 = self.critics[agent_id].forward(state_batch.view(batch_size, -1), joint_action.view(batch_size, -1))
 
 				# if self.args.use_advantage: policy_loss = -(Q1 - val)
 				policy_loss = -Q1
