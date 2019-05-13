@@ -732,7 +732,7 @@ class MADDPG_reference:
         return actions
 
 
-class MADDPG(object):
+class MATD3(object):
 	"""Classes implementing TD3 and DDPG off-policy learners
 
 		 Parameters:

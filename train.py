@@ -13,13 +13,16 @@ import threading, sys
 parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
-parser.add_argument('-config', type=str, help='World Setting?', default='')
-parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
+parser.add_argument('-config', type=str, help='World Setting?', default='4_2')
+parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
 
-parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
-parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
-parser.add_argument('-proxim_rew', type=str2bool, help='Local Reward subsumes global reward?', default=True)
+
+parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='')
+
+# parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
+# parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
+# parser.add_argument('-proxim_rew', type=str2bool, help='Local Reward subsumes global reward?', default=True)
 
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
@@ -41,17 +44,30 @@ RANDOM_BASELINE = False
 
 
 class ConfigSettings:
-	def __init__(self):
+	def __init__(self, popnsize):
 
 		self.env_choice = vars(parser.parse_args())['env']
 		config = vars(parser.parse_args())['config']
 		self.config = config
-
+		self.reward_scheme = vars(parser.parse_args())['reward']
 		#Global subsumes local or vice-versa?
-		self.is_gsl = vars(parser.parse_args())['gsl']
-		self.is_lsg = vars(parser.parse_args())['lsg']
+		####################### NIPS EXPERIMENTS SETUP #################
+		if popnsize > 0: #######MERL or EA
+			self.is_lsg = False
+			self.is_proxim_rew = True
+
+		else: #######TD3 or MADDPG
+			if self.reward_scheme == 'mixed':
+				self.is_lsg = True
+				self.is_proxim_rew = True
+			elif self.reward_scheme == 'global':
+				self.is_lsg = True
+				self.is_proxim_rew = False
+			else:
+				sys.exit('Incorrect Reward Scheme')
+
+		self.is_gsl = False
 		self.cmd_vel = vars(parser.parse_args())['cmd_vel']
-		self.is_proxim_rew = vars(parser.parse_args())['proxim_rew']
 
 		# ROVER DOMAIN
 		if self.env_choice == 'rover_loose' or self.env_choice == 'rover_tight' or self.env_choice == 'rover_trap':  # Rover Domain
@@ -63,9 +79,9 @@ class ConfigSettings:
 				self.obs_radius = self.dim_x * 10
 				self.act_dist = 2
 				self.angle_res = 10
-				self.num_poi = 6
+				self.num_poi = 2
 				self.num_agents = 2
-				self.ep_len = 50
+				self.ep_len = 30
 				self.poi_rand = 1
 				self.coupling = 2
 				self.rover_speed = 1
@@ -94,6 +110,20 @@ class ConfigSettings:
 				self.coupling = 1
 
 			##########TIGHT##########
+			elif config == '4_2':
+				# Rover domain
+				self.dim_x = self.dim_y = 20;
+				self.obs_radius = self.dim_x * 10;
+				self.act_dist = 3;
+				self.rover_speed = 1;
+				self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 4
+				self.num_agents = 4
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 2
+
 			elif config == '6_3':
 				# Rover domain
 				self.dim_x = self.dim_y = 20; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
@@ -201,6 +231,7 @@ class Parameters:
 	def __init__(self):
 
 		# Transitive Algo Params
+		self.popn_size = vars(parser.parse_args())['popsize']
 		self.rollout_size = vars(parser.parse_args())['rollsize']
 		self.num_evals = vars(parser.parse_args())['evals']
 		self.frames_bound = int(vars(parser.parse_args())['frames'] * 1000000)
@@ -209,10 +240,10 @@ class Parameters:
 		self.use_gpu = vars(parser.parse_args())['use_gpu']
 		self.seed = vars(parser.parse_args())['seed']
 		self.ps = vars(parser.parse_args())['ps']
-		self.is_maddpg = vars(parser.parse_args())['maddpg']
+		self.is_matd3 = vars(parser.parse_args())['matd3']
 
 		# Env domain
-		self.config = ConfigSettings()
+		self.config = ConfigSettings(self.popn_size)
 
 		# Fairly Stable Algo params
 		self.hidden_size = 100
@@ -238,7 +269,7 @@ class Parameters:
 		self.target_update_interval = 1
 
 		# NeuroEvolution stuff
-		self.popn_size = vars(parser.parse_args())['popsize']
+
 		self.scheme = vars(parser.parse_args())['scheme']  # 'multipoint' vs 'standard'
 		self.crossover_prob = 0.1
 		self.mutation_prob = 0.9
@@ -298,15 +329,13 @@ class Parameters:
 		               'pop' + str(self.popn_size) + \
 		               '_roll' + str(self.rollout_size) + \
 		               '_env' + str(self.config.env_choice) + '_' + str(self.config.config) + \
-			           '_ps' + str(self.ps) +\
 					   '_seed' + str(self.seed) + \
+						'-reward' + str(self.config.reward_scheme) +\
 					   ('_alz' if self.actualize else '') + \
-		               ('_lsg' if self.config.is_lsg else '') + \
-		               ('_cmdvel' if self.config.cmd_vel else '') + \
 		               ('_gsl' if self.config.is_gsl else '') + \
 		               ('_multipoint' if self.scheme == 'multipoint' else '') + \
-		               ('_maddpg' if self.is_maddpg else '') + \
-		               ('_noProximRew' if not self.config.is_proxim_rew else '')
+		               ('_matd3' if self.is_matd3 else '')
+
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
 		# '_evals' + str(self.num_evals) + \
@@ -532,7 +561,7 @@ if __name__ == "__main__":
 			print('Q', pprint(ai.agents[0].algo.q))
 			print('Q_loss', pprint(ai.agents[0].algo.q_loss))
 			print('Policy', pprint(ai.agents[0].algo.policy_loss))
-			if args.algo_name == 'TD3' and not args.is_maddpg:
+			if args.algo_name == 'TD3' and not args.is_matd3:
 				print('Alz_Score', pprint(ai.agents[0].algo.alz_score))
 				print('Alz_policy', pprint(ai.agents[0].algo.alz_policy))
 
@@ -559,3 +588,5 @@ if __name__ == "__main__":
 		for p in ai.evo_task_pipes: p[0].send('TERMINATE')
 
 	except: None
+	print('Finished Running ', args.savetag)
+	sys.exit('COMPLETED')
