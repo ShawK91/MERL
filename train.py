@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
-parser.add_argument('-config', type=str, help='World Setting?', default='4_2')
+parser.add_argument('-config', type=str, help='World Setting?', default='')
 parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
 
 
@@ -33,7 +33,7 @@ parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
 parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
-parser.add_argument('-frames', type=float, help='Frames in millions?', default=50)
+parser.add_argument('-frames', type=float, help='Frames in millions?', default=2.5)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
@@ -153,6 +153,26 @@ class ConfigSettings:
 				self.ep_len = 50
 				self.poi_rand = 1
 				self.coupling = 5
+
+			elif config == '12_6':
+				# Rover domain
+				self.dim_x = self.dim_y = 20; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 4
+				self.num_agents = 12
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 6
+
+			elif config == '14_7':
+				# Rover domain
+				self.dim_x = self.dim_y = 20; self.obs_radius = self.dim_x * 10; self.act_dist = 3; self.rover_speed = 1; self.sensor_model = 'closest'
+				self.angle_res = 10
+				self.num_poi = 4
+				self.num_agents = 14
+				self.ep_len = 50
+				self.poi_rand = 1
+				self.coupling = 7
 
 
 
