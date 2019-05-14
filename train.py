@@ -16,8 +16,6 @@ parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', defa
 parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
 parser.add_argument('-config', type=str, help='World Setting?', default='')
 parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
-
-
 parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='')
 
 # parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)

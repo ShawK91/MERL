@@ -829,7 +829,7 @@ class MATD3(object):
 				elif self.algo_name == 'TD3_max': next_q = torch.max(q1, q2)
 
 				#Compute target q and target val
-				target_q = reward_batch + (self.gamma * next_q)
+				target_q = reward_batch[:,agent_id].unsqueeze(1) + (self.gamma * next_q)
 				#if self.args.use_advantage: target_val = reward_batch + (self.gamma * next_val)
 
 

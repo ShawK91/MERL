@@ -137,14 +137,14 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 															  universe_id,
 								                              type])
 
-				else:
+				else: #FOR MATD3
 					for universe_id in range(NUM_EVALS):
 						if not done[universe_id]:
 							rollout_trajectory[0].append(
 								[np.expand_dims(utils.to_numpy(joint_state)[:, universe_id, :], 0),
 								 np.expand_dims(utils.to_numpy(next_state)[:, universe_id, :], 0),
 								 np.expand_dims(joint_action[:, universe_id, :], 0), #[batch, agent_id, :]
-								 np.expand_dims(np.expand_dims(np.array([reward[:, universe_id]], dtype="float32").mean(), 0), 0),
+								 np.array([reward[:, universe_id]], dtype="float32"),
 								 np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
 								 universe_id,
 								 type])
