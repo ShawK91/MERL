@@ -102,8 +102,7 @@ class Agent:
 
 				buffer.tensorify()
 
-				multiplier = self.args.config.num_agents if self.args.is_matd3 else 1 #Correct for the collective data collection in maddpg
-				for _ in range(int(self.args.gradperstep * buffer.pg_frames * multiplier)):
+				for _ in range(int(self.args.gradperstep * buffer.pg_frames)):
 					s, ns, a, r, done, global_reward = buffer.sample(self.args.batch_size,
 					                                                      pr_rew=self.args.priority_rate,
 					                                                      pr_global=self.args.priority_rate)

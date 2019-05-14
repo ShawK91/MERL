@@ -167,7 +167,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 								entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
 								data_bucket[0].append(entry)
 
-					else: #Heterogeneous
+					else: #Heterogeneous or Trunk
 						for agent_id, buffer in enumerate(data_bucket):
 							for entry in rollout_trajectory[agent_id]:
 								temp_global_reward = fitness[entry[5]]
