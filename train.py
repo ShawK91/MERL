@@ -16,11 +16,9 @@ parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', defa
 parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
 parser.add_argument('-config', type=str, help='World Setting?', default='')
 parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
+parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
 parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='')
-
-# parser.add_argument('-gsl', type=str2bool, help='Global Reward subsumes local reward?', default=False)
-# parser.add_argument('-lsg', type=str2bool, help='Local Reward subsumes global reward?', default=False)
-# parser.add_argument('-proxim_rew', type=str2bool, help='Local Reward subsumes global reward?', default=True)
+parser.add_argument('-frames', type=float, help='Frames in millions?', default=2)
 
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
@@ -31,7 +29,6 @@ parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
 parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
-parser.add_argument('-frames', type=float, help='Frames in millions?', default=2.5)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
@@ -259,6 +256,8 @@ class Parameters:
 		self.seed = vars(parser.parse_args())['seed']
 		self.ps = vars(parser.parse_args())['ps']
 		self.is_matd3 = vars(parser.parse_args())['matd3']
+		self.is_maddpg = vars(parser.parse_args())['maddpg']
+		assert  self.is_maddpg * self.is_matd3 == 0 #Cannot be both True
 
 		# Env domain
 		self.config = ConfigSettings(self.popn_size)
@@ -271,7 +270,7 @@ class Parameters:
 		self.tau = 1e-5
 		self.init_w = True
 		self.gradperstep = vars(parser.parse_args())['gradperstep']
-		self.gamma = 0.5
+		self.gamma = 0.5 if self.popn_size > 0 else 0.97
 		self.batch_size = 512
 		self.buffer_size = 100000
 		self.filter_c = vars(parser.parse_args())['filter_c']
@@ -352,7 +351,8 @@ class Parameters:
 					   ('_alz' if self.actualize else '') + \
 		               ('_gsl' if self.config.is_gsl else '') + \
 		               ('_multipoint' if self.scheme == 'multipoint' else '') + \
-		               ('_matd3' if self.is_matd3 else '')
+		               ('_matd3' if self.is_matd3 else '') + \
+		               ('_maddpg' if self.is_maddpg else '')
 
 		# '_pr' + str(self.priority_rate)
 		# '_algo' + str(self.algo_name) + \
@@ -579,7 +579,7 @@ if __name__ == "__main__":
 			print('Q', pprint(ai.agents[0].algo.q))
 			print('Q_loss', pprint(ai.agents[0].algo.q_loss))
 			print('Policy', pprint(ai.agents[0].algo.policy_loss))
-			if args.algo_name == 'TD3' and not args.is_matd3:
+			if args.algo_name == 'TD3' and not args.is_matd3 and not args.is_maddpg:
 				print('Alz_Score', pprint(ai.agents[0].algo.alz_score))
 				print('Alz_policy', pprint(ai.agents[0].algo.alz_policy))
 

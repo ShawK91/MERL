@@ -125,7 +125,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 			#Push experiences to memory
 			if store_transitions:
-				if not args.is_matd3: #Default
+				if not args.is_matd3 and not args.is_maddpg: #Default
 					for agent_id in range(args.config.num_agents):
 						for universe_id in range(NUM_EVALS):
 							if not done[universe_id]:

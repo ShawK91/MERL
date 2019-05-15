@@ -807,13 +807,15 @@ class MATD3(object):
 
 			#Compute next q-val, next_v and target
 			with torch.no_grad():
-				#Policy Noise
-				policy_noise = np.random.normal(0, kwargs['policy_noise'], (action_batch.size()[0], action_batch.size()[1]*action_batch.size()[2]))
-				policy_noise = torch.clamp(torch.Tensor(policy_noise), -kwargs['policy_noise_clip'], kwargs['policy_noise_clip'])
+
 
 				#Compute next action_bacth
 				next_action_batch = torch.cat([self.policy_target.clean_action(next_state_batch[:, id, :], id) for id in range(self.num_agents)], 1)
-				if self.algo_name == 'TD3': next_action_batch += policy_noise.cuda() if self.use_gpu else policy_noise
+				if self.algo_name == 'TD3':
+					# Policy Noise
+					policy_noise = np.random.normal(0, kwargs['policy_noise'], (action_batch.size()[0], action_batch.size()[1] * action_batch.size()[2]))
+					policy_noise = torch.clamp(torch.Tensor(policy_noise), -kwargs['policy_noise_clip'], kwargs['policy_noise_clip'])
+					next_action_batch += policy_noise.cuda() if self.use_gpu else policy_noise
 				next_action_batch = torch.clamp(next_action_batch, -1, 1)
 
 				#Compute Q-val and value of next state masking by done
@@ -824,9 +826,8 @@ class MATD3(object):
 				#next_val = (1 - done_batch) * next_val
 
 				#Select which q to use as next-q (depends on algo)
-				if self.algo_name == 'TD3' or self.algo_name == 'TD3_actor_min': next_q = torch.min(q1, q2)
+				if self.algo_name == 'TD3':next_q = torch.min(q1, q2)
 				elif self.algo_name == 'DDPG': next_q = q1
-				elif self.algo_name == 'TD3_max': next_q = torch.max(q1, q2)
 
 				#Compute target q and target val
 				target_q = reward_batch[:,agent_id].unsqueeze(1) + (self.gamma * next_q)
@@ -843,7 +844,7 @@ class MATD3(object):
 			#     dt = dt + self.loss(current_val, target_val)
 			#     utils.compute_stats(current_val, self.val)
 
-			if self.algo_name == 'TD3' or self.algo_name == 'TD3_max': dt = dt + self.loss(current_q2, target_q)
+			if self.algo_name == 'TD3': dt = dt + self.loss(current_q2, target_q)
 			utils.compute_stats(dt, self.q_loss)
 
 			# if self.args.critic_constraint:
@@ -855,12 +856,13 @@ class MATD3(object):
 			self.num_critic_updates += 1
 
 			#Delayed Actor Update
-			if self.num_critic_updates % kwargs['policy_ups_freq'] == 0:
+			if self.num_critic_updates % kwargs['policy_ups_freq'] == 0 or self.algo_name == 'DDPG':
 
 				agent_action = self.policy.clean_action(state_batch[:,agent_id,:], agent_id)
-				joint_action = action_batch[:]
-				joint_action[:,agent_id,:] = agent_action
+				joint_action = action_batch.clone()
+				joint_action[:,agent_id,:] = agent_action[:]
 
+				#print(np.max(torch.abs(joint_action - action_batch).detach().cpu().numpy()), np.max(torch.abs(joint_action[:,agent_id,:] - agent_action).detach().cpu().numpy()))
 				# # Trust Region constraint
 				# if self.args.trust_region_actor:
 				#     with torch.no_grad(): old_actor_actions = self.actor_target.forward(state_batch)
@@ -897,7 +899,7 @@ class MATD3(object):
 			#         self.hard_update(self.critic_target, self.critic)
 
 
-			if self.num_critic_updates % kwargs['policy_ups_freq'] == 0: utils.soft_update(self.policy_target, self.policy, self.tau)
+			if self.num_critic_updates % kwargs['policy_ups_freq'] == 0 or self.algo_name == 'DDPG': utils.soft_update(self.policy_target, self.policy, self.tau)
 			for critic, critic_target in zip(self.critics, self.critics_target):
 				utils.soft_update(critic_target, critic, self.tau)
 

@@ -45,8 +45,9 @@ class Agent:
 		#### INITIALIZE PG ALGO #####
 		if args.ps == 'trunk':
 
-			if self.args.is_matd3:
-				self.algo = MATD3(id, args.algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr,
+			if self.args.is_matd3 or args.is_maddpg:
+				algo_name = 'TD3' if self.args.is_matd3 else 'DDPG'
+				self.algo = MATD3(id, algo_name, args.state_dim, args.action_dim, args.hidden_size, args.actor_lr,
 				                args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.actualize,
 				                args.use_gpu, args.config.num_agents, args.init_w)
 
@@ -93,7 +94,7 @@ class Agent:
 		if self.args.ps == 'trunk':
 
 			for agent_id, buffer in enumerate(self.buffer):
-				if self.args.is_matd3: buffer = self.buffer[0] #Hardcoded Hack for MADDPG
+				if self.args.is_matd3 or self.args.is_maddpg: buffer = self.buffer[0] #Hardcoded Hack for MADDPG
 
 				buffer.referesh()
 				if buffer.__len__() < 10 * self.args.batch_size:
