@@ -186,15 +186,16 @@ class ConfigSettings:
 			# Motivate domain
 			self.dim_x = self.dim_y = 20
 			self.obs_radius = self.dim_x * 10
-			self.act_dist = 1.5
+			self.act_dist = 2
 			self.angle_res = 10
 			self.num_poi = 2
 			self.num_agents = 2
-			self.ep_len = 20
+			self.ep_len = 30
 			self.poi_rand = 0
 			self.coupling = 1
 			self.rover_speed = 1
 			self.sensor_model = 'closest'
+			self.harvest_period = 1
 
 		elif self.env_choice == 'pursuit':  # Rover Domain
 			#Pursuit Domain
@@ -306,8 +307,8 @@ class Parameters:
 			if self.config.cmd_vel: self.state_dim += 2
 			self.action_dim = 2
 		elif self.config.env_choice == 'motivate':  # MultiWalker Domain
-			self.state_dim = int(720 / self.config.angle_res) + 1
-			self.action_dim = 1
+			self.state_dim = int(720 / self.config.angle_res) + 3
+			self.action_dim = 2
 		elif self.config.env_choice == 'multiwalker':  # MultiWalker Domain
 			self.state_dim = 33
 			self.action_dim = 4
@@ -330,12 +331,12 @@ class Parameters:
 		else:
 			sys.exit('Unknown Environment Choice')
 
-		if self.config.env_choice == 'motivate':
-			self.hidden_size = 100
-			self.buffer_size = 100000
-			self.batch_size = 128
-			self.gamma = 0.9
-			self.num_anchors=7
+		# if self.config.env_choice == 'motivate':
+		# 	self.hidden_size = 100
+		# 	self.buffer_size = 100000
+		# 	self.batch_size = 128
+		# 	self.gamma = 0.9
+		# 	self.num_anchors=7
 
 
 		self.num_test = 10
