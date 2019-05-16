@@ -375,7 +375,7 @@ class RoverDomainVel:
 		print('------------------------------------------------------------------------')
 
 
-	def viz(self):
+	def viz(self, save=False, fname=''):
 
 		padding = 100
 
@@ -423,4 +423,7 @@ class RoverDomainVel:
 
 		fig, ax = plt.subplots()
 		im = ax.imshow(matrix, cmap='Accent', origin='upper')
-		plt.show()
+		if save:
+			plt.savefig(fname=fname, dpi=300, quality=90, format='eps')
+		else:
+			plt.show()

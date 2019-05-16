@@ -23,13 +23,12 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 	if type == 'test': NUM_EVALS = args.num_test
 	elif type == 'pg': NUM_EVALS = args.rollout_size
-	elif type == 'evo': NUM_EVALS = 10
+	elif type == 'evo': NUM_EVALS = 10 if not args.config.env_choice == 'motivate' else 1
 	else: sys.exit('Incorrect type')
 
 	if args.config.env_choice == 'multiwalker': NUM_EVALS=1
 	if args.config.env_choice == 'cassie': NUM_EVALS = 1
 	if args.config.env_choice == 'hyper': NUM_EVALS = 1
-	if args.config.env_choice == 'motivate': NUM_EVALS = 1
 	if args.config.env_choice == 'pursuit': NUM_EVALS = 10
 
 
@@ -56,6 +55,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	else: sys.exit('Incorrect env type')
 	np.random.seed(id); random.seed(id)
 
+	viz_gen = 0
 	while True:
 		teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
 		if teams_blueprint == 'TERMINATE': exit(0)  # Kill yourself
@@ -105,7 +105,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			#info --> [universe_id]
 
 
-			if args.config.env_choice == 'motivate' and type == "test": print(['%.2f'%r for r in reward], global_reward)
+			#if args.config.env_choice == 'motivate' and type == "test": print(['%.2f'%r for r in reward], global_reward)
 
 			next_state = utils.to_tensor(np.array(next_state))
 
@@ -178,10 +178,16 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 		#print(fitness)
 
-		if type == "test" and random.random() < 1.0 and (args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'motivate'or args.config.env_choice == 'rover_trap'):
+		#Vizualization for test sets
+		if type == "test" and (args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'motivate'or args.config.env_choice == 'rover_trap'):
 			env.render()
-			print('Test trajectory lens',[len(world.rover_path[0]) for world in env.universe])
+			viz_gen += 5
+			#print('Test trajectory lens',[len(world.rover_path[0]) for world in env.universe])
 			#print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
+			if random.random() < 0.1:
+				best_performant = fitness.index(max(fitness))
+				env.universe[best_performant].viz(save=True, fname=args.aux_save+str(viz_gen))
+
 
 		#Send back id, fitness, total length and shaped fitness using the result pipe
 

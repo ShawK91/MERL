@@ -11,8 +11,8 @@ from torch.distributions import Normal
 
 RANDOM_BASELINE = False
 parser = argparse.ArgumentParser()
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
-parser.add_argument('-config', type=str, help='World Setting?', default='6_3')
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
+parser.add_argument('-config', type=str, help='World Setting?', default='3_1')
 
 
 class ConfigSettings:
@@ -229,7 +229,7 @@ NUM_EVALS = 1
 env = RoverDomainPython(args, NUM_EVALS)
 
 
-path = 'nets/reward_pop20_roll50_envrover_tight_6_3_pstrunk_seed2019_cmdvel.csv'
+path = 'nets/0_actor_pop20_roll50_envrover_loose_3_1_seed2019-reward'
 buffer = torch.load(path)
 net = MultiHeadActor(args.state_dim, args.action_dim, 100, args.config.num_agents)
 net.load_state_dict(buffer)
@@ -264,7 +264,7 @@ while True: #unless done
 		break
 
 env.universe[0].render()
-env.universe[0].viz()
+env.universe[0].viz(save=True, fname='test')
 print('Global', fitness)
 
 #print(fitness)
