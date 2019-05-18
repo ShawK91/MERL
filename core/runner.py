@@ -186,7 +186,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			#print (type, id, 'Fit of rendered', ['%.2f'%f for f in fitness])
 			if random.random() < 0.1:
 				best_performant = fitness.index(max(fitness))
-				env.universe[best_performant].viz(save=True, fname=args.aux_save+str(viz_gen))
+				env.universe[best_performant].viz(save=True, fname=args.aux_save+str(viz_gen)+'_'+args.savetag)
 
 
 		#Send back id, fitness, total length and shaped fitness using the result pipe
