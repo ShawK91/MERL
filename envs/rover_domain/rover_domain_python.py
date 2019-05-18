@@ -380,7 +380,7 @@ class RoverDomainVel:
 		padding = 100
 
 		observed = 2 + self.args.num_agents
-		unobserved = observed + 1
+		unobserved = observed + 2
 
 		# Empty Canvas
 		matrix = np.zeros((padding+self.args.dim_x*10, padding+self.args.dim_y*10))
