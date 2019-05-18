@@ -563,7 +563,7 @@ class MotivateDomain:
 		for poi_id, rovers in enumerate(poi_visitors):
 				#if self.task_type == 'rover_tight' and len(rovers) >= self.args.coupling or self.task_type == 'rover_loose' and len(rovers) >= 1:
 				#Update POI status
-				if self.task_type == 'rover_tight' and len(rovers) >= self.args.coupling or self.task_type == 'rover_loose' and len(rovers) >= 1 or self.task_type == 'rover_trap' and len(rovers) >= 1:
+				if len(rovers) >= 1:
 					self.poi_status[poi_id] -= 1
 					self.poi_visitor_list[poi_id] = list(set(self.poi_visitor_list[poi_id]+rovers[:]))
 
