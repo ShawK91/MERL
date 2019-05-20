@@ -1,18 +1,16 @@
 import numpy as np
 from core import mod_utils as utils
 from envs.env_wrapper import RoverDomainPython
-import core.mod_utils as mod
 import argparse
 import sys
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.distributions import Normal
+
 
 RANDOM_BASELINE = False
 parser = argparse.ArgumentParser()
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_loose')
-parser.add_argument('-config', type=str, help='World Setting?', default='3_1')
+parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
+parser.add_argument('-config', type=str, help='World Setting?', default='6_3')
 
 
 class ConfigSettings:
@@ -172,6 +170,7 @@ class MultiHeadActor(nn.Module):
 		self.mean = nn.Linear(hidden_size, num_actions*num_heads)
 		self.noise = torch.Tensor(num_actions*num_heads)
 
+		self.apply(weights_init_policy_fn)
 
 
 
@@ -188,8 +187,8 @@ class MultiHeadActor(nn.Module):
 
 		"""
 
-		x = F.elu(self.linear1(state))
-		x = F.elu(self.linear2(x))
+		x = torch.tanh(self.linear1(state))
+		x = torch.tanh(self.linear2(x))
 		mean = torch.tanh(self.mean(x))
 
 		if head == -1:
@@ -202,11 +201,11 @@ class MultiHeadActor(nn.Module):
 
 	def noisy_action(self, state, head=-1):
 
-		x = F.elu(self.linear1(state))
-		x = F.elu(self.linear2(x))
+		x = torch.tanh(self.linear1(state))
+		x = torch.tanh(self.linear2(x))
 		mean = torch.tanh(self.mean(x))
 
-		action = mean + self.noise.normal_(0., std=0.25)
+		action = mean + self.noise.normal_(0., std=0.4)
 		if head == -1:
 			return action
 		else:
@@ -224,19 +223,35 @@ class MultiHeadActor(nn.Module):
 
 		return minimum, maximum, mean
 
+# Initialize Policy weights
+def weights_init_policy_fn(m):
+	classname = m.__class__.__name__
+	if classname.find('Linear') != -1:
+		torch.nn.init.xavier_uniform_(m.weight, gain=0.5)
+		torch.nn.init.constant_(m.bias, 0)
+
+# Initialize Value Fn weights
+def weights_init_value_fn(m):
+	classname = m.__class__.__name__
+	if classname.find('Linear') != -1:
+		torch.nn.init.xavier_uniform_(m.weight, gain=1)
+		torch.nn.init.constant_(m.bias, 0)
+
 args=Parameters()
 NUM_EVALS = 1
 env = RoverDomainPython(args, NUM_EVALS)
 
 
-path = 'nets/0_actor_pop20_roll50_envrover_loose_3_1_seed2019-reward'
+path = 'nets/0_actor_pop20_roll50_envrover_tight_6_3_seed2023-reward'
 buffer = torch.load(path)
 net = MultiHeadActor(args.state_dim, args.action_dim, 100, args.config.num_agents)
 net.load_state_dict(buffer)
+net.eval()
 
 joint_state = env.reset()
 joint_state = utils.to_tensor(np.array(joint_state))
 fitness = [0 for _ in range(NUM_EVALS)]
+local_fitness = [0 for _ in range(NUM_EVALS)]
 
 while True: #unless done
 
@@ -252,10 +267,12 @@ while True: #unless done
 
 	next_state = utils.to_tensor(np.array(next_state))
 
+
 	#Grab global reward as fitnesses
 	for i, grew in enumerate(global_reward):
 		if grew != None:
 			fitness[i] = grew
+			local_fitness[i] = sum(env.universe[i].cumulative_local)
 
 	joint_state = next_state
 
@@ -263,8 +280,13 @@ while True: #unless done
 	if sum(done)==len(done):
 		break
 
-env.universe[0].render()
-env.universe[0].viz(save=True, fname='test')
-print('Global', fitness)
+best_performant = fitness.index(max(fitness))
+#best_performant = local_fitness.index(max(local_fitness))
+
+env.universe[best_performant].render()
+env.universe[best_performant].viz()
+env.universe[best_performant].viz(save=True, fname='test.png')
+print('Global', fitness, fitness[best_performant])
+print('Local', local_fitness, local_fitness[best_performant])
 
 #print(fitness)
