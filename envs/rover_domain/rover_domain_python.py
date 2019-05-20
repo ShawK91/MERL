@@ -377,31 +377,26 @@ class RoverDomainVel:
 
 	def viz(self, save=False, fname=''):
 
-		padding = 100
+		padding = 70
 
-		observed = 2 + self.args.num_agents
-		unobserved = observed + 2
+		observed = 3 + self.args.num_agents*2
+		unobserved = observed + 3
 
 		# Empty Canvas
-		matrix = np.zeros((padding+self.args.dim_x*10, padding+self.args.dim_y*10))
+		matrix = np.zeros((padding*2+self.args.dim_x*10, padding*2+self.args.dim_y*10))
 
-
-		#Draw in POIs
-		poi_width = 5
-		for poi_pos, poi_status in zip(self.poi_pos, self.poi_status):
-			x = padding+int(poi_pos[0])*10; y = padding+int(poi_pos[1])*10
-			if poi_status: color = unobserved #Not observed
-			else: color = observed #Observed
-
-			matrix[x-poi_width:x+poi_width, y-poi_width:y+poi_width] = color
 
 		#Draw in rover
-		color = 2.0; rover_width = 1
+		color = 3.0; rover_width = 1; rover_start_width = 4
 		# Draw in rover path
 		for rover_id, path in enumerate(self.rover_path):
 			start_x, start_y = int(path[0][0]*10)+padding, int(path[0][1]*10)+padding
+
+			matrix[start_x-rover_start_width:start_x+rover_start_width, start_y-rover_start_width:start_y+rover_start_width] = color
+			#continue
 			for loc in path[1:]:
 				x = int(loc[0]*10)+padding; y = int(loc[1]*10)+padding
+				if x > len(matrix) or y > len(matrix) or x < 0 or y < 0 : continue
 
 				#Interpolate and Draw
 				for i in range(int(abs(start_x-x))):
@@ -417,13 +412,20 @@ class RoverDomainVel:
 						matrix[x  - rover_width:x + rover_width, y-i- rover_width:y-i + rover_width] = color
 				start_x, start_y = x, y
 
-			color += 1
+			color += 2
 
+		#Draw in POIs
+		poi_width = 8
+		for poi_pos, poi_status in zip(self.poi_pos, self.poi_status):
+			x = padding+int(poi_pos[0])*10; y = padding+int(poi_pos[1])*10
+			if poi_status: color = unobserved #Not observed
+			else: color = observed #Observed
 
+			matrix[x-poi_width:x+poi_width, y-poi_width:y+poi_width] = color
 
 		fig, ax = plt.subplots()
 		im = ax.imshow(matrix, cmap='Accent', origin='upper')
 		if save:
-			plt.savefig(fname=fname, dpi=300, quality=90, format='eps')
+			plt.savefig(fname=fname, dpi=300, quality=90, format='png')
 		else:
 			plt.show()
