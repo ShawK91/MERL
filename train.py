@@ -601,11 +601,12 @@ if __name__ == "__main__":
 			break
 
 	###Kill all processes
+	try: ai.pg_task_pipes[0].send('TERMINATE')
+	except: None
+	try: ai.test_task_pipes[0].send('TERMINATE')
+	except: None
 	try:
-		ai.pg_task_pipes[0].send('TERMINATE')
-		ai.test_task_pipes[0].send('TERMINATE')
 		for p in ai.evo_task_pipes: p[0].send('TERMINATE')
-
 	except: None
 	print('Finished Running ', args.savetag)
 	exit(0)
