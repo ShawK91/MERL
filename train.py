@@ -11,13 +11,13 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
-parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
-parser.add_argument('-config', type=str, help='World Setting?', default='')
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
+parser.add_argument('-env', type=str, help='Env to test on?', default='maddpg_envs')
+parser.add_argument('-config', type=str, help='World Setting?', default='simple_spread')
 parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
 parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
-parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='')
+parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='mixed')
 parser.add_argument('-frames', type=float, help='Frames in millions?', default=2)
 
 
@@ -28,7 +28,7 @@ parser.add_argument('-algo', type=str, help='SAC Vs. TD3?', default='TD3')
 parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
-parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
+parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=False)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
@@ -238,6 +238,9 @@ class ConfigSettings:
 			self.reconf_shape = 2
 			self.num_profiles = 3 #only applicable for some reconf_shapes
 
+		elif self.env_choice == 'maddpg_envs':  # Hyper Domain
+			self.num_agents = 3
+
 
 		else:
 			sys.exit('Unknown Environment Choice')
@@ -328,6 +331,9 @@ class Parameters:
 		elif self.config.env_choice == 'pursuit':  # Cassie Domain
 			self.state_dim = 213
 			self.action_dim = 2
+		elif self.config.env_choice == 'maddpg_envs':  # Cassie Domain
+			self.state_dim = 18
+			self.action_dim = 5
 		else:
 			sys.exit('Unknown Environment Choice')
 

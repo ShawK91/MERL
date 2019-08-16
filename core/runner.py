@@ -30,6 +30,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	if args.config.env_choice == 'cassie': NUM_EVALS = 1
 	if args.config.env_choice == 'hyper': NUM_EVALS = 1
 	if args.config.env_choice == 'pursuit': NUM_EVALS = 10
+	if args.config.env_choice == 'maddpg_envs': NUM_EVALS = 1
 
 
 
@@ -52,11 +53,15 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 	elif args.config.env_choice == 'hyper':
 		from envs.env_wrapper import PowerPlant
 		env = PowerPlant(args, NUM_EVALS)
+	elif args.config.env_choice == 'maddpg_envs':
+		from envs.env_wrapper import SimpleSpread
+		env = SimpleSpread(args, NUM_EVALS)
 	else: sys.exit('Incorrect env type')
 	np.random.seed(id); random.seed(id)
 
 	viz_gen = 0
 	while True:
+
 		teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
 		if teams_blueprint == 'TERMINATE': exit(0)  # Kill yourself
 
@@ -81,7 +86,6 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 		joint_state = utils.to_tensor(np.array(joint_state))
 
 		while True: #unless done
-
 			if random_baseline:
 				joint_action = [np.random.random((NUM_EVALS, args.state_dim))for _ in range(args.config.num_agents)]
 			elif type == 'pg':
@@ -153,8 +157,6 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 			joint_state = next_state
 			frame+=NUM_EVALS
 
-			if sum(done) > 0 and sum(done) != len(done):
-				k = None
 
 			#DONE FLAG IS Received
 			if sum(done)==len(done):
