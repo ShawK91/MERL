@@ -17,6 +17,7 @@ class SimpleSpread:
 		self.args = args
 		self.num_envs = num_envs
 		self.i = 0
+		self.T = 20
 
 		from envs.maddpg_envs.make_env import make_env
 
@@ -25,15 +26,8 @@ class SimpleSpread:
 			env = make_env(args.config.config)
 			self.universe.append(env)
 
-
-		#Action Space
-		self.action_low = -1.0
-		self.action_high = 1.0
-		self.action_dim = 5
-		self.state_dim = 18
-
 		self.global_reward = [0.0 for _ in range(num_envs)]
-		self.env_dones = [False for _ in range(num_envs)]
+
 
 
 	def reset(self):
@@ -46,7 +40,6 @@ class SimpleSpread:
 		"""
 		#Reset Global Reward and dones
 		self.global_reward = [0.0 for _ in range(self.num_envs)]
-		self.env_dones = [False for _ in range(self.num_envs)]
 		self.i = 0
 
 		#Get joint observation
@@ -56,8 +49,6 @@ class SimpleSpread:
 			joint_obs.append(obs)
 
 		joint_obs = np.stack(joint_obs, axis=1)
-
-
 		return joint_obs
 
 
@@ -74,37 +65,31 @@ class SimpleSpread:
 				info (None): Template from OpenAi gym (doesnt have anything)
 		"""
 
-		joint_obs = []; joint_reward = []; joint_done = []; joint_global = []
+		joint_obs = []; joint_reward = []; joint_done = []
 		self.i+=1
+
 		for universe_id, env in enumerate(self.universe):
 
 			#If this particular env instance in universe is already done:
-			if self.env_dones[universe_id]:
-				joint_obs.append(env.dummy_state()); joint_reward.append(env.dummy_reward()); joint_done.append(True); joint_global.append(None)
-
-			else:
-				next_state, reward, _, _ = env.step(action[:,universe_id,:])
-				done = self.i > 25
-				joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
-
-				self.global_reward[universe_id] += sum(reward)
-				if done:
-					joint_global.append(self.global_reward[universe_id])
-					self.env_dones[universe_id] = True
-				else: joint_global.append(None)
+			next_state, reward, _, _ = env.step(action[:,universe_id,:])
+			done = self.i > self.T
+			joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
+			self.global_reward[universe_id] += sum(reward) / ((len(reward) * self.T))
 
 
 		joint_obs = np.stack(joint_obs, axis=1)
 		joint_reward = np.stack(joint_reward, axis=1)
 
-		return joint_obs, joint_reward, joint_done, joint_global
+		return joint_obs, joint_reward, joint_done, self.global_reward if done else [None for _ in range(self.num_envs)]
 
 
 
-	def render(self):
-		pass
-		# rand_univ = np.random.randint(0, len(self.universe))
-		# self.universe[rand_univ].render()
+	def render(self, env_id=None):
+		if env_id == None:
+			rand_univ = np.random.randint(0, len(self.universe))
+		else: rand_univ = env_id
+
+		self.universe[rand_univ].render()
 
 
 class RoverDomainPython:

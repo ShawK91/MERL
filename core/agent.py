@@ -5,6 +5,8 @@ from core.buffer import Buffer
 from core.neuroevolution import SSNE
 import core.mod_utils as mod
 import random, sys
+import torch
+
 
 class Agent:
 	"""Learner object encapsulating a local learner

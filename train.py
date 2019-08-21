@@ -10,15 +10,17 @@ import random
 import threading, sys
 
 
+
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=1)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=20)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-env', type=str, help='Env to test on?', default='maddpg_envs')
 parser.add_argument('-config', type=str, help='World Setting?', default='simple_spread')
 parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
 parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
 parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='mixed')
-parser.add_argument('-frames', type=float, help='Frames in millions?', default=2)
+parser.add_argument('-frames', type=float, help='Frames in millions?', default=20)
+
 
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
@@ -28,7 +30,7 @@ parser.add_argument('-algo', type=str, help='SAC Vs. TD3?', default='TD3')
 parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
-parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=False)
+#parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=False)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
@@ -256,7 +258,7 @@ class Parameters:
 		self.frames_bound = int(vars(parser.parse_args())['frames'] * 1000000)
 		self.actualize = vars(parser.parse_args())['alz']
 		self.priority_rate = vars(parser.parse_args())['pr']
-		self.use_gpu = vars(parser.parse_args())['use_gpu']
+		self.use_gpu = torch.cuda.is_available()
 		self.seed = vars(parser.parse_args())['seed']
 		self.ps = vars(parser.parse_args())['ps']
 		self.is_matd3 = vars(parser.parse_args())['matd3']
@@ -333,7 +335,8 @@ class Parameters:
 			self.action_dim = 2
 		elif self.config.env_choice == 'maddpg_envs':  # Cassie Domain
 			self.state_dim = 18
-			self.action_dim = 5
+			self.action_dim = 2
+			self.hidden_size = 100
 		else:
 			sys.exit('Unknown Environment Choice')
 
@@ -345,7 +348,7 @@ class Parameters:
 		# 	self.num_anchors=7
 
 
-		self.num_test = 10
+		self.num_test = 20
 		self.test_gap = 5
 
 		# Save Filenames
