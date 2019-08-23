@@ -12,15 +12,14 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=20)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=5)
 parser.add_argument('-env', type=str, help='Env to test on?', default='maddpg_envs')
 parser.add_argument('-config', type=str, help='World Setting?', default='simple_spread')
-parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
+parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=1)
 parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
 parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='mixed')
 parser.add_argument('-frames', type=float, help='Frames in millions?', default=20)
-
 
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
@@ -199,50 +198,9 @@ class ConfigSettings:
 			self.sensor_model = 'closest'
 			self.harvest_period = 1
 
-		elif self.env_choice == 'pursuit':  # Rover Domain
-			#Pursuit Domain
-			if config == '2_2':
-				self.num_agents = 2
-				self.coupling = 2
-
-			elif config == '1_1':
-				self.num_agents = 1
-				self.coupling = 1
-
-			elif config == '3_3':
-				self.num_agents = 3
-				self.coupling = 3
-			elif config == '4_4':
-				self.num_agents = 4
-				self.coupling = 4
-			else:
-				sys.exit('Unknown Config')
-
-
-
-		# MultiWalker Domain
-		elif self.env_choice == 'multiwalker':  # MultiWalker Domain
-			try:
-				self.num_agents = int(config)
-			except:
-				sys.exit('Unknown Config Choice for multiwalker env. Choose #walkers')
-
-		# Cassie Domain
-		elif self.env_choice == 'cassie':  # Cassie Domain
-			self.num_agents = 1
-
-		# Hyper Domain
-		elif self.env_choice == 'hyper':  # Hyper Domain
-			self.num_agents = 1
-			self.target_sensor = 11
-			self.run_time = 300
-			self.sensor_noise = 0.1
-			self.reconf_shape = 2
-			self.num_profiles = 3 #only applicable for some reconf_shapes
 
 		elif self.env_choice == 'maddpg_envs':  # Hyper Domain
 			self.num_agents = 3
-
 
 		else:
 			sys.exit('Unknown Environment Choice')
@@ -314,38 +272,22 @@ class Parameters:
 		elif self.config.env_choice == 'motivate':  # MultiWalker Domain
 			self.state_dim = int(720 / self.config.angle_res) + 3
 			self.action_dim = 2
-		elif self.config.env_choice == 'multiwalker':  # MultiWalker Domain
-			self.state_dim = 33
-			self.action_dim = 4
-		elif self.config.env_choice == 'cassie':  # Cassie Domain
-			self.state_dim = 82 if self.config.config == 'adaptive' else 80
-			self.action_dim = 10
-			self.hidden_size = 200
-			self.gamma = 0.99
-			self.buffer_size = 1000000
-
-
-
-		elif self.config.env_choice == 'hyper':  # Cassie Domain
-			self.state_dim = 20
-			self.action_dim = 2
-
-		elif self.config.env_choice == 'pursuit':  # Cassie Domain
-			self.state_dim = 213
-			self.action_dim = 2
 		elif self.config.env_choice == 'maddpg_envs':  # Cassie Domain
 			self.state_dim = 18
 			self.action_dim = 2
 			self.hidden_size = 100
+			self.actor_lr = 0.01
+			self.critic_lr = 0.01
+			self.tau = 0.01
+			self.init_w = True
+			self.gradperstep = vars(parser.parse_args())['gradperstep']
+			self.gamma = 0.95
+			self.batch_size = 1024
+			self.buffer_size = 1000000
+			self.reward_scaling = 1.0
+
 		else:
 			sys.exit('Unknown Environment Choice')
-
-		# if self.config.env_choice == 'motivate':
-		# 	self.hidden_size = 100
-		# 	self.buffer_size = 100000
-		# 	self.batch_size = 128
-		# 	self.gamma = 0.9
-		# 	self.num_anchors=7
 
 
 		self.num_test = 20
@@ -364,11 +306,7 @@ class Parameters:
 		               ('_matd3' if self.is_matd3 else '') + \
 		               ('_maddpg' if self.is_maddpg else '')
 
-		# '_pr' + str(self.priority_rate)
-		# '_algo' + str(self.algo_name) + \
-		# '_evals' + str(self.num_evals) + \
-		# '_seed' + str(SEED)
-		#'_filter' + str(self.filter_c)
+
 
 		self.save_foldername = 'R_MERL/'
 		if not os.path.exists(self.save_foldername): os.makedirs(self.save_foldername)
