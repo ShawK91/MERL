@@ -144,7 +144,7 @@ class SimpleTag:
 		return agent_obs, adversary_obs
 
 
-	def step(self, action): #Expects a numpy action
+	def step(self, pred_action, prey_action): #Expects a numpy action
 		"""Take an action to forward the simulation
 
 			Parameters:
@@ -156,23 +156,29 @@ class SimpleTag:
 				done (bool): Simulation done?
 				info (None): Template from OpenAi gym (doesnt have anything)
 		"""
+		joint_action = np.concatenate((pred_action, prey_action), axis=0)
 
-		joint_obs = []; joint_reward = []; joint_done = []
+		pred_obs = []; pred_reward = []
+		prey_obs = []; prey_reward = []
 		self.i+=1
 
 		for universe_id, env in enumerate(self.universe):
 
 			#If this particular env instance in universe is already done:
-			next_state, reward, _, _ = env.step(action[:,universe_id,:])
+			next_state, reward, _, _ = env.step(joint_action[:,universe_id,:])
 			done = self.i > self.T
-			joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
-			self.global_reward[universe_id] += sum(reward) / ((len(reward) * self.T))
+			prey_obs.append(next_state[3:4])
+			pred_obs.append(next_state[0:3])
+			pred_reward.append(reward[0:3])
+			prey_reward.append(reward[3:4])
+			self.global_reward[universe_id] += sum(pred_reward[-1]) / ((len(pred_reward[-1]) * self.T))
 
+		pred_obs = np.stack(pred_obs, axis=1)
+		prey_obs = np.stack(prey_obs, axis=1)
+		pred_reward = np.stack(pred_reward, axis=1)
+		prey_reward = np.stack(prey_reward, axis=1)
 
-		joint_obs = np.stack(joint_obs, axis=1)
-		joint_reward = np.stack(joint_reward, axis=1)
-
-		return joint_obs, joint_reward, joint_done, self.global_reward if done else [None for _ in range(self.num_envs)]
+		return pred_obs, prey_obs, pred_reward, prey_reward, done, self.global_reward if done else [None for _ in range(self.num_envs)]
 
 
 

@@ -3,7 +3,7 @@ import numpy as np, random, sys
 
 
 #Rollout evaluate an agent in a complete game
-def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_bucket, store_transitions, random_baseline):
+def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket, prey_data_bucket, predators_bucket, prey_bucket, store_transitions, random_baseline):
     """Rollout Worker runs a simulation in the environment to generate experiences and fitness values
 
         Parameters:
@@ -23,166 +23,129 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
     if type == 'test': NUM_EVALS = args.num_test
     elif type == 'pg': NUM_EVALS = args.rollout_size
-    elif type == 'evo': NUM_EVALS = 10 if not args.config.env_choice == 'motivate' else 1
+    elif type == 'evo': NUM_EVALS = 10
     else: sys.exit('Incorrect type')
 
-    if args.config.env_choice == 'multiwalker': NUM_EVALS=1
-    if args.config.env_choice == 'cassie': NUM_EVALS = 1
-    if args.config.env_choice == 'hyper': NUM_EVALS = 1
-    if args.config.env_choice == 'pursuit': NUM_EVALS = 10
-    if args.config.env_choice == 'maddpg_envs': NUM_EVALS = 10
 
-
-
-
-    if args.config.env_choice == 'rover_tight' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'rover_trap':
-        from envs.env_wrapper import RoverDomainPython
-        env = RoverDomainPython(args, NUM_EVALS)
-    elif args.config.env_choice == 'motivate':
-        from envs.env_wrapper import MotivateDomain
-        env = MotivateDomain(args, NUM_EVALS)
-    elif args.config.env_choice == 'pursuit':
-        from envs.env_wrapper import Pursuit
-        env = Pursuit(args, NUM_EVALS)
-    elif args.config.env_choice == 'multiwalker':
-        from envs.env_wrapper import MultiWalker
-        env = MultiWalker(args, NUM_EVALS)
-    elif args.config.env_choice == 'cassie':
-        from envs.env_wrapper import Cassie
-        env = Cassie(args, NUM_EVALS)
-    elif args.config.env_choice == 'hyper':
-        from envs.env_wrapper import PowerPlant
-        env = PowerPlant(args, NUM_EVALS)
-    elif args.config.env_choice == 'maddpg_envs':
-        if args.config.config == 'simple_spread':
-            from envs.env_wrapper import SimpleSpread
-            env = SimpleSpread(args, NUM_EVALS)
-        elif args.config.config == 'simple_tag':
-            from envs.env_wrapper import SimpleTag
-            env = SimpleTag(args, NUM_EVALS)
-    else: sys.exit('Incorrect env type')
+    from envs.env_wrapper import SimpleTag
+    env = SimpleTag(args, NUM_EVALS)
     np.random.seed(id); random.seed(id)
 
-    viz_gen = 0
     while True:
 
         teams_blueprint = task_pipe.recv() #Wait until a signal is received  to start rollout
         if teams_blueprint == 'TERMINATE': exit(0)  # Kill yourself
 
         # Get the current team actors
-        if args.ps == 'full' or args.ps == 'trunk':
-            if type == 'test' or type == 'pg': team = [models_bucket[0] for _ in range(args.config.num_agents)]
-            elif type == "evo": team = [models_bucket[0][teams_blueprint[0]] for _ in range(args.config.num_agents)]
-            else: sys.exit('Incorrect type')
+        if type == 'test' or type == 'pg': team = [predators_bucket[0] for _ in range(args.config.num_agents)]
+        elif type == "evo": team = [predators_bucket[teams_blueprint[0]] for _ in range(args.config.num_agents)]
+        else: sys.exit('Incorrect type')
 
-        else: #Heterogeneous
-            if type == 'test' or type == 'pg': team = models_bucket
-            elif type == "evo": team = [models_bucket[agent_id][popn_id] for agent_id, popn_id in enumerate(teams_blueprint)]
-            else: sys.exit('Incorrect type')
+        if args.rollout_size == 0: store_transitions = False
 
-
-        if args.rollout_size == 0:
-            if args.scheme == 'standard': store_transitions = False
-            elif args.scheme == 'multipoint' and random.random() < 0.1 and store_transitions: store_transitions = True
         fitness = [None for _ in range(NUM_EVALS)]; frame=0
-        joint_state = env.reset(); rollout_trajectory = [[] for _ in range(args.config.num_agents)]
+        prey_state, predator_state = env.reset()
+        prey_rollout_trajectory = [[] for _ in range(1)]
+        predator_rollout_trajectory = [[] for _ in range(3)]
 
-        joint_state = utils.to_tensor(np.array(joint_state))
+        prey_state = utils.to_tensor(np.array(prey_state))
+        predator_state = utils.to_tensor(np.array(predator_state))
 
         while True: #unless done
-            if random_baseline:
-                joint_action = [np.random.random((NUM_EVALS, args.state_dim))for _ in range(args.config.num_agents)]
-            elif type == 'pg':
-                if  args.ps == 'trunk':
-                    joint_action = [team[i][0].noisy_action(joint_state[i,:], head=i).detach().numpy() for i in range(args.config.num_agents)]
-                else:
-                    joint_action = [team[i][0].noisy_action(joint_state[i, :]).detach().numpy() for i in range(args.config.num_agents)]
+            if type == 'pg':
+                prey_action = [prey_bucket[0].noisy_action(prey_state[i,:], head=i).detach().numpy() for i in range(1)]
+                predator_action = [team[i].noisy_action(predator_state[i,:], head=i).detach().numpy() for i in range(3)]
             else:
-                if args.ps == 'trunk':
-                    joint_action = [team[i].clean_action(joint_state[i, :], head=i).detach().numpy() for i in range(args.config.num_agents)]
-                else:
-                    joint_action = [team[i].clean_action(joint_state[i, :]).detach().numpy() for i in range(args.config.num_agents)]
+                prey_action = [prey_bucket[0].clean_action(prey_state[i, :], head=i).detach().numpy() for i in range(1)]
+                predator_action = [team[i].clean_action(predator_state[i, :], head=i).detach().numpy() for i in range(3)]
+
             #JOINT ACTION [agent_id, universe_id, action]
 
+
+            #TODO PREY ACTION RELEASE
             #Bound Action
-            joint_action = np.array(joint_action).clip(-1.0, 1.0)
-            next_state, reward, done, global_reward = env.step(joint_action)  # Simulate one step in environment
+            prey_action = np.array(prey_action).clip(-1.0, 1.0)*0
+            predator_action = np.array(predator_action).clip(-1.0, 1.0)
+
+            next_pred_state, next_prey_state, pred_reward, prey_reward, done, global_reward = env.step(predator_action, prey_action)  # Simulate one step in environment
             #State --> [agent_id, universe_id, obs]
             #reward --> [agent_id, universe_id]
             #done --> [universe_id]
             #info --> [universe_id]
 
 
-            #if args.config.env_choice == 'motivate' and type == "test": print(['%.2f'%r for r in reward], global_reward)
+            if type == "test": env.universe[0].render()
 
-            next_state = utils.to_tensor(np.array(next_state))
-            # if type == "test" and args.config.config == 'simple_spread':
-            #     env.render(0)
-            #     print(joint_action[:,0,:])
-            #     # print(joint_state[0])
+            next_pred_state = utils.to_tensor(np.array(next_pred_state))
+            next_prey_state = utils.to_tensor(np.array(next_prey_state))
+
 
             #Grab global reward as fitnesses
             for i, grew in enumerate(global_reward):
                 if grew != None:
                     fitness[i] = grew
 
-                    #Reward Shaping
-                    if (args.config.env_choice == 'motivate' or args.config.env_choice == 'rover_loose' or args.config.env_choice == 'rover_tight') and type == "evo":
-                        if args.config.is_gsl:  # Gloabl subsumes local?
-                            fitness[i] += sum(env.universe[i].cumulative_local)
 
-
-
-
-
+            #PREDATOR
             #Push experiences to memory
             if store_transitions:
                 if not args.is_matd3 and not args.is_maddpg: #Default
                     for agent_id in range(args.config.num_agents):
                         for universe_id in range(NUM_EVALS):
-                            if not done[universe_id]:
-                                rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(joint_state)[agent_id,universe_id, :], 0),
-                                                              np.expand_dims(utils.to_numpy(next_state)[agent_id, universe_id, :], 0),
-                                                              np.expand_dims(joint_action[agent_id,universe_id, :], 0),
-                                                              np.expand_dims(np.array([reward[agent_id, universe_id]], dtype="float32"), 0),
-                                                              np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
+                            if not done:
+                                predator_rollout_trajectory[agent_id].append([np.expand_dims(utils.to_numpy(predator_state)[agent_id,universe_id, :], 0),
+                                                              np.expand_dims(utils.to_numpy(next_pred_state)[agent_id, universe_id, :], 0),
+                                                              np.expand_dims(predator_action[agent_id,universe_id, :], 0),
+                                                              np.expand_dims(np.array([pred_reward[agent_id, universe_id]], dtype="float32"), 0),
+                                                              np.expand_dims(np.array([done], dtype="float32"), 0),
                                                               universe_id,
                                                               type])
 
                 else: #FOR MATD3
                     for universe_id in range(NUM_EVALS):
-                        if not done[universe_id]:
-                            rollout_trajectory[0].append(
-                                [np.expand_dims(utils.to_numpy(joint_state)[:, universe_id, :], 0),
-                                 np.expand_dims(utils.to_numpy(next_state)[:, universe_id, :], 0),
-                                 np.expand_dims(joint_action[:, universe_id, :], 0), #[batch, agent_id, :]
-                                 np.array([reward[:, universe_id]], dtype="float32"),
-                                 np.expand_dims(np.array([done[universe_id]], dtype="float32"), 0),
+                        if not done:
+                            predator_rollout_trajectory[0].append(
+                                [np.expand_dims(utils.to_numpy(predator_state)[:, universe_id, :], 0),
+                                 np.expand_dims(utils.to_numpy(next_pred_state)[:, universe_id, :], 0),
+                                 np.expand_dims(predator_action[:, universe_id, :], 0), #[batch, agent_id, :]
+                                 np.array([pred_reward[:, universe_id]], dtype="float32"),
+                                 np.expand_dims(np.array([done], dtype="float32"), 0),
                                  universe_id,
                                  type])
 
+            #PREY
+            for universe_id in range(NUM_EVALS):
+                if not done:
+                    prey_rollout_trajectory[0].append(
+                        [np.expand_dims(utils.to_numpy(prey_state)[:, universe_id, :], 0),
+                         np.expand_dims(utils.to_numpy(next_prey_state)[:, universe_id, :], 0),
+                         np.expand_dims(prey_action[:, universe_id, :], 0),  # [batch, agent_id, :]
+                         np.array([prey_reward[:, universe_id]], dtype="float32"),
+                         np.expand_dims(np.array([done], dtype="float32"), 0),
+                         universe_id,
+                         type])
 
-            joint_state = next_state
+
+            predator_state = next_pred_state
+            prey_state = next_prey_state
             frame+=NUM_EVALS
 
 
             #DONE FLAG IS Received
-            if sum(done)==len(done):
+            if done:
                 #Push experiences to main
                 if store_transitions:
-                    if args.ps == 'full': #Full setup with one replay buffer
-                        for heap in rollout_trajectory:
-                            for entry in heap:
-                                temp_global_reward = fitness[entry[5]]
-                                entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
-                                data_bucket[0].append(entry)
+                    for agent_id, buffer in enumerate(predator_data_bucket):
+                        for entry in predator_rollout_trajectory[agent_id]:
+                            temp_global_reward = fitness[entry[5]]
+                            entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
+                            buffer.append(entry)
 
-                    else: #Heterogeneous or Trunk
-                        for agent_id, buffer in enumerate(data_bucket):
-                            for entry in rollout_trajectory[agent_id]:
-                                temp_global_reward = fitness[entry[5]]
-                                entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
-                                buffer.append(entry)
+                    #PREY
+                    for entry in prey_rollout_trajectory:
+                        temp_global_reward = 0.0
+                        entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
+                        prey_data_bucket.append(entry)
 
                 break
 

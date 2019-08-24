@@ -1,4 +1,4 @@
-from core.agent import Agent, TestAgent
+from core.agent import Agent, TestAgent, PreyAgent
 from core.mod_utils import pprint, str2bool
 import numpy as np, os, time, torch
 from core import mod_utils as utils
@@ -12,11 +12,11 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=5)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-env', type=str, help='Env to test on?', default='maddpg_envs')
 parser.add_argument('-config', type=str, help='World Setting?', default='simple_tag')
-parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=1)
+parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
 parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
 parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='mixed')
 parser.add_argument('-frames', type=float, help='Frames in millions?', default=20)
@@ -273,7 +273,7 @@ class Parameters:
 			self.state_dim = int(720 / self.config.angle_res) + 3
 			self.action_dim = 2
 		elif self.config.env_choice == 'maddpg_envs':  # Cassie Domain
-			self.state_dim = 18
+			self.state_dim = 16
 			self.action_dim = 2
 			self.hidden_size = 100
 			self.actor_lr = 0.01
@@ -337,20 +337,19 @@ class MERL:
 		self.args = args
 
 		######### Initialize the Multiagent Team of agents ########
-		if self.args.ps == 'full' or self.args.ps == 'trunk':
-			self.agents = [Agent(self.args, id)]
-		elif self.args.ps == 'none':
-			self.agents = [Agent(self.args, id) for id in range(self.args.config.num_agents)]
-		else: sys.exit('Incorrect PS choice')
+		self.agents = Agent(self.args, id)
+		self.prey_agent = PreyAgent(self.args, -1)
 		self.test_agent = TestAgent(self.args, 991)
 
 		###### Buffer and Model Bucket as references to the corresponding agent's attributes ####
-		if args.ps == "trunk": self.buffer_bucket = [buffer.tuples for buffer in self.agents[0].buffer]
-		else: self.buffer_bucket = [ag.buffer.tuples for ag in self.agents]
+		self.predator_buffer_bucket = [buffer.tuples for buffer in self.agents.buffer]
+		self.prey_buffer_bucket = self.prey_agent.buffer[0].tuples
 
-		self.popn_bucket = [ag.popn for ag in self.agents]
-		self.rollout_bucket = [ag.rollout_actor for ag in self.agents]
-		self.test_bucket = self.test_agent.rollout_actor
+		self.popn_bucket = self.agents.popn
+		self.predator_rollout_bucket = self.agents.rollout_actor
+		self.prey_rollout_bucket = self.prey_agent.rollout_actor
+		self.predator_test = self.test_agent.predator
+		self.prey_test = self.test_agent.prey
 
 		######### EVOLUTIONARY WORKERS ############
 		if self.args.popn_size > 0:
@@ -358,7 +357,7 @@ class MERL:
 			self.evo_result_pipes = [Pipe() for _ in range(args.popn_size * args.num_evals)]
 			self.evo_workers = [Process(target=rollout_worker, args=(
 				self.args, i, 'evo', self.evo_task_pipes[i][1], self.evo_result_pipes[i][0],
-				self.buffer_bucket, self.popn_bucket, True, RANDOM_BASELINE)) for i in
+				self.predator_buffer_bucket, self.prey_buffer_bucket, self.popn_bucket, self.prey_rollout_bucket, True, RANDOM_BASELINE)) for i in
 			                    range(args.popn_size * args.num_evals)]
 			for worker in self.evo_workers: worker.start()
 
@@ -368,7 +367,7 @@ class MERL:
 			self.pg_result_pipes = Pipe()
 			self.pg_workers = [
 				Process(target=rollout_worker, args=(self.args, 0, 'pg', self.pg_task_pipes[1], self.pg_result_pipes[0],
-				                                     self.buffer_bucket, self.rollout_bucket,
+				                                     self.predator_buffer_bucket, self.prey_buffer_bucket, self.predator_rollout_bucket, self.prey_rollout_bucket,
 				                                     self.args.rollout_size > 0, RANDOM_BASELINE))]
 			for worker in self.pg_workers: worker.start()
 
@@ -377,7 +376,7 @@ class MERL:
 		self.test_result_pipes = Pipe()
 		self.test_workers = [Process(target=rollout_worker,
 		                             args=(self.args, 0, 'test', self.test_task_pipes[1], self.test_result_pipes[0],
-		                                   None, self.test_bucket, False, RANDOM_BASELINE))]
+		                                   None, None, self.predator_test, self.prey_test, False, RANDOM_BASELINE))]
 		for worker in self.test_workers: worker.start()
 
 		#### STATS AND TRACKING WHICH ROLLOUT IS DONE ######
@@ -392,10 +391,6 @@ class MERL:
 		for _ in range(num_evals): temp_inds += list(range(popn_size))
 
 		all_inds = [temp_inds[:] for _ in range(num_agents)]
-		# for _ in range(num_evals):
-		# 	for ag in range(num_agents):
-		# 		all_inds[ag] += list(range(popn_size))
-
 		for entry in all_inds: random.shuffle(entry)
 
 		teams = [[entry[i] for entry in all_inds] for i in range(popn_size * num_evals)]
@@ -414,14 +409,11 @@ class MERL:
 
 		# Test Rollout
 		if gen % self.args.test_gap == 0:
-			self.test_agent.make_champ_team(self.agents)  # Sync the champ policies into the TestAgent
+			self.test_agent.make_champ_team(self.agents, self.prey_agent)  # Sync the champ policies into the TestAgent
 			self.test_task_pipes[0].send("START")
 
 		# Figure out teams for Coevolution
-		if self.args.ps == 'full' or self.args.ps == 'trunk':
-			teams = [[i] for i in list(range(args.popn_size))]  # Homogeneous case is just the popn as a list of lists to maintain compatibility
-		else:
-			teams = self.make_teams(args.config.num_agents, args.popn_size, args.num_evals)  # Heterogeneous Case
+		teams = [[i] for i in list(range(args.popn_size))]  # Homogeneous case is just the popn as a list of lists to maintain compatibility
 
 		########## START EVO ROLLOUT ##########
 		if self.args.popn_size > 0:
@@ -431,20 +423,21 @@ class MERL:
 		########## START POLICY GRADIENT ROLLOUT ##########
 		if self.args.rollout_size > 0 and not RANDOM_BASELINE:
 			# Synch pg_actors to its corresponding rollout_bucket
-			for agent in self.agents: agent.update_rollout_actor()
+			self.agents.update_rollout_actor()
+			self.prey_agent.update_rollout_actor()
 
 			# Start rollouts using the rollout actors
 			self.pg_task_pipes[0].send('START')  # Index 0 for the Rollout bucket
 
 			############ POLICY GRADIENT UPDATES #########
 			# Spin up threads for each agent
-			threads = [threading.Thread(target=agent.update_parameters, args=()) for agent in self.agents]
+			self.agents.update_parameters()
 
-			# Start threads
-			for thread in threads: thread.start()
+		    # TODO PREY ACTION RELEASE
+			#PREY
+			#self.prey_agent.update_parameters()
 
-			# Join threads
-			for thread in threads: thread.join()
+
 
 		all_fits = []
 		####### JOIN EVO ROLLOUTS ########
@@ -455,8 +448,8 @@ class MERL:
 				fitness = entry[1][0];
 				frames = entry[2]
 
-				for agent_id, popn_id in enumerate(team): self.agents[agent_id].fitnesses[popn_id].append(
-					utils.list_mean(fitness))  ##Assign
+				for agent_id, popn_id in enumerate(team):
+					self.agents.fitnesses[popn_id].append(utils.list_mean(fitness))  ##Assign
 				all_fits.append(utils.list_mean(fitness))
 				self.total_frames += frames
 
@@ -476,14 +469,13 @@ class MERL:
 			self.test_trace.append(mod.list_mean(test_fits))
 
 		# Evolution Step
-		for agent in self.agents:
-			agent.evolve()
+		self.agents.evolve()
 
-		#Save models periodically
-		if gen % 20 == 0:
-			for id, test_actor in enumerate(self.test_agent.rollout_actor):
-				torch.save(test_actor.state_dict(), self.args.model_save + str(id) + '_' + self.args.actor_fname)
-			print("Models Saved")
+		# #Save models periodically
+		# if gen % 20 == 0:
+		# 	for id, test_actor in enumerate(self.test_agent.rollout_actor):
+		# 		torch.save(test_actor.state_dict(), self.args.model_save + str(id) + '_' + self.args.actor_fname)
+		# 	print("Models Saved")
 
 		return all_fits, pg_fits, test_fits
 
@@ -515,34 +507,34 @@ if __name__ == "__main__":
 		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'PS:', args.ps
 		      )
 
-		if gen % 5 == 0:
-			print()
-			print('Test_stat:', mod.list_stat(test_fits), 'SAVETAG:  ', args.savetag)
-			print('Weight Stats: min/max/average', pprint(ai.test_bucket[0].get_norm_stats()))
-			print('Buffer Lens:', [ag.buffer[0].__len__() for ag in ai.agents] if args.ps == 'trunk' else [ag.buffer.__len__() for ag in ai.agents])
-			print()
-
-		if gen % 10 == 0 and args.rollout_size > 0:
-			print()
-			print('Q', pprint(ai.agents[0].algo.q))
-			print('Q_loss', pprint(ai.agents[0].algo.q_loss))
-			print('Policy', pprint(ai.agents[0].algo.policy_loss))
-			if args.algo_name == 'TD3' and not args.is_matd3 and not args.is_maddpg:
-				print('Alz_Score', pprint(ai.agents[0].algo.alz_score))
-				print('Alz_policy', pprint(ai.agents[0].algo.alz_policy))
-
-			if args.algo_name == 'SAC':
-				print('Val', pprint(ai.agents[0].algo.val))
-				print('Val_loss', pprint(ai.agents[0].algo.value_loss))
-				print('Mean_loss', pprint(ai.agents[0].algo.mean_loss))
-				print('Std_loss', pprint(ai.agents[0].algo.std_loss))
-
-			# Buffer Stats
-			if args.ps != 'trunk':
-				print('R_mean:', [agent.buffer.rstats['mean'] for agent in ai.agents])
-				print('G_mean:', [agent.buffer.gstats['mean'] for agent in ai.agents])
-
-			print('########################################################################')
+		# if gen % 5 == 0:
+		# 	print()
+		# 	print('Test_stat:', mod.list_stat(test_fits), 'SAVETAG:  ', args.savetag)
+		# 	print('Weight Stats: min/max/average', pprint(ai.test_bucket[0].get_norm_stats()))
+		# 	print('Buffer Lens:', [ag.buffer[0].__len__() for ag in ai.agents] if args.ps == 'trunk' else [ag.buffer.__len__() for ag in ai.agents])
+		# 	print()
+		#
+		# if gen % 10 == 0 and args.rollout_size > 0:
+		# 	print()
+		# 	print('Q', pprint(ai.agents[0].algo.q))
+		# 	print('Q_loss', pprint(ai.agents[0].algo.q_loss))
+		# 	print('Policy', pprint(ai.agents[0].algo.policy_loss))
+		# 	if args.algo_name == 'TD3' and not args.is_matd3 and not args.is_maddpg:
+		# 		print('Alz_Score', pprint(ai.agents[0].algo.alz_score))
+		# 		print('Alz_policy', pprint(ai.agents[0].algo.alz_policy))
+		#
+		# 	if args.algo_name == 'SAC':
+		# 		print('Val', pprint(ai.agents[0].algo.val))
+		# 		print('Val_loss', pprint(ai.agents[0].algo.value_loss))
+		# 		print('Mean_loss', pprint(ai.agents[0].algo.mean_loss))
+		# 		print('Std_loss', pprint(ai.agents[0].algo.std_loss))
+		#
+		# 	# Buffer Stats
+		# 	if args.ps != 'trunk':
+		# 		print('R_mean:', [agent.buffer.rstats['mean'] for agent in ai.agents])
+		# 		print('G_mean:', [agent.buffer.gstats['mean'] for agent in ai.agents])
+		#
+		# 	print('########################################################################')
 
 		if ai.total_frames > args.frames_bound:
 			break

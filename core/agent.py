@@ -75,10 +75,8 @@ class Agent:
 			else: self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
 
 		#Initalize buffer
-		if args.ps == 'trunk':
-			self.buffer = [Buffer(args.buffer_size, buffer_gpu=False, filter_c=args.filter_c) for _ in range(args.config.num_agents)]
-		else:
-			self.buffer = Buffer(args.buffer_size, buffer_gpu=False, filter_c=args.filter_c)
+		self.buffer = [Buffer(args.buffer_size, buffer_gpu=False, filter_c=args.filter_c) for _ in range(args.config.num_agents)]
+
 
 		#Agent metrics
 		self.fitnesses = [[] for _ in range(args.popn_size)]
@@ -173,7 +171,87 @@ class Agent:
 			mod.hard_update(actor, self.algo.policy)
 			if self.args.use_gpu: self.algo.policy.cuda()
 
+class PreyAgent:
+	"""Learner object encapsulating a local learner
 
+		Parameters:
+		algo_name (str): Algorithm Identifier
+		state_dim (int): State size
+		action_dim (int): Action size
+		actor_lr (float): Actor learning rate
+		critic_lr (float): Critic learning rate
+		gamma (float): DIscount rate
+		tau (float): Target network sync generate
+		init_w (bool): Use kaimling normal to initialize?
+		**td3args (**kwargs): arguments for TD3 algo
+
+
+	"""
+
+	def __init__(self, args, id):
+		self.args = args
+		self.id = id
+
+
+		########Initialize population
+		self.manager = Manager()
+
+		#### INITIALIZE PG ALGO #####
+		self.algo = MultiTD3(id, args.algo_name, 14, 2, args.hidden_size, args.actor_lr,
+				                args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.actualize,
+				                args.use_gpu, 1, args.init_w)
+		self.rollout_actor = self.manager.list()
+		self.rollout_actor.append(MultiHeadActor(14, 2, args.hidden_size, 1))
+
+
+		#Initalize buffer
+		self.buffer = [Buffer(args.buffer_size, buffer_gpu=False, filter_c=args.filter_c)]
+
+
+	def update_parameters(self):
+
+		td3args = {'policy_noise': 0.2, 'policy_noise_clip': 0.5, 'policy_ups_freq': 2, 'action_low': -1.0, 'action_high': 1.0}
+
+		if self.args.ps == 'trunk':
+
+			for agent_id, buffer in enumerate(self.buffer):
+
+				buffer.referesh()
+				if buffer.__len__() < 10 * self.args.batch_size:
+					buffer.pg_frames = 0
+					return  ###BURN_IN_PERIOD
+				buffer.tensorify()
+
+				for _ in range(int(self.args.gradperstep * buffer.pg_frames)):
+					s, ns, a, r, done, global_reward = buffer.sample(self.args.batch_size,
+					                                                      pr_rew=self.args.priority_rate,
+					                                                      pr_global=self.args.priority_rate)
+					r*=self.args.reward_scaling
+					if self.args.use_gpu:
+						s = s.cuda(); ns = ns.cuda(); a = a.cuda(); r = r.cuda(); done = done.cuda(); global_reward = global_reward.cuda()
+					self.algo.update_parameters(s, ns, a, r, done, global_reward, agent_id, 1, **td3args)
+				buffer.pg_frames = 0
+
+		else:
+			self.buffer.referesh()
+			#if self.buffer.__len__() < 10 * self.args.batch_size: return  ###BURN_IN_PERIOD
+			self.buffer.tensorify()
+
+			for _ in range(int(self.args.gradperstep * self.buffer.pg_frames)):
+				s, ns, a, r, done, global_reward = self.buffer.sample(self.args.batch_size, pr_rew=self.args.priority_rate, pr_global=self.args.priority_rate)
+				r *= self.args.reward_scaling
+				if self.args.use_gpu:
+					s = s.cuda(); ns = ns.cuda(); a = a.cuda(); r = r.cuda(); done = done.cuda(); global_reward = global_reward.cuda()
+				self.algo.update_parameters(s, ns, a, r, done, global_reward, 1, **td3args)
+
+			self.buffer.pg_frames = 0 #Reset new frame counter to 0
+
+
+	def update_rollout_actor(self):
+		for actor in self.rollout_actor:
+			self.algo.policy.cpu()
+			mod.hard_update(actor, self.algo.policy)
+			if self.args.use_gpu: self.algo.policy.cuda()
 
 class TestAgent:
 	"""Learner object encapsulating a local learner
@@ -197,26 +275,23 @@ class TestAgent:
 
 		#### Rollout Actor is a template used for MP #####
 		self.manager = Manager()
-		self.rollout_actor = self.manager.list()
-		for _ in range(args.config.num_agents):
+		self.predator = self.manager.list()
+		self.prey = self.manager.list()
 
-			if args.ps == 'trunk':
-				self.rollout_actor.append(MultiHeadActor(args.state_dim, args.action_dim, args.hidden_size, args.config.num_agents))
-			else:
-				if args.algo_name == 'TD3':
-					self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='DeterministicPolicy'))
-				else:
-					self.rollout_actor.append(Actor(args.state_dim, args.action_dim, args.hidden_size, policy_type='GaussianPolicy'))
-
-			if self.args.ps == 'full' or self.args.ps == 'trunk': break #Only need one for homogeneous workloads
+		self.predator.append(MultiHeadActor(args.state_dim, args.action_dim, args.hidden_size, args.config.num_agents))
+		self.prey.append(MultiHeadActor(14, 2, args.hidden_size, 1))
 
 
-	def make_champ_team(self, agents):
-		for agent_id, agent in enumerate(agents):
-			if self.args.popn_size <= 1: #Testing without Evo
-				agent.update_rollout_actor()
-				mod.hard_update(self.rollout_actor[agent_id], agent.rollout_actor[0])
-			else:
-				mod.hard_update(self.rollout_actor[agent_id], agent.popn[agent.champ_ind])
 
+	def make_champ_team(self, predators, prey):
+		#Predator
+		if self.args.popn_size <= 1: #Testing without Evo
+			predators.update_rollout_actor()
+			mod.hard_update(self.predator[0], predators.rollout_actor[0])
+		else:
+			mod.hard_update(self.predator[0], predators.popn[predators.champ_ind])
+
+		#PREY
+		prey.update_rollout_actor()
+		mod.hard_update(self.prey[0], prey.rollout_actor[0])
 
