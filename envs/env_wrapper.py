@@ -91,6 +91,97 @@ class SimpleSpread:
 
 		self.universe[rand_univ].render()
 
+class SimpleTag:
+	"""Wrapper around the Environment to expose a cleaner interface for RL
+
+		Parameters:
+			env_name (str): Env name
+
+
+	"""
+	def __init__(self, args, num_envs=1):
+		"""
+		A base template for all environment wrappers.
+		"""
+		#Initialize world with requiste params
+		self.args = args
+		self.num_envs = num_envs
+		self.i = 0
+		self.T = 20
+
+		from envs.maddpg_envs.make_env import make_env
+
+		self.universe = [] #Universe - collection of all envs running in parallel
+		for _ in range(num_envs):
+			env = make_env(args.config.config)
+			self.universe.append(env)
+
+		self.global_reward = [0.0 for _ in range(num_envs)]
+
+
+
+	def reset(self):
+		"""Method overloads reset
+			Parameters:
+				None
+
+			Returns:
+				next_obs (list): Next state
+		"""
+		#Reset Global Reward and dones
+		self.global_reward = [0.0 for _ in range(self.num_envs)]
+		self.i = 0
+
+		#Get joint observation
+		agents_obs = []; adversary_obs = []
+		for env in self.universe:
+			obs = env.reset()
+			agents_obs.append(obs[3:4])
+			adversary_obs.append(obs[0:3])
+
+		agent_obs = np.stack(agents_obs, axis=1)
+		adversary_obs = np.stack(adversary_obs, axis=1)
+		return agent_obs, adversary_obs
+
+
+	def step(self, action): #Expects a numpy action
+		"""Take an action to forward the simulation
+
+			Parameters:
+				action (ndarray): action to take in the env
+
+			Returns:
+				next_obs (list): Next state
+				reward (float): Reward for this step
+				done (bool): Simulation done?
+				info (None): Template from OpenAi gym (doesnt have anything)
+		"""
+
+		joint_obs = []; joint_reward = []; joint_done = []
+		self.i+=1
+
+		for universe_id, env in enumerate(self.universe):
+
+			#If this particular env instance in universe is already done:
+			next_state, reward, _, _ = env.step(action[:,universe_id,:])
+			done = self.i > self.T
+			joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
+			self.global_reward[universe_id] += sum(reward) / ((len(reward) * self.T))
+
+
+		joint_obs = np.stack(joint_obs, axis=1)
+		joint_reward = np.stack(joint_reward, axis=1)
+
+		return joint_obs, joint_reward, joint_done, self.global_reward if done else [None for _ in range(self.num_envs)]
+
+
+
+	def render(self, env_id=None):
+		if env_id == None:
+			rand_univ = np.random.randint(0, len(self.universe))
+		else: rand_univ = env_id
+
+		self.universe[rand_univ].render()
 
 class RoverDomainPython:
 	"""Wrapper around the Environment to expose a cleaner interface for RL

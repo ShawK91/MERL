@@ -54,8 +54,12 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
         from envs.env_wrapper import PowerPlant
         env = PowerPlant(args, NUM_EVALS)
     elif args.config.env_choice == 'maddpg_envs':
-        from envs.env_wrapper import SimpleSpread
-        env = SimpleSpread(args, NUM_EVALS)
+        if args.config.config == 'simple_spread':
+            from envs.env_wrapper import SimpleSpread
+            env = SimpleSpread(args, NUM_EVALS)
+        elif args.config.config == 'simple_tag':
+            from envs.env_wrapper import SimpleTag
+            env = SimpleTag(args, NUM_EVALS)
     else: sys.exit('Incorrect env type')
     np.random.seed(id); random.seed(id)
 
