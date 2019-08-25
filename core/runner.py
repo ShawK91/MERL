@@ -64,7 +64,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
 
             #Bound Action
             prey_action = np.array(prey_action).clip(-1.0, 1.0)
-            predator_action = np.array(predator_action).clip(-1.0, 1.0)*0
+            predator_action = np.array(predator_action).clip(-1.0, 1.0)
 
             next_pred_state, next_prey_state, pred_reward, prey_reward, done, global_reward = env.step(predator_action, prey_action)  # Simulate one step in environment
             #State --> [agent_id, universe_id, obs]

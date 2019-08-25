@@ -12,7 +12,7 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=10)
 parser.add_argument('-env', type=str, help='Env to test on?', default='maddpg_envs')
 parser.add_argument('-config', type=str, help='World Setting?', default='simple_tag')
@@ -431,7 +431,7 @@ class MERL:
 
 			############ POLICY GRADIENT UPDATES #########
 			# Spin up threads for each agent
-			#self.agents.update_parameters()
+			self.agents.update_parameters()
 
 		    # TODO PREY ACTION RELEASE
 			#PREY
