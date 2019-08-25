@@ -57,6 +57,7 @@ class Buffer():
 		self.total_frames += 1
 
 
+
 	def referesh(self):
 		"""Housekeeping
 			Parameters:
@@ -112,6 +113,7 @@ class Buffer():
 		self.referesh() #Referesh first
 
 		if self.__len__() >1:
+
 
 			self.sT = torch.tensor(np.vstack(self.s))
 			self.nsT = torch.tensor(np.vstack(self.ns))

@@ -12,8 +12,8 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=10)
 parser.add_argument('-env', type=str, help='Env to test on?', default='maddpg_envs')
 parser.add_argument('-config', type=str, help='World Setting?', default='simple_tag')
 parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
@@ -343,7 +343,7 @@ class MERL:
 
 		###### Buffer and Model Bucket as references to the corresponding agent's attributes ####
 		self.predator_buffer_bucket = [buffer.tuples for buffer in self.agents.buffer]
-		self.prey_buffer_bucket = self.prey_agent.buffer[0].tuples
+		self.prey_buffer_bucket = [self.prey_agent.buffer[0].tuples]
 
 		self.popn_bucket = self.agents.popn
 		self.predator_rollout_bucket = self.agents.rollout_actor
@@ -397,7 +397,7 @@ class MERL:
 
 		return teams
 
-	def train(self, gen, test_tracker):
+	def train(self, gen, test_tracker, prey_tracker):
 		"""Main training loop to do rollouts and run policy gradients
 
 			Parameters:
@@ -431,11 +431,11 @@ class MERL:
 
 			############ POLICY GRADIENT UPDATES #########
 			# Spin up threads for each agent
-			self.agents.update_parameters()
+			#self.agents.update_parameters()
 
 		    # TODO PREY ACTION RELEASE
 			#PREY
-			#self.prey_agent.update_parameters()
+			self.prey_agent.update_parameters()
 
 
 
@@ -445,7 +445,7 @@ class MERL:
 			for pipe in self.evo_result_pipes:
 				entry = pipe[1].recv()
 				team = entry[0];
-				fitness = entry[1][0];
+				fitness = entry[1][0]
 				frames = entry[2]
 
 				for agent_id, popn_id in enumerate(team):
@@ -461,10 +461,12 @@ class MERL:
 			self.total_frames += entry[2]
 
 		####### JOIN TEST ROLLOUTS ########
-		test_fits = []
+		test_fits = []; prey_score = 0.0
 		if gen % self.args.test_gap == 0:
 			entry = self.test_result_pipes[1].recv()
 			test_fits = entry[1][0]
+			prey_score = mod.list_mean(entry[1][1])
+			prey_tracker.update([prey_score], self.total_frames)
 			test_tracker.update([mod.list_mean(test_fits)], self.total_frames)
 			self.test_trace.append(mod.list_mean(test_fits))
 
@@ -477,12 +479,13 @@ class MERL:
 		# 		torch.save(test_actor.state_dict(), self.args.model_save + str(id) + '_' + self.args.actor_fname)
 		# 	print("Models Saved")
 
-		return all_fits, pg_fits, test_fits
+		return all_fits, pg_fits, test_fits, prey_score
 
 
 if __name__ == "__main__":
 	args = Parameters()  # Create the Parameters class
 	test_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
+	prey_tracker = utils.Tracker(args.metric_save, ['prey_'+args.log_fname], '.csv')  # Initiate tracker
 	torch.manual_seed(args.seed);
 	np.random.seed(args.seed);
 	random.seed(args.seed)  # Seeds
@@ -498,14 +501,13 @@ if __name__ == "__main__":
 	for gen in range(1, 10000000000):  # RUN VIRTUALLY FOREVER
 
 		# ONE EPOCH OF TRAINING
-		popn_fits, pg_fits, test_fits = ai.train(gen, test_tracker)
+		popn_fits, pg_fits, test_fits, prey_score = ai.train(gen, test_tracker. prey_tracker)
 
 		# PRINT PROGRESS
 		print('Ep:/Frames', gen, '/', ai.total_frames, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:',
 		      mod.list_stat(pg_fits),
 		      'Test_trace:', [pprint(i) for i in ai.test_trace[-5:]], 'FPS:',
-		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'PS:', args.ps
-		      )
+		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'Prey Score:', prey_score)
 
 		# if gen % 5 == 0:
 		# 	print()

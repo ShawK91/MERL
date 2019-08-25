@@ -44,8 +44,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
         if args.rollout_size == 0: store_transitions = False
 
         fitness = [None for _ in range(NUM_EVALS)]; frame=0
+        prey_fitness = [None for _ in range(NUM_EVALS)]
         prey_state, predator_state = env.reset()
-        prey_rollout_trajectory = [[] for _ in range(1)]
+        prey_rollout_trajectory = []
         predator_rollout_trajectory = [[] for _ in range(3)]
 
         prey_state = utils.to_tensor(np.array(prey_state))
@@ -61,11 +62,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
 
             #JOINT ACTION [agent_id, universe_id, action]
 
-
-            #TODO PREY ACTION RELEASE
             #Bound Action
-            prey_action = np.array(prey_action).clip(-1.0, 1.0)*0
-            predator_action = np.array(predator_action).clip(-1.0, 1.0)
+            prey_action = np.array(prey_action).clip(-1.0, 1.0)
+            predator_action = np.array(predator_action).clip(-1.0, 1.0)*0
 
             next_pred_state, next_prey_state, pred_reward, prey_reward, done, global_reward = env.step(predator_action, prey_action)  # Simulate one step in environment
             #State --> [agent_id, universe_id, obs]
@@ -82,8 +81,9 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
 
             #Grab global reward as fitnesses
             for i, grew in enumerate(global_reward):
-                if grew != None:
-                    fitness[i] = grew
+                if grew[0] != None:
+                    fitness[i] = grew[0]
+                    prey_fitness[i] = grew[1]
 
 
             #PREDATOR
@@ -113,17 +113,17 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
                                  universe_id,
                                  type])
 
-            #PREY
-            for universe_id in range(NUM_EVALS):
-                if not done:
-                    prey_rollout_trajectory[0].append(
-                        [np.expand_dims(utils.to_numpy(prey_state)[:, universe_id, :], 0),
-                         np.expand_dims(utils.to_numpy(next_prey_state)[:, universe_id, :], 0),
-                         np.expand_dims(prey_action[:, universe_id, :], 0),  # [batch, agent_id, :]
-                         np.array([prey_reward[:, universe_id]], dtype="float32"),
-                         np.expand_dims(np.array([done], dtype="float32"), 0),
-                         universe_id,
-                         type])
+                #PREY
+                for universe_id in range(NUM_EVALS):
+                    if not done:
+                        prey_rollout_trajectory.append(
+                            [np.expand_dims(utils.to_numpy(prey_state)[0, universe_id, :], 0),
+                             np.expand_dims(utils.to_numpy(next_prey_state)[0, universe_id, :], 0),
+                             np.expand_dims(prey_action[0, universe_id, :], 0),  # [batch, agent_id, :]
+                             np.array([prey_reward[:, universe_id]], dtype="float32"),
+                             np.expand_dims(np.array([done], dtype="float32"), 0),
+                             universe_id,
+                             type])
 
 
             predator_state = next_pred_state
@@ -142,10 +142,11 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
                             buffer.append(entry)
 
                     #PREY
-                    for entry in prey_rollout_trajectory:
-                        temp_global_reward = 0.0
-                        entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
-                        prey_data_bucket.append(entry)
+                    for buffer in prey_data_bucket:
+                        for entry in prey_rollout_trajectory:
+                            temp_global_reward = 0.0
+                            entry[5] = np.expand_dims(np.array([temp_global_reward], dtype="float32"), 0)
+                            buffer.append(entry)
 
                 break
 
@@ -163,7 +164,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
 
 
         #Send back id, fitness, total length and shaped fitness using the result pipe
-        result_pipe.send([teams_blueprint, [fitness], frame])
+        result_pipe.send([teams_blueprint, [fitness, prey_fitness], frame])
 
 
 
