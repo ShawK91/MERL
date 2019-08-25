@@ -501,7 +501,7 @@ if __name__ == "__main__":
 	for gen in range(1, 10000000000):  # RUN VIRTUALLY FOREVER
 
 		# ONE EPOCH OF TRAINING
-		popn_fits, pg_fits, test_fits, prey_score = ai.train(gen, test_tracker. prey_tracker)
+		popn_fits, pg_fits, test_fits, prey_score = ai.train(gen, test_tracker, prey_tracker)
 
 		# PRINT PROGRESS
 		print('Ep:/Frames', gen, '/', ai.total_frames, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:',
