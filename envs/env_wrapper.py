@@ -107,7 +107,7 @@ class SimpleTag:
 		self.args = args
 		self.num_envs = num_envs
 		self.i = 0
-		self.T = 20
+		self.T = 50
 
 		from envs.maddpg_envs.make_env import make_env
 
