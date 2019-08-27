@@ -73,7 +73,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
             #info --> [universe_id]
 
 
-            if type == "test": env.universe[0].render()
+            #if type == "test": env.universe[0].render()
 
             next_pred_state = utils.to_tensor(np.array(next_pred_state))
             next_prey_state = utils.to_tensor(np.array(next_prey_state))
