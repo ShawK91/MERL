@@ -11,10 +11,10 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=10)
 parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
-parser.add_argument('-config', type=str, help='World Setting?', default='')
+parser.add_argument('-config', type=str, help='World Setting?', default='6_3')
 parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
 parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
 parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='')
@@ -544,6 +544,9 @@ class MERL:
 if __name__ == "__main__":
 	args = Parameters()  # Create the Parameters class
 	test_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
+	elites_tracker = utils.Tracker(args.metric_save, ['elites_'+args.log_fname], '.csv')  # Initiate tracker
+	selects_tracker = utils.Tracker(args.metric_save, ['selects_'+args.log_fname], '.csv')  # Initiate tracker
+	discarded_tracker = utils.Tracker(args.metric_save, ['discarded_'+args.log_fname], '.csv')  # Initiate tracker
 	torch.manual_seed(args.seed);
 	np.random.seed(args.seed);
 	random.seed(args.seed)  # Seeds
@@ -565,8 +568,14 @@ if __name__ == "__main__":
 		print('Ep:/Frames', gen, '/', ai.total_frames, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:',
 		      mod.list_stat(pg_fits),
 		      'Test_trace:', [pprint(i) for i in ai.test_trace[-5:]], 'FPS:',
-		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'PS:', args.ps
+		      pprint(ai.total_frames / (time.time() - time_start)), 'Migration', ai.agents[0].evolver.rl_res
 		      )
+
+		#Update elites tracker
+		if gen >2:
+			elites_tracker.update([ai.agents[0].evolver.rl_res['elites']], gen)
+			selects_tracker.update([ai.agents[0].evolver.rl_res['selects']], gen)
+			discarded_tracker.update([ai.agents[0].evolver.rl_res['discarded']], gen)
 
 		if gen % 5 == 0:
 			print()
