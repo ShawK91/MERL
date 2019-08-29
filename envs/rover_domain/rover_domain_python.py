@@ -296,7 +296,7 @@ class RoverDomainVel:
 
 				if self.args.is_lsg: #Local subsume Global?
 					for rover_id, dist in zip(rovers, poi_visitor_dist[poi_id]):
-						rewards[rover_id] += self.poi_value[poi_id]*10
+						rewards[rover_id] += self.poi_value[poi_id]*self.args.global_w
 
 		#Proximity Rewards
 		if self.args.is_proxim_rew:

@@ -14,11 +14,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
 parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=0)
 parser.add_argument('-env', type=str, help='Env to test on?', default='rover_tight')
-parser.add_argument('-config', type=str, help='World Setting?', default='')
+parser.add_argument('-config', type=str, help='World Setting?', default='6_3')
 parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
 parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
-parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='')
+parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='mixed')
 parser.add_argument('-frames', type=float, help='Frames in millions?', default=2)
+parser.add_argument('-global_w', type=float, help='GLobal Weight?', default=10)
 
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
@@ -28,7 +29,7 @@ parser.add_argument('-algo', type=str, help='SAC Vs. TD3?', default='TD3')
 parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
-parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
+parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=False)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
@@ -45,6 +46,7 @@ class ConfigSettings:
 		config = vars(parser.parse_args())['config']
 		self.config = config
 		self.reward_scheme = vars(parser.parse_args())['reward']
+		self.global_w = vars(parser.parse_args())['global_w']
 		#Global subsumes local or vice-versa?
 		####################### NIPS EXPERIMENTS SETUP #################
 		if popnsize > 0: #######MERL or EA
@@ -349,9 +351,8 @@ class Parameters:
 		               '_env' + str(self.config.env_choice) + '_' + str(self.config.config) + \
 					   '_seed' + str(self.seed) + \
 						'-reward' + str(self.config.reward_scheme) +\
-					   ('_alz' if self.actualize else '') + \
+					   '_globalW' + str(self.config.global_w) + \
 		               ('_gsl' if self.config.is_gsl else '') + \
-		               ('_multipoint' if self.scheme == 'multipoint' else '') + \
 		               ('_matd3' if self.is_matd3 else '') + \
 		               ('_maddpg' if self.is_maddpg else '')
 
