@@ -36,7 +36,7 @@ class SSNE:
 		self.scheme = args.scheme
 
 		#RL TRACKERS
-		self.migrating_inds = []; self.all_offs = []; self.rl_res = {"elites":0.0, 'selects': 0.0, 'discarded':0.0}
+		self.migrating_inds = []; self.all_offs = []; self.rl_res = {'selects': 0.0, 'discarded':0.0}
 
 		#Lineage scores
 		self.lineage = [[] for _ in range(self.popn_size)]
@@ -436,6 +436,7 @@ class SSNE:
 			                                       num_offsprings=len(index_rank) - len(elitist_index) - len(
 				                                       migration), tournament_size=3)
 
+
 			# Transcribe ranked indexes from now on to refer to net indexes
 			elitist_index = [net_inds[i] for i in elitist_index]
 			offsprings = [net_inds[i] for i in offsprings]
@@ -449,11 +450,11 @@ class SSNE:
 					unselects.append(i)
 			random.shuffle(unselects)
 
+
+
 			#Check for migration's performance
 			for ind in self.migrating_inds:
-				if ind in elitist_index:
-					self.rl_res['elites'] += 1
-				elif ind in offsprings:
+				if ind in offsprings or ind in elitist_index:
 					self.rl_res['selects'] += 1
 				else:
 					self.rl_res['discarded'] += 1

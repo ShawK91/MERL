@@ -28,7 +28,7 @@ parser.add_argument('-algo', type=str, help='SAC Vs. TD3?', default='TD3')
 parser.add_argument('-savetag', help='Saved tag', default='')
 parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
 parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
-parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=True)
+parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=False)
 parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
 parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
 parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
@@ -544,7 +544,7 @@ class MERL:
 if __name__ == "__main__":
 	args = Parameters()  # Create the Parameters class
 	test_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
-	elites_tracker = utils.Tracker(args.metric_save, ['elites_'+args.log_fname], '.csv')  # Initiate tracker
+	#elites_tracker = utils.Tracker(args.metric_save, ['elites_'+args.log_fname], '.csv')  # Initiate tracker
 	selects_tracker = utils.Tracker(args.metric_save, ['selects_'+args.log_fname], '.csv')  # Initiate tracker
 	discarded_tracker = utils.Tracker(args.metric_save, ['discarded_'+args.log_fname], '.csv')  # Initiate tracker
 	torch.manual_seed(args.seed);
@@ -573,7 +573,7 @@ if __name__ == "__main__":
 
 		#Update elites tracker
 		if gen >2:
-			elites_tracker.update([ai.agents[0].evolver.rl_res['elites']], gen)
+			#elites_tracker.update([ai.agents[0].evolver.rl_res['elites']], gen)
 			selects_tracker.update([ai.agents[0].evolver.rl_res['selects']], gen)
 			discarded_tracker.update([ai.agents[0].evolver.rl_res['discarded']], gen)
 
