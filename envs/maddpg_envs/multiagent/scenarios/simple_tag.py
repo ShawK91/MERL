@@ -32,11 +32,13 @@ class Scenario(BaseScenario):
             landmark.size = 0.2
             landmark.boundary = False
         # make initial conditions
+        world.num_collisions = 0
         self.reset_world(world)
         return world
 
 
     def reset_world(self, world):
+        world.num_collisions += 1
         # random properties for agents
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.35, 0.85, 0.35]) if not agent.adversary else np.array([0.85, 0.35, 0.35])
@@ -91,9 +93,9 @@ class Scenario(BaseScenario):
         rew = 0
         shape = True
         adversaries = self.adversaries(world)
-        if shape:  # reward can optionally be shaped (increased reward for increased distance from adversary)
-            for adv in adversaries:
-                rew += 0.1 * np.sqrt(np.sum(np.square(agent.state.p_pos - adv.state.p_pos)))
+        #if shape:  # reward can optionally be shaped (increased reward for increased distance from adversary)
+            #for adv in adversaries:
+                #rew += 0.1 * np.sqrt(np.sum(np.square(agent.state.p_pos - adv.state.p_pos)))
         if agent.collide:
             for a in adversaries:
                 if self.is_collision(a, agent):
@@ -121,11 +123,18 @@ class Scenario(BaseScenario):
         if shape:  # reward can optionally be shaped (decreased reward for increased distance from agents)
             for adv in adversaries:
                 rew -= 0.1 * min([np.sqrt(np.sum(np.square(a.state.p_pos - adv.state.p_pos))) for a in agents])
+
+            # rew -= 0.1 * np.sqrt(np.sum(np.square(agents[0].state.p_pos - agent.state.p_pos)))
         if agent.collide:
             for ag in agents:
                 for adv in adversaries:
                     if self.is_collision(ag, adv):
                         rew += 10
+                        world.num_collisions += 1
+
+            # if self.is_collision(agent, agents[0]):
+            #     rew += 10
+            #     world.num_collisions += 1
         return rew
 
     def observation(self, agent, world):

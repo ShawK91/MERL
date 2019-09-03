@@ -113,17 +113,17 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, predator_data_bucket,
                                  universe_id,
                                  type])
 
-                #PREY
-                for universe_id in range(NUM_EVALS):
-                    if not done:
-                        prey_rollout_trajectory.append(
-                            [np.expand_dims(utils.to_numpy(prey_state)[0, universe_id, :], 0),
-                             np.expand_dims(utils.to_numpy(next_prey_state)[0, universe_id, :], 0),
-                             np.expand_dims(prey_action[0, universe_id, :], 0),  # [batch, agent_id, :]
-                             np.array([prey_reward[:, universe_id]], dtype="float32"),
-                             np.expand_dims(np.array([done], dtype="float32"), 0),
-                             universe_id,
-                             type])
+            #PREY
+            for universe_id in range(NUM_EVALS):
+                if not done:
+                    prey_rollout_trajectory.append(
+                        [np.expand_dims(utils.to_numpy(prey_state)[0, universe_id, :], 0),
+                         np.expand_dims(utils.to_numpy(next_prey_state)[0, universe_id, :], 0),
+                         np.expand_dims(prey_action[0, universe_id, :], 0),  # [batch, agent_id, :]
+                         np.array([prey_reward[:, universe_id]], dtype="float32"),
+                         np.expand_dims(np.array([done], dtype="float32"), 0),
+                         universe_id,
+                         type])
 
 
             predator_state = next_pred_state

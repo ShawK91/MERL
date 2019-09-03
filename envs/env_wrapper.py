@@ -107,7 +107,7 @@ class SimpleTag:
 		self.args = args
 		self.num_envs = num_envs
 		self.i = 0
-		self.T = 50
+		self.T = 25
 
 		from envs.maddpg_envs.make_env import make_env
 
@@ -171,13 +171,15 @@ class SimpleTag:
 			pred_obs.append(next_state[0:3])
 			pred_reward.append(reward[0:3])
 			prey_reward.append(reward[3:4])
-			self.global_reward[universe_id][0] += sum(pred_reward[-1]) / ((len(pred_reward[-1]) * self.T))
+			self.global_reward[universe_id][0] = env.world.num_collisions
 			self.global_reward[universe_id][1] += sum(prey_reward[-1]) / (self.T)
+
 
 		pred_obs = np.stack(pred_obs, axis=1)
 		prey_obs = np.stack(prey_obs, axis=1)
 		pred_reward = np.stack(pred_reward, axis=1)
 		prey_reward = np.stack(prey_reward, axis=1)
+
 
 		return pred_obs, prey_obs, pred_reward, prey_reward, done, self.global_reward if done else [[None,None] for _ in range(self.num_envs)]
 

@@ -1,4 +1,4 @@
-from core.off_policy_algo import TD3, SAC, MultiTD3, MATD3
+from core.off_policy_algo import TD3, MultiTD3, MATD3
 from torch.multiprocessing import Manager
 from core.models import Actor, MultiHeadActor
 from core.buffer import Buffer
@@ -197,7 +197,7 @@ class PreyAgent:
         self.manager = Manager()
 
         #### INITIALIZE PG ALGO #####
-        self.algo = MultiTD3(id, args.algo_name, 14, 2, args.hidden_size, args.actor_lr,
+        self.algo = MultiTD3(id, 'DDPG', 14, 2, args.hidden_size, args.actor_lr,
                                 args.critic_lr, args.gamma, args.tau, args.savetag, args.aux_save, args.actualize,
                                 args.use_gpu, 1, args.init_w)
         self.rollout_actor = self.manager.list()
