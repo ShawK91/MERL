@@ -38,7 +38,7 @@ class Scenario(BaseScenario):
 
 
     def reset_world(self, world):
-        world.num_collisions += 1
+        world.num_collisions = 0
         # random properties for agents
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.35, 0.85, 0.35]) if not agent.adversary else np.array([0.85, 0.35, 0.35])
@@ -124,7 +124,7 @@ class Scenario(BaseScenario):
             for adv in adversaries:
                 rew -= 0.1 * min([np.sqrt(np.sum(np.square(a.state.p_pos - adv.state.p_pos))) for a in agents])
 
-            # rew -= 0.1 * np.sqrt(np.sum(np.square(agents[0].state.p_pos - agent.state.p_pos)))
+            #rew -= 0.1 * np.sqrt(np.sum(np.square(agents[0].state.p_pos - agent.state.p_pos)))
         if agent.collide:
             for ag in agents:
                 for adv in adversaries:
