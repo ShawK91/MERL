@@ -511,7 +511,7 @@ if __name__ == "__main__":
 		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'Prey Score:', prey_score)
 
 		#Update elites tracker
-		if gen >2:
+		if gen >2 and args.popn_size > 0:
 			#elites_tracker.update([ai.agents[0].evolver.rl_res['elites']], gen)
 			selects_tracker.update([ai.agents.evolver.rl_res['selects']], gen)
 
