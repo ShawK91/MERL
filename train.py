@@ -554,7 +554,7 @@ if __name__ == "__main__":
 			print('########################################################################')
 
 		#Update elites tracker
-		if gen >2:
+		if gen >2 and args.popn_size > 0:
 			#elites_tracker.update([ai.agents[0].evolver.rl_res['elites']], gen)
 			selects_tracker.update([ai.agents[0].evolver.rl_res['selects']], gen)
 
