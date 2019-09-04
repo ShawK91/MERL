@@ -486,6 +486,7 @@ if __name__ == "__main__":
 	args = Parameters()  # Create the Parameters class
 	test_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
 	prey_tracker = utils.Tracker(args.metric_save, ['prey_'+args.log_fname], '.csv')  # Initiate tracker
+	selects_tracker = utils.Tracker(args.metric_save, ['selects_' + args.log_fname], '.csv')
 	torch.manual_seed(args.seed);
 	np.random.seed(args.seed);
 	random.seed(args.seed)  # Seeds
@@ -508,6 +509,11 @@ if __name__ == "__main__":
 		      mod.list_stat(pg_fits),
 		      'Test_trace:', [pprint(i) for i in ai.test_trace[-5:]], 'FPS:',
 		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'Prey Score:', prey_score)
+
+		#Update elites tracker
+		if gen >2:
+			#elites_tracker.update([ai.agents[0].evolver.rl_res['elites']], gen)
+			selects_tracker.update([ai.agents.evolver.rl_res['selects']], gen)
 
 		# if gen % 5 == 0:
 		# 	print()
