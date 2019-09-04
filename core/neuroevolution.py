@@ -36,7 +36,7 @@ class SSNE:
 		self.scheme = args.scheme
 
 		#RL TRACKERS
-		self.rl_sync_pool = []; self.all_offs = []; self.rl_res = {"elites":0.0, 'selects': 0.0, 'discarded':0.0}; self.num_rl_syncs = 0.0001
+		self.migrating_inds = []; self.all_offs = []; self.rl_res = {'selects': 0.0, 'discarded':0.0}
 
 		#Lineage scores
 		self.lineage = [[] for _ in range(self.popn_size)]
@@ -450,6 +450,15 @@ class SSNE:
 				else:
 					unselects.append(i)
 			random.shuffle(unselects)
+
+			# Check for migration's performance
+			for ind in self.migrating_inds:
+				if ind in offsprings or ind in elitist_index:
+					self.rl_res['selects'] += 1
+				else:
+					self.rl_res['discarded'] += 1
+			self.migrating_inds = []
+
 
 			# Inheritance step (sync learners to population)
 			for policy in migration:

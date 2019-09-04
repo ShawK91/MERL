@@ -12,14 +12,14 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=0)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=5)
+parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
+parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=10)
 parser.add_argument('-env', type=str, help='Env to test on?', default='maddpg_envs')
 parser.add_argument('-config', type=str, help='World Setting?', default='simple_spread')
-parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=1)
+parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
 parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
 parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='mixed')
-parser.add_argument('-frames', type=float, help='Frames in millions?', default=20)
+parser.add_argument('-frames', type=float, help='Frames in millions?', default=10)
 
 
 parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
@@ -385,6 +385,7 @@ class MERL:
 		self.total_frames = 0;
 		self.gen_frames = 0;
 		self.test_trace = []
+		self.collisions_trace = []
 
 	def make_teams(self, num_agents, popn_size, num_evals):
 
@@ -402,7 +403,7 @@ class MERL:
 
 		return teams
 
-	def train(self, gen, test_tracker):
+	def train(self, gen, test_tracker, collisions_tracker=None):
 		"""Main training loop to do rollouts and run policy gradients
 
 			Parameters:
@@ -454,7 +455,6 @@ class MERL:
 				team = entry[0];
 				fitness = entry[1][0];
 				frames = entry[2]
-
 				for agent_id, popn_id in enumerate(team): self.agents[agent_id].fitnesses[popn_id].append(
 					utils.list_mean(fitness))  ##Assign
 				all_fits.append(utils.list_mean(fitness))
@@ -474,6 +474,10 @@ class MERL:
 			test_fits = entry[1][0]
 			test_tracker.update([mod.list_mean(test_fits)], self.total_frames)
 			self.test_trace.append(mod.list_mean(test_fits))
+			if self.args.config.env_choice == 'maddpg_envs':
+				num_collisions = entry[1][1]
+				collisions_tracker.update([mod.list_mean(num_collisions)], self.total_frames)
+				self.collisions_trace.append(mod.list_mean(num_collisions))
 
 		# Evolution Step
 		for agent in self.agents:
@@ -491,6 +495,8 @@ class MERL:
 if __name__ == "__main__":
 	args = Parameters()  # Create the Parameters class
 	test_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
+	collisions_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')
+	selects_tracker = utils.Tracker(args.metric_save, ['selects_' + args.log_fname], '.csv')
 	torch.manual_seed(args.seed);
 	np.random.seed(args.seed);
 	random.seed(args.seed)  # Seeds
@@ -506,7 +512,7 @@ if __name__ == "__main__":
 	for gen in range(1, 10000000000):  # RUN VIRTUALLY FOREVER
 
 		# ONE EPOCH OF TRAINING
-		popn_fits, pg_fits, test_fits = ai.train(gen, test_tracker)
+		popn_fits, pg_fits, test_fits = ai.train(gen, test_tracker, collisions_tracker)
 
 		# PRINT PROGRESS
 		print('Ep:/Frames', gen, '/', ai.total_frames, 'Popn stat:', mod.list_stat(popn_fits), 'PG_stat:',
@@ -515,8 +521,10 @@ if __name__ == "__main__":
 		      pprint(ai.total_frames / (time.time() - time_start)), 'Evo', args.scheme, 'PS:', args.ps
 		      )
 
+
 		if gen % 5 == 0:
 			print()
+			print('Collision_trace:', [pprint(i) for i in ai.collisions_trace[-5:]])
 			print('Test_stat:', mod.list_stat(test_fits), 'SAVETAG:  ', args.savetag)
 			print('Weight Stats: min/max/average', pprint(ai.test_bucket[0].get_norm_stats()))
 			print('Buffer Lens:', [ag.buffer[0].__len__() for ag in ai.agents] if args.ps == 'trunk' else [ag.buffer.__len__() for ag in ai.agents])
@@ -543,6 +551,12 @@ if __name__ == "__main__":
 				print('G_mean:', [agent.buffer.gstats['mean'] for agent in ai.agents])
 
 			print('########################################################################')
+
+		#Update elites tracker
+		if gen >2:
+			#elites_tracker.update([ai.agents[0].evolver.rl_res['elites']], gen)
+			selects_tracker.update([ai.agents[0].evolver.rl_res['selects']], gen)
+
 
 		if ai.total_frames > args.frames_bound:
 			break

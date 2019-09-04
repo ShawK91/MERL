@@ -17,7 +17,7 @@ class SimpleSpread:
 		self.args = args
 		self.num_envs = num_envs
 		self.i = 0
-		self.T = 20
+		self.T = 25
 
 		from envs.maddpg_envs.make_env import make_env
 
@@ -27,6 +27,7 @@ class SimpleSpread:
 			self.universe.append(env)
 
 		self.global_reward = [0.0 for _ in range(num_envs)]
+		self.num_collisions = [0.0 for _ in range(self.num_envs)]
 
 
 
@@ -40,6 +41,7 @@ class SimpleSpread:
 		"""
 		#Reset Global Reward and dones
 		self.global_reward = [0.0 for _ in range(self.num_envs)]
+		self.num_collisions = [0.0 for _ in range(self.num_envs)]
 		self.i = 0
 
 		#Get joint observation
@@ -74,7 +76,10 @@ class SimpleSpread:
 			next_state, reward, _, _ = env.step(action[:,universe_id,:])
 			done = self.i > self.T
 			joint_obs.append(next_state); joint_reward.append(reward); joint_done.append(done)
-			self.global_reward[universe_id] += sum(reward) / ((len(reward) * self.T))
+			if done:
+				self.global_reward[universe_id] = sum(reward) / (len(reward))
+				self.num_collisions[universe_id] = env.world.num_collisions
+
 
 
 		joint_obs = np.stack(joint_obs, axis=1)

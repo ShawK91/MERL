@@ -164,6 +164,14 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
             #DONE FLAG IS Received
             if sum(done)==len(done):
+                #Process #collisions
+                if args.config.env_choice == 'maddpg_envs':
+                    num_collisions = [ins.world.num_collisions for ins in env.universe]
+                else:
+                    num_collisions = None
+
+
+
                 #Push experiences to main
                 if store_transitions:
                     if args.ps == 'full': #Full setup with one replay buffer
@@ -196,7 +204,7 @@ def rollout_worker(args, id, type, task_pipe, result_pipe, data_bucket, models_b
 
 
         #Send back id, fitness, total length and shaped fitness using the result pipe
-        result_pipe.send([teams_blueprint, [fitness], frame])
+        result_pipe.send([teams_blueprint, [fitness,num_collisions], frame])
 
 
 

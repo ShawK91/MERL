@@ -24,11 +24,14 @@ class Scenario(BaseScenario):
             landmark.name = 'landmark %d' % i
             landmark.collide = False
             landmark.movable = False
+
+        world.num_collisions = 0
         # make initial conditions
         self.reset_world(world)
         return world
 
     def reset_world(self, world):
+        world.num_collisions = 0
         # random properties for agents
         for i, agent in enumerate(world.agents):
             agent.color = np.array([0.35, 0.35, 0.85])
@@ -77,8 +80,10 @@ class Scenario(BaseScenario):
             rew -= min(dists)
         if agent.collide:
             for a in world.agents:
+                if a == agent: continue
                 if self.is_collision(a, agent):
                     rew -= 1
+                    world.num_collisions+=0.5
         return rew
 
     def observation(self, agent, world):
