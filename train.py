@@ -496,7 +496,7 @@ class MERL:
 if __name__ == "__main__":
 	args = Parameters()  # Create the Parameters class
 	test_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')  # Initiate tracker
-	collisions_tracker = utils.Tracker(args.metric_save, [args.log_fname], '.csv')
+	collisions_tracker = utils.Tracker(args.metric_save, ['collision_'+args.log_fname], '.csv')
 	selects_tracker = utils.Tracker(args.metric_save, ['selects_' + args.log_fname], '.csv')
 	torch.manual_seed(args.seed);
 	np.random.seed(args.seed);
