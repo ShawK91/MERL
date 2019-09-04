@@ -201,7 +201,12 @@ class ConfigSettings:
 
 
 		elif self.env_choice == 'maddpg_envs':  # Hyper Domain
-			self.num_agents = 3
+			if self.config =='simple_spread':
+				self.num_agents = 3
+			elif self.config == 'big_spread':
+				self.num_agents = 6
+			else:
+				sys.exit('Unknown Config Choice')
 
 		else:
 			sys.exit('Unknown Environment Choice')
@@ -274,7 +279,8 @@ class Parameters:
 			self.state_dim = int(720 / self.config.angle_res) + 3
 			self.action_dim = 2
 		elif self.config.env_choice == 'maddpg_envs':  # Cassie Domain
-			self.state_dim = 18
+
+			self.state_dim = 18 if self.config.config == 'simple_spread' else 36
 			self.action_dim = 2
 			self.hidden_size = 100
 			self.actor_lr = 0.01
