@@ -12,31 +12,32 @@ import threading, sys
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-popsize', type=int, help='#Evo Population size', default=10)
-parser.add_argument('-rollsize', type=int, help='#Rollout size for agents', default=10)
-parser.add_argument('-env', type=str, help='Env to test on?', default='maddpg_envs')
-parser.add_argument('-config', type=str, help='World Setting?', default='simple_spread')
-parser.add_argument('-matd3', type=str2bool, help='Use_MATD3?', default=False)
-parser.add_argument('-maddpg', type=str2bool, help='Use_MADDPG?', default=False)
-parser.add_argument('-reward', type=str, help='Reward Structure? 1. mixed 2. global', default='mixed')
-parser.add_argument('-frames', type=float, help='Frames in millions?', default=10)
+parser.add_argument('--popsize', type=int, help='#Evo Population size', default=10)
+parser.add_argument('--rollsize', type=int, help='#Rollout size for agents', default=10)
+parser.add_argument('--env', type=str, help='Env to test on?', default='maddpg_envs')
+parser.add_argument('--config', type=str, help='World Setting?', default='simple_spread')
+parser.add_argument('--matd3', type=str2bool, help='Use_MATD3?', default=False)
+parser.add_argument('--maddpg', type=str2bool, help='Use_MADDPG?', default=False)
+parser.add_argument('--reward', type=str, help='Reward Structure? 1. mixed 2. global', default='mixed')
+parser.add_argument('--frames', type=float, help='Frames in millions?', default=10)
+parser.add_argument('--gpu_id', type=int, help='#GPU ID ',  default=-1)
 
 
-parser.add_argument('-filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
-parser.add_argument('-evals', type=int, help='#Evals to compute a fitness', default=1)
-parser.add_argument('-seed', type=int, help='#Seed', default=2019)
-parser.add_argument('-algo', type=str, help='SAC Vs. TD3?', default='TD3')
-parser.add_argument('-savetag', help='Saved tag', default='')
-parser.add_argument('-gradperstep', type=float, help='gradient steps per frame', default=1.0)
-parser.add_argument('-pr', type=float, help='Prioritization?', default=0.0)
+parser.add_argument('--filter_c', type=int, help='Prob multiplier for evo experiences absorbtion into buffer?', default=1)
+parser.add_argument('--evals', type=int, help='#Evals to compute a fitness', default=1)
+parser.add_argument('--seed', type=int, help='#Seed', default=2019)
+parser.add_argument('--algo', type=str, help='SAC Vs. TD3?', default='TD3')
+parser.add_argument('--savetag', help='Saved tag', default='')
+parser.add_argument('--gradperstep', type=float, help='gradient steps per frame', default=1.0)
+parser.add_argument('--pr', type=float, help='Prioritization?', default=0.0)
 #parser.add_argument('-use_gpu', type=str2bool, help='USE_GPU?', default=False)
-parser.add_argument('-alz', type=str2bool, help='Actualize?', default=False)
-parser.add_argument('-scheme', type=str, help='Scheme?', default='standard')
-parser.add_argument('-cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
-parser.add_argument('-ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
+parser.add_argument('--alz', type=str2bool, help='Actualize?', default=False)
+parser.add_argument('--scheme', type=str, help='Scheme?', default='standard')
+parser.add_argument('--cmd_vel', type=str2bool, help='Switch to Velocity commands?', default=True)
+parser.add_argument('--ps', type=str, help='Parameter Sharing Scheme: 1. none (heterogenous) 2. full (homogeneous) 3. trunk (shared trunk - similar to multi-headed)?', default='trunk')
 
 RANDOM_BASELINE = False
-
+if vars(parser.parse_args())['gpu_id'] != -1: os.environ["CUDA_VISIBLE_DEVICES"]=str(vars(parser.parse_args())['gpu_id'])
 
 
 class ConfigSettings:
